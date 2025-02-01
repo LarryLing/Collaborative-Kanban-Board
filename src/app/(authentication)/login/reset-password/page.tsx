@@ -1,4 +1,4 @@
-import ResetPasswordForm from "@/components/blocks/reset-password-form/reset-password-form"
+import ResetPasswordForm from "@/components/blocks/authentication/reset-password-form"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import React from "react"

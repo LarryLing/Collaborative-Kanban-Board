@@ -1,3 +1,4 @@
+import Branding from "@/components/blocks/misc/branding"
 import { BrillianceIcon } from "@/components/icons/icon"
 import { Button } from "@/components/ui/button"
 import { NavigationMenu } from "@/components/ui/navigation-menu"
@@ -9,22 +10,16 @@ export default async function AuthenticationLayout({
 	children: React.ReactNode
 }) {
 	return (
-		<section>
-			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] pl-6 pr-4 md:pr-6 flex justify-between items-center border-b-[1px] border-border">
-				<Link
-					href="/"
-					className="flex item-center font-bold text-2xl gap-3"
-				>
-					<BrillianceIcon />
-					<span className="hidden sm:inline">NextJS Template</span>
-				</Link>
-				<Link href="/">
-					<Button>Return home</Button>
-				</Link>
-			</NavigationMenu>
-			<div className="flex justify-center items-center mt-6">
-				{children}
+		<section className="relative">
+			<div className="absolute top-0 left-0 w-full h-[80px] px-4 py-5 border-b-[1px] border-transparent">
+				<div className="flex justify-between items-center size-full">
+					<Branding />
+					<Link href="/">
+						<Button>Return Home</Button>
+					</Link>
+				</div>
 			</div>
+			{children}
 		</section>
 	)
 }

@@ -7,8 +7,8 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-	title: "NextJS Template",
-	description: "A NextJS Template",
+	title: "Kanban Board",
+	description: "A bootleg Notion and Google Docs clone",
 }
 
 export default async function RootLayout({
@@ -19,7 +19,7 @@ export default async function RootLayout({
 			<body className={`${inter.className} antialiased`}>
 				<ThemeProvider
 					attribute="class"
-					defaultTheme="system"
+					defaultTheme="dark"
 					enableSystem
 					disableTransitionOnChange
 				>

@@ -1,4 +1,4 @@
-import { LoginForm } from "@/components/blocks/login-form/login-form"
+import { LoginForm } from "@/components/blocks/authentication/login-form"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 
@@ -10,5 +10,9 @@ export default async function LoginPage() {
 		redirect("/")
 	}
 
-	return <LoginForm />
+	return (
+		<div className="flex justify-start h-screen">
+			<LoginForm />
+		</div>
+	)
 }

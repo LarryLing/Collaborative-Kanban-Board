@@ -1,4 +1,4 @@
-import { SignupForm } from "@/components/blocks/signup-form/signup-form"
+import { SignupForm } from "@/components/blocks/authentication/signup-form"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import React from "react"
