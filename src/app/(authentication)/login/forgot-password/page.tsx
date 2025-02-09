@@ -2,5 +2,9 @@ import ForgotPasswordForm from "@/components/blocks/authentication/forgot-passwo
 import React from "react"
 
 export default async function ForgotPasswordPage() {
-	return <ForgotPasswordForm />
+	return (
+		<div className="flex justify-center items-center h-screen">
+			<ForgotPasswordForm />
+		</div>
+	)
 }

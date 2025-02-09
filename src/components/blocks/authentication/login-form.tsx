@@ -27,7 +27,7 @@ export function LoginForm({
 	}, [state?.toast])
 
 	return (
-		<div className="h-full w-[500px] p-20 border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
+		<div className="h-full w-[350px] lg:w-[500px] py-20 px-4 lg:px-20 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
 			<div className="w-full">
 				<h2 className="font-semibold text-3xl">Welcome Back</h2>
 				<p>Sign into your account</p>
@@ -63,6 +63,7 @@ export function LoginForm({
 						name="email"
 						type="text"
 						placeholder="m@example.com"
+						className="text-sm"
 					/>
 					{state?.errors?.email && (
 						<p className="text-sm text-destructive">
@@ -85,6 +86,7 @@ export function LoginForm({
 						name="password"
 						type="password"
 						placeholder="••••••••"
+						className="text-sm"
 					/>
 					{state?.errors?.password && (
 						<p className="text-sm text-destructive">
@@ -95,7 +97,7 @@ export function LoginForm({
 				<Button type="submit" disabled={pending} className="w-full">
 					Login
 				</Button>
-				<div className="mt-3 text-center text-sm">
+				<div className="text-center text-sm">
 					Don't have an account?{" "}
 					<Link
 						href="/signup"

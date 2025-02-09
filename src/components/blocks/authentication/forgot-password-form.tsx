@@ -23,16 +23,16 @@ export default function ForgotPasswordForm() {
 	)
 
 	useEffect(() => {
-		if (state?.message !== undefined) {
+		if (state?.toast) {
 			toast({
-				title: "Success",
-				description: state.message,
+				title: state.toast.title,
+				description: state.toast.title,
 			})
 		}
-	}, [state?.message])
+	}, [state?.toast])
 
 	return (
-		<Card className="w-[384px]">
+		<Card className="w-[384px] ">
 			<CardHeader>
 				<CardTitle className="text-2xl">Recover your account</CardTitle>
 				<CardDescription>
@@ -40,25 +40,33 @@ export default function ForgotPasswordForm() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<form action={action} className="text-sm flex flex-col gap-6">
+				<form action={action} className="space-y-3">
 					<div className="flex flex-col gap-2">
 						<Label htmlFor="email">Email</Label>
-						<Input id="email" name="email" type="text" />
+						<Input
+							id="email"
+							name="email"
+							type="text"
+							placeholder="m@example.com"
+							className="text-sm"
+						/>
 						{state?.errors?.email && (
 							<p className="text-sm text-destructive">
 								{state.errors.email}
 							</p>
 						)}
 					</div>
-					<div className="flex justify-between">
-						<Link href="/login" className="mr-2">
-							<Button variant="outline" disabled={pending}>
-								Return to login
-							</Button>
+					<Button type="submit" className="w-full" disabled={pending}>
+						Send Reset Email
+					</Button>
+					<div className="text-center text-sm">
+						Remember your password?{" "}
+						<Link
+							href="/login"
+							className="underline underline-offset-4"
+						>
+							Return to Login
 						</Link>
-						<Button type="submit" disabled={pending}>
-							Submit
-						</Button>
 					</div>
 				</form>
 			</CardContent>

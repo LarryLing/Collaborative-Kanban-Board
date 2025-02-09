@@ -54,7 +54,13 @@ export default function NavigationBar({ user }: HomeNavigationBarProps) {
 	return (
 		<>
 			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
-				<Branding />
+				<Link
+					href="/"
+					className="flex item-center font-bold text-2xl gap-3"
+				>
+					<BrillianceIcon />
+					<span className="hidden sm:inline">Kanban Board</span>
+				</Link>
 				<div className="flex justify-center items-center gap-4">
 					<Button
 						variant="ghost"

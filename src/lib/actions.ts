@@ -186,10 +186,21 @@ export async function sendPasswordReset(
 		validatedFields.data.email,
 	)
 
-	if (resetError) throw resetError
+	if (resetError) {
+		return {
+			toast: {
+				title: "Something went wrong...",
+				message:
+					"We couldn't send the password recovery email. Please try again",
+			},
+		}
+	}
 
 	return {
-		message: "Please check your inbox to recover your password!",
+		toast: {
+			title: "Success!",
+			message: "Please check your inbox to recover your password!",
+		},
 	}
 }
 

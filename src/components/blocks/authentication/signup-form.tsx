@@ -24,7 +24,7 @@ export function SignupForm() {
 	}, [state?.toast])
 
 	return (
-		<div className="h-full w-[500px] p-20 border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
+		<div className="h-full w-[350px] lg:w-[500px] py-20 px-4 lg:px-20 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
 			<div className="w-full">
 				<h2 className="font-semibold text-3xl">Get Started</h2>
 				<p>Create a new account</p>
@@ -60,6 +60,7 @@ export function SignupForm() {
 						name="displayName"
 						type="text"
 						placeholder="displayname"
+						className="text-sm"
 					/>
 					{state?.errors?.displayName && (
 						<p className="text-sm text-destructive">
@@ -74,6 +75,7 @@ export function SignupForm() {
 						name="email"
 						type="text"
 						placeholder="m@example.com"
+						className="text-sm"
 					/>
 					{state?.errors?.email && (
 						<p className="text-sm text-destructive">
@@ -88,6 +90,7 @@ export function SignupForm() {
 						name="password"
 						type="password"
 						placeholder="••••••••"
+						className="text-sm"
 					/>
 					{state?.errors?.password && (
 						<div className="text-sm text-destructive">
@@ -107,6 +110,7 @@ export function SignupForm() {
 						name="confirm"
 						type="confirm"
 						placeholder="••••••••"
+						className="text-sm"
 					/>
 					{state?.errors?.confirm && (
 						<p className="text-sm text-destructive">

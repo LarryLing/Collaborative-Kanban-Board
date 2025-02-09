@@ -6,7 +6,7 @@ export default function Branding() {
 	return (
 		<Link href="/" className="flex item-center font-bold text-2xl gap-3">
 			<BrillianceIcon />
-			<span>Kanban Board</span>
+			<span className="text-nowrap">Kanban Board</span>
 		</Link>
 	)
 }

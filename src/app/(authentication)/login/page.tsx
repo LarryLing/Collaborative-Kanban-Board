@@ -11,7 +11,7 @@ export default async function LoginPage() {
 	}
 
 	return (
-		<div className="flex justify-start h-screen">
+		<div className="flex justify-center lg:justify-start h-screen">
 			<LoginForm />
 		</div>
 	)
