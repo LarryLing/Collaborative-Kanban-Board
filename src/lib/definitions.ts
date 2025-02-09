@@ -19,9 +19,9 @@ export const SignupFormSchema = z
 				message: "Contain at least one special character.",
 			})
 			.trim(),
-		confirmPassword: z.string().trim(),
+		confirm: z.string().trim(),
 	})
-	.refine((data) => data.password === data.confirmPassword, {
+	.refine((data) => data.password === data.confirm, {
 		message: "Passwords don't match",
 		path: ["confirmPassword"],
 	})

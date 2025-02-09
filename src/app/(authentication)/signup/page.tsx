@@ -11,5 +11,9 @@ export default async function SignupPage() {
 		redirect("/")
 	}
 
-	return <SignupForm />
+	return (
+		<div className="flex justify-start h-screen">
+			<SignupForm />
+		</div>
+	)
 }

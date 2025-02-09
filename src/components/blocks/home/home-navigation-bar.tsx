@@ -53,10 +53,8 @@ export default function NavigationBar({ user }: HomeNavigationBarProps) {
 
 	return (
 		<>
-			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 py-5 flex justify-between items-center border-b-[1px] border-border">
-				<div className="flex justify-center items-center">
-					<Branding />
-				</div>
+			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
+				<Branding />
 				<div className="flex justify-center items-center gap-4">
 					<Button
 						variant="ghost"
