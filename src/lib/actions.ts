@@ -42,7 +42,15 @@ export async function signup(formState: FormState, formData: FormData) {
 		},
 	)
 
-	if (signupError) throw signupError
+	if (signupError) {
+		return {
+			toast: {
+				title: "Something went wrong...",
+				message:
+					"We couldn't sign you up at this time. Please try again!",
+			},
+		}
+	}
 
 	if (
 		signupData.user &&
@@ -66,7 +74,10 @@ export async function signup(formState: FormState, formData: FormData) {
 	revalidatePath("/", "layout")
 
 	return {
-		message: "Please check your inbox to confirm your signup!",
+		toast: {
+			title: "Success!",
+			message: "Please check your inbox to confirm your signup",
+		},
 	}
 }
 
@@ -95,7 +106,13 @@ export async function login(formState: FormState, formData: FormData) {
 			},
 		}
 	} else if (signinError?.status && signinError.status >= 500) {
-		throw signinError
+		return {
+			toast: {
+				title: "Something went wrong...",
+				message:
+					"We couldn't log you in at this time. Please try again",
+			},
+		}
 	}
 
 	revalidatePath("/", "layout")

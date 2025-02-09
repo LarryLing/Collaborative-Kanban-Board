@@ -3,17 +3,28 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
 import { login, loginWithDiscord, loginWithGithub } from "@/lib/actions"
 import { Separator } from "@/components/ui/separator"
 import { GoogleIcon, GithubIcon } from "@/components/icons/icon"
 import Link from "next/link"
+import { useToast } from "@/hooks/use-toast"
 
 export function LoginForm({
 	className,
 	...props
 }: React.ComponentPropsWithoutRef<"div">) {
+	const { toast } = useToast()
 	const [state, action, pending] = useActionState(login, undefined)
+
+	useEffect(() => {
+		if (state?.toast) {
+			toast({
+				title: state.toast.title,
+				description: state.toast.message,
+			})
+		}
+	}, [state?.toast])
 
 	return (
 		<div className="h-full w-[500px] p-20 border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
@@ -60,7 +71,15 @@ export function LoginForm({
 					)}
 				</div>
 				<div className="grid gap-2">
-					<Label htmlFor="password">Password</Label>
+					<div className="flex items-center">
+						<Label htmlFor="password">Password</Label>
+						<Link
+							href="/login/forgot-password"
+							className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+						>
+							Forgot your password?
+						</Link>
+					</div>
 					<Input
 						id="password"
 						name="password"

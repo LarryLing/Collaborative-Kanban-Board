@@ -15,13 +15,13 @@ export function SignupForm() {
 	const [state, action, pending] = useActionState(signup, undefined)
 
 	useEffect(() => {
-		if (state?.message !== undefined) {
+		if (state?.toast) {
 			toast({
-				title: "Success",
-				description: state.message,
+				title: state.toast.title,
+				description: state.toast.message,
 			})
 		}
-	}, [state?.message])
+	}, [state?.toast])
 
 	return (
 		<div className="h-full w-[500px] p-20 border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
@@ -90,9 +90,14 @@ export function SignupForm() {
 						placeholder="••••••••"
 					/>
 					{state?.errors?.password && (
-						<p className="text-sm text-destructive">
-							{state.errors.password}
-						</p>
+						<div className="text-sm text-destructive">
+							<p>Password must:</p>
+							<ul>
+								{state.errors.password.map((error) => (
+									<li key={error}>- {error}</li>
+								))}
+							</ul>
+						</div>
 					)}
 				</div>
 				<div className="grid gap-2">
