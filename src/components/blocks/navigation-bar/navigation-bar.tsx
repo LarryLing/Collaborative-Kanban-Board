@@ -12,7 +12,7 @@ import {
 import { Button } from "../../ui/button"
 import { LogIn, MenuIcon, PlusIcon, Settings, XIcon } from "lucide-react"
 import { Separator } from "../../ui/separator"
-import AvatarPopover from "./avatar-popover"
+import AvatarPopover from "../dashboard/avatar-popover"
 import ThemeDropdown from "./theme-dropdown"
 import UserWidget from "./user-widget"
 import SettingsDialog from "../settings-dialog/settings-dialog"

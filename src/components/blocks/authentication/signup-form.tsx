@@ -108,7 +108,7 @@ export function SignupForm() {
 					<Input
 						id="confirm"
 						name="confirm"
-						type="confirm"
+						type="password"
 						placeholder="••••••••"
 						className="text-sm"
 					/>
