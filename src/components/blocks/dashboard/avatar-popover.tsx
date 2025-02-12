@@ -8,8 +8,7 @@ import {
 } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { LogOut, Settings, Settings2 } from "lucide-react"
-import ThemeDropdown from "../navigation-bar/theme-dropdown"
+import { LogOut, Settings2 } from "lucide-react"
 import { UserProfile } from "@/lib/types"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signout } from "@/lib/actions"
@@ -73,7 +72,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 						Settings
 					</Button>
 					<Separator orientation="vertical" />
-					<Button variant="ghost">
+					<Button variant="ghost" onClick={signout}>
 						<LogOut />
 						Sign Out
 					</Button>

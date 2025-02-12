@@ -116,7 +116,7 @@ export async function login(formState: FormState, formData: FormData) {
 	}
 
 	revalidatePath("/", "layout")
-	redirect("/")
+	redirect("/dashboard")
 }
 
 export async function loginWithDiscord() {
