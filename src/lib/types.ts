@@ -6,3 +6,9 @@ export type UserProfile = {
 	bio: string
 	avatar: string | undefined
 }
+
+export type BoardType = {
+	id: string
+	owner: string
+	title: string
+}
