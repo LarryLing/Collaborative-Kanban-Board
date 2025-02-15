@@ -24,7 +24,6 @@ export function getLastOpened(datetime: string) {
 	const date = new Date(datetime)
 	const today = new Date()
 
-	console.log(date)
 	if (date.toDateString() === today.toDateString()) {
 		const shortTime = new Intl.DateTimeFormat("en-US", {
 			timeStyle: "short",

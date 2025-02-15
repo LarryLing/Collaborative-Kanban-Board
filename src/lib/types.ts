@@ -10,6 +10,7 @@ export type UserProfile = {
 export type BoardType = {
 	id: string
 	owner: string
+	cover?: string
 	title: string
 	last_opened: string
 }

@@ -15,9 +15,7 @@ export default async function DashboardLayout({
 	return (
 		<section>
 			<DashboardNavigationBar user={userData.user} />
-			<div className="w-full py-4 px-8 flex flex-col justify-center items-center">
-				{children}
-			</div>
+			<div className="flex justify-center items-center">{children}</div>
 		</section>
 	)
 }

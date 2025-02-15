@@ -15,7 +15,6 @@ import {
 	DropdownMenuContent,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { BoardType } from "@/lib/types"
 import { getLastOpened } from "@/lib/utils"
 import {
@@ -26,14 +25,31 @@ import {
 	Trash2,
 	Users,
 } from "lucide-react"
+import Image from "next/image"
+import Link from "next/link"
 import React from "react"
 
-export default function Board({ id, owner, title, last_opened }: BoardType) {
+export default function Board({
+	id,
+	owner,
+	cover,
+	title,
+	last_opened,
+}: BoardType) {
 	return (
-		<div className="w-full h-[280px] border border-border rounded-md overflow-hidden">
-			<div className="w-full h-[184px] bg-border"></div>
-			<div className="w-full h-[96px] p-4 flex flex-col justify-start items-between">
-				<h2 className="font-semibold text-lg">{title}</h2>
+		<Link
+			href={`/boards/${id}`}
+			className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden"
+		>
+			<div className="h-[188px] bg-border relative">
+				{cover ? (
+					<Image src={cover} alt="" objectFit="cover" layout="fill" />
+				) : (
+					<></>
+				)}
+			</div>
+			<div className="h-[92px] p-4 flex flex-col justify-start items-between">
+				<h2 className="font-semibold text-md">{title}</h2>
 				<div className="flex justify-between items-center">
 					<div className="flex justify-center items-center gap-1">
 						<Users className="size-5 inline-block" />
@@ -44,7 +60,7 @@ export default function Board({ id, owner, title, last_opened }: BoardType) {
 					<OptionsDropdown id={id} title={title} />
 				</div>
 			</div>
-		</div>
+		</Link>
 	)
 }
 
@@ -67,10 +83,16 @@ function OptionsDropdown({ id, title }: OptionsDropdownProps) {
 					<Trash2 className="size-4" />
 					<span>Delete</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<SquareArrowOutUpRight className="size-4" />
-					<span>Open in new tab</span>
-				</DropdownMenuItem>
+				<Link
+					href={`/boards/${id}`}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					<DropdownMenuItem>
+						<SquareArrowOutUpRight className="size-4" />
+						<span>Open in new tab</span>
+					</DropdownMenuItem>
+				</Link>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)

@@ -38,7 +38,7 @@ export default function BoardsDisplayHeader() {
 				<Button>
 					<Plus className="size-4" /> New Board
 				</Button>
-				<div className="sm:flex hidden gap-2">
+				<div className="md:flex hidden gap-2">
 					<OwnershipDropdown
 						ownership={ownership}
 						setOwnership={setOwnership}
@@ -53,7 +53,7 @@ export default function BoardsDisplayHeader() {
 						setSortMethod={setSortMethod}
 					/>
 				</div>
-				<div className="block sm:hidden">
+				<div className="block md:hidden">
 					<OptionsDropdown
 						ownership={ownership}
 						setOwnership={setOwnership}
