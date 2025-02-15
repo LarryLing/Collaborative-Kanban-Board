@@ -159,7 +159,7 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 					<ArrowDownAZ className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<DropdownMenuContent align="end">
 				<DropdownMenuRadioGroup
 					value={sortMethod}
 					onValueChange={setSortMethod}
