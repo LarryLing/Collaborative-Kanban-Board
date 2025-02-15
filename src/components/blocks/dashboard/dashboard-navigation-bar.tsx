@@ -51,7 +51,7 @@ export default function DashboardNavigationBar({
 
 	return (
 		<>
-			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
+			<NavigationMenu className="sticky text-nowrap max-w-none w-full basis-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
 				<Link
 					href="/"
 					className="flex item-center font-bold text-2xl gap-3"

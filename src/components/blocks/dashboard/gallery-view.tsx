@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -29,7 +31,7 @@ import Image from "next/image"
 import Link from "next/link"
 import React from "react"
 
-export default function Board({
+export default function GalleryItem({
 	id,
 	owner,
 	cover,
@@ -137,7 +139,7 @@ function RenameDialog({ id, title }: RenameDialogProps) {
 	)
 }
 
-export function NewBoard() {
+export function NewBoardGalleryItem() {
 	return (
 		<Button
 			variant="outline"

@@ -1,6 +1,6 @@
-import DashboardNavigationBar from "@/components/blocks/dashboard/dashboard-navigation-bar"
 import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
+import DashboardNavigationBar from "@/components/blocks/dashboard/dashboard-navigation-bar"
 
 export default async function DashboardLayout({
 	children,
@@ -13,9 +13,9 @@ export default async function DashboardLayout({
 	if (!userData.user) redirect("/login")
 
 	return (
-		<section>
+		<section className="flex flex-col justify-center items-center">
 			<DashboardNavigationBar user={userData.user} />
-			<div className="flex justify-center items-center">{children}</div>
+			{children}
 		</section>
 	)
 }

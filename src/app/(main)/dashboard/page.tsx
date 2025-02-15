@@ -1,6 +1,4 @@
-import Boards from "@/components/blocks/dashboard/boards"
-import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header"
-import { Separator } from "@/components/ui/separator"
+import Dashboard from "@/components/blocks/dashboard/dashboard"
 import { BoardType } from "@/lib/types"
 import React from "react"
 
@@ -44,10 +42,8 @@ export default async function DashboardPage() {
 	]
 
 	return (
-		<div className="my-4 mx-8 w-full max-w-[450px] md:max-w-[656px] lg:max-w-[992px] space-y-4">
-			<BoardsDisplayHeader />
-			<Separator className="w-full" />
-			<Boards boards={boards} />
+		<div className="py-4 px-8 w-full max-w-[450px] md:max-w-[656px] lg:max-w-[992px] space-y-4">
+			<Dashboard boards={boards} />
 		</div>
 	)
 }

@@ -20,17 +20,32 @@ import {
 	List,
 	Plus,
 } from "lucide-react"
-import React, { useState } from "react"
+import React from "react"
 
 type OwnershipTypes = "Owned by anyone" | "Owned by me" | "Not owned by me"
 type SortMethodTypes = "Last Opened" | "Sort Ascending" | "Sort Descending"
 
-export default function BoardsDisplayHeader() {
-	const [ownership, setOwnership] = useState("Owned by anyone")
-	const [listView, setListView] = useState(false)
-	const [bookmarked, setBookmarked] = useState(false)
-	const [sortMethod, setSortMethod] = useState("Last Opened")
+type BoardsDisplayHeaderProps = {
+	ownership: string
+	setOwnership: (arg0: string) => void
+	listView: boolean
+	setListView: (arg0: boolean) => void
+	bookmarked: boolean
+	setBookmarked: (arg0: boolean) => void
+	sortMethod: string
+	setSortMethod: (arg0: string) => void
+}
 
+export default function BoardsDisplayHeader({
+	ownership,
+	setOwnership,
+	listView,
+	setListView,
+	bookmarked,
+	setBookmarked,
+	sortMethod,
+	setSortMethod,
+}: BoardsDisplayHeaderProps) {
 	return (
 		<div className="flex flex-col gap-4">
 			<h2 className="font-semibold text-3xl">My Boards</h2>
