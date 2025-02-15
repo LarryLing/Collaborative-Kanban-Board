@@ -4,7 +4,8 @@ import { BoardType } from "@/lib/types"
 import React, { useState } from "react"
 import BoardsDisplayHeader from "./boards-display-header"
 import { Separator } from "@/components/ui/separator"
-import GalleryItem, { NewBoardGalleryItem } from "./gallery-view"
+import GalleryView from "./gallery-view"
+import ListView from "./list-view"
 
 type DashboardProps = {
 	boards: BoardType[]
@@ -29,12 +30,11 @@ export default function Dashboard({ boards }: DashboardProps) {
 				setSortMethod={setSortMethod}
 			/>
 			<Separator className="w-full" />
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-				{boards.map((board) => {
-					return <GalleryItem {...board} key={board.id} />
-				})}
-				<NewBoardGalleryItem />
-			</div>
+			{listView ? (
+				<ListView boards={boards} />
+			) : (
+				<GalleryView boards={boards} />
+			)}
 		</>
 	)
 }
