@@ -24,20 +24,17 @@ function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 
 	return (
-		<div className="w-full h-[56px] border border-border rounded-md overflow-hidden pl-4 pr-2 py-2 relative">
-			<Link
-				href={`/boards/${id}`}
-				className="md:max-w-[500px] lg:max-w-[700px] h-full flex justify-between items-center"
-			>
-				<div className="flex justify-center items-center gap-5">
+		<div className="w-full h-auto border border-border rounded-md overflow-hidden relative">
+			<Link href={`/boards/${id}`}>
+				<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
 					<span className="font-semibold text-md">{title}</span>
-					<Users className="size-4 inline-block" />
+					<div className="hidden md:flex items-center gap-4 w-[180px] text-left font-normal text-sm">
+						<Users className="size-4 inline-block" />
+						<span>Opened {getLastOpened(last_opened)}</span>
+					</div>
 				</div>
-				<span className="hidden md:inline w-[160px] text-left font-normal text-sm">
-					Opened {getLastOpened(last_opened)}
-				</span>
 			</Link>
-			<div className="absolute bottom-2 right-2">
+			<div className="absolute bottom-2.5 right-2">
 				<OptionsDropdown
 					id={id}
 					title={title}
@@ -59,10 +56,10 @@ function NewBoardItem() {
 	return (
 		<Button
 			variant="outline"
-			className="w-full h-[56px] overflow-hidden flex justify-start items-center gap-2 pl-4 pr-2"
+			className="w-full h-[56px] overflow-hidden flex justify-center items-center gap-2 pl-4 pr-2"
 		>
-			<span className="font-semibold text-md">New Board</span>
 			<Plus className="size-4" />
+			<span className="font-semibold text-md">New Board</span>
 		</Button>
 	)
 }
