@@ -22,9 +22,6 @@ import {
 } from "lucide-react"
 import React from "react"
 
-type OwnershipTypes = "Owned by anyone" | "Owned by me" | "Not owned by me"
-type SortMethodTypes = "Last Opened" | "Sort Ascending" | "Sort Descending"
-
 type BoardsDisplayHeaderProps = {
 	ownership: string
 	setOwnership: (arg0: string) => void
@@ -179,14 +176,14 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 					value={sortMethod}
 					onValueChange={setSortMethod}
 				>
-					<DropdownMenuRadioItem value="Last Opened">
-						Last Opened
+					<DropdownMenuRadioItem value="Last opened">
+						Last opened
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort Ascending">
-						Sort Ascending
+					<DropdownMenuRadioItem value="Sort ascending">
+						Sort ascending
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort Descending">
-						Sort Descending
+					<DropdownMenuRadioItem value="Sort descending">
+						Sort descending
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
