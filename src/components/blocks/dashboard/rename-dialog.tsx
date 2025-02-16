@@ -13,18 +13,18 @@ import { Input } from "@/components/ui/input"
 type RenameDialogProps = {
 	id: string
 	title: string
-	isDialogOpen: boolean
-	setIsDialogOpen: (arg0: boolean) => void
+	isRenameDialogOpen: boolean
+	setIsRenameDialogOpen: (arg0: boolean) => void
 }
 
 export default function RenameDialog({
 	id,
 	title,
-	isDialogOpen,
-	setIsDialogOpen,
+	isRenameDialogOpen,
+	setIsRenameDialogOpen,
 }: RenameDialogProps) {
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+		<Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Rename Board</DialogTitle>
@@ -32,19 +32,17 @@ export default function RenameDialog({
 						Please enter a new name for this board
 					</DialogDescription>
 				</DialogHeader>
-				<form className="grid gap-4 py-4">
-					<div className="grid grid-cols-4 items-center gap-4">
-						<Input
-							id="title"
-							defaultValue={title}
-							className="col-span-3"
-						/>
-					</div>
+				<form>
+					<Input
+						id="title"
+						defaultValue={title}
+						className="col-span-3"
+					/>
 				</form>
 				<DialogFooter>
 					<Button
 						variant="outline"
-						onClick={() => setIsDialogOpen(false)}
+						onClick={() => setIsRenameDialogOpen(false)}
 					>
 						Cancel
 					</Button>

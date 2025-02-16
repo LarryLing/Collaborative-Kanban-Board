@@ -3,12 +3,13 @@
 import { Button } from "@/components/ui/button"
 import { BoardType } from "@/lib/types"
 import { getLastOpened } from "@/lib/utils"
-import { Plus, Users } from "lucide-react"
+import { Bookmark, Delete, Plus, Users } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import React, { useState } from "react"
 import OptionsDropdown from "./options-dropdown"
 import RenameDialog from "./rename-dialog"
+import DeleteDialog from "./delete-dialog"
 
 export default function GalleryView({ boards }: { boards: BoardType[] }) {
 	return (
@@ -21,8 +22,16 @@ export default function GalleryView({ boards }: { boards: BoardType[] }) {
 	)
 }
 
-function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
-	const [isDialogOpen, setIsDialogOpen] = useState(false)
+function BoardItem({
+	id,
+	owner,
+	cover,
+	bookmarked,
+	title,
+	last_opened,
+}: BoardType) {
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
 	return (
 		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative">
@@ -45,6 +54,12 @@ function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
 					</span>
 					<div className="flex justify-start items-center gap-2 basis-[40px]">
 						<Users className="size-4 inline-block" />
+						{bookmarked ? (
+							<Bookmark className="size-4 inline-block" />
+						) : (
+							<></>
+						)}
+						{/* <div className="size-4 inline-block" /> //TODO: use this div to differentiate between collaborative and solo boards*/}
 						<span className="font-normal text-sm">
 							Opened {getLastOpened(last_opened)}
 						</span>
@@ -55,15 +70,21 @@ function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
 				<OptionsDropdown
 					id={id}
 					title={title}
-					isDialogOpen={isDialogOpen}
-					setIsDialogOpen={setIsDialogOpen}
+					bookmarked={bookmarked}
+					setIsRenameDialogOpen={setIsRenameDialogOpen}
+					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
 				id={id}
 				title={title}
-				isDialogOpen={isDialogOpen}
-				setIsDialogOpen={setIsDialogOpen}
+				isRenameDialogOpen={isRenameDialogOpen}
+				setIsRenameDialogOpen={setIsRenameDialogOpen}
+			/>
+			<DeleteDialog
+				id={id}
+				isDeleteDialogOpen={isDeleteDialogOpen}
+				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>
 		</div>
 	)

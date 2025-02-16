@@ -5,22 +5,29 @@ import {
 	DropdownMenuContent,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Ellipsis, PenLine, SquareArrowOutUpRight, Trash2 } from "lucide-react"
+import {
+	Bookmark,
+	Ellipsis,
+	PenLine,
+	SquareArrowOutUpRight,
+	Trash2,
+} from "lucide-react"
 import React from "react"
 import Link from "next/link"
 
 type OptionsDropdownProps = {
 	id: string
 	title: string
-	isDialogOpen: boolean
-	setIsDialogOpen: (arg0: boolean) => void
+	bookmarked: boolean
+	setIsRenameDialogOpen: (arg0: boolean) => void
+	setIsDeleteDialogOpen: (arg0: boolean) => void
 }
 
 export default function OptionsDropdown({
 	id,
 	title,
-	isDialogOpen,
-	setIsDialogOpen,
+	setIsRenameDialogOpen,
+	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
 	return (
 		<DropdownMenu>
@@ -30,13 +37,22 @@ export default function OptionsDropdown({
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side="top">
-				<DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+				<DropdownMenuItem onClick={() => setIsRenameDialogOpen(true)}>
 					<PenLine className="size-4" />
 					<span>Rename</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem>
-					<Trash2 className="size-4" />
-					<span>Delete</span>
+				<DropdownMenuItem className="group">
+					<Bookmark className="size-4 group-hover:stroke-yellow-500" />
+					<span className="group-hover:text-yellow-500">
+						Bookmark
+					</span>
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					className="group"
+					onClick={() => setIsDeleteDialogOpen(true)}
+				>
+					<Trash2 className="size-4 group-hover:stroke-destructive" />
+					<span className="group-hover:text-destructive">Delete</span>
 				</DropdownMenuItem>
 				<Link
 					href={`/boards/${id}`}

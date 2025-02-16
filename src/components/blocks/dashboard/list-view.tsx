@@ -3,11 +3,12 @@
 import { Button } from "@/components/ui/button"
 import { BoardType } from "@/lib/types"
 import { getLastOpened } from "@/lib/utils"
-import { Plus, Users } from "lucide-react"
+import { Bookmark, Plus, Users } from "lucide-react"
 import Link from "next/link"
 import React, { useState } from "react"
 import RenameDialog from "./rename-dialog"
 import OptionsDropdown from "./options-dropdown"
+import DeleteDialog from "./delete-dialog"
 
 export default function ListView({ boards }: { boards: BoardType[] }) {
 	return (
@@ -20,17 +21,35 @@ export default function ListView({ boards }: { boards: BoardType[] }) {
 	)
 }
 
-function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
-	const [isDialogOpen, setIsDialogOpen] = useState(false)
+function BoardItem({
+	id,
+	owner,
+	cover,
+	bookmarked,
+	title,
+	last_opened,
+}: BoardType) {
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
 	return (
 		<div className="w-full h-auto border border-border rounded-md overflow-hidden relative">
 			<Link href={`/boards/${id}`}>
 				<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
 					<span className="font-semibold text-md">{title}</span>
-					<div className="hidden md:flex items-center gap-4 w-[180px] text-left font-normal text-sm">
-						<Users className="size-4 inline-block" />
-						<span>Opened {getLastOpened(last_opened)}</span>
+					<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
+						<span className="w-[150px]">
+							Opened {getLastOpened(last_opened)}
+						</span>
+						<div className="space-x-2">
+							<Users className="size-4 inline-block" />
+							{/* <div className="size-4 inline-block" /> //TODO: use this div to differentiate between collaborative and solo boards*/}
+							{bookmarked ? (
+								<Bookmark className="size-4 inline-block" />
+							) : (
+								<></>
+							)}
+						</div>
 					</div>
 				</div>
 			</Link>
@@ -38,15 +57,21 @@ function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
 				<OptionsDropdown
 					id={id}
 					title={title}
-					isDialogOpen={isDialogOpen}
-					setIsDialogOpen={setIsDialogOpen}
+					bookmarked={bookmarked}
+					setIsRenameDialogOpen={setIsRenameDialogOpen}
+					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
 				id={id}
 				title={title}
-				isDialogOpen={isDialogOpen}
-				setIsDialogOpen={setIsDialogOpen}
+				isRenameDialogOpen={isRenameDialogOpen}
+				setIsRenameDialogOpen={setIsRenameDialogOpen}
+			/>
+			<DeleteDialog
+				id={id}
+				isDeleteDialogOpen={isDeleteDialogOpen}
+				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>
 		</div>
 	)

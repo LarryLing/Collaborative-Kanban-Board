@@ -55,14 +55,14 @@ export default function BoardsDisplayHeader({
 						ownership={ownership}
 						setOwnership={setOwnership}
 					/>
+					<SortDropdown
+						sortMethod={sortMethod}
+						setSortMethod={setSortMethod}
+					/>
 					<ViewToggle listView={listView} setListView={setListView} />
 					<BookmarkToggle
 						bookmarked={bookmarked}
 						setBookmarked={setBookmarked}
-					/>
-					<SortDropdown
-						sortMethod={sortMethod}
-						setSortMethod={setSortMethod}
 					/>
 				</div>
 				<div className="block md:hidden">
@@ -171,7 +171,7 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 					<ArrowDownAZ className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
+			<DropdownMenuContent>
 				<DropdownMenuRadioGroup
 					value={sortMethod}
 					onValueChange={setSortMethod}
@@ -225,6 +225,21 @@ function OptionsDropdown({
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 				<DropdownMenuSeparator />
+				<DropdownMenuRadioGroup
+					value={sortMethod}
+					onValueChange={setSortMethod}
+				>
+					<DropdownMenuRadioItem value="Last opened">
+						Last opened
+					</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem value="Sort ascending">
+						Sort ascending
+					</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem value="Sort descending">
+						Sort descending
+					</DropdownMenuRadioItem>
+				</DropdownMenuRadioGroup>
+				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuItem onSelect={() => setListView(false)}>
 						{!listView ? (
@@ -232,7 +247,7 @@ function OptionsDropdown({
 						) : (
 							<div className="size-4"></div>
 						)}
-						<span>Gallery View</span>
+						<span>Gallery view</span>
 					</DropdownMenuItem>
 					<DropdownMenuItem onSelect={() => setListView(true)}>
 						{listView ? (
@@ -240,7 +255,7 @@ function OptionsDropdown({
 						) : (
 							<div className="size-4"></div>
 						)}
-						<span>List View</span>
+						<span>List view</span>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator />
@@ -262,21 +277,6 @@ function OptionsDropdown({
 						<span>Bookmarked</span>
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
-				<DropdownMenuSeparator />
-				<DropdownMenuRadioGroup
-					value={sortMethod}
-					onValueChange={setSortMethod}
-				>
-					<DropdownMenuRadioItem value="Last Opened">
-						Last Opened
-					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort Ascending">
-						Sort Ascending
-					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort Descending">
-						Sort Descending
-					</DropdownMenuRadioItem>
-				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)
