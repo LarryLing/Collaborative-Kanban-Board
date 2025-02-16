@@ -6,26 +6,25 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 } from "@/components/ui/dialog"
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu"
+
 import { Input } from "@/components/ui/input"
-import { PenLine } from "lucide-react"
 
 type RenameDialogProps = {
 	id: string
 	title: string
+	isDialogOpen: boolean
+	setIsDialogOpen: (arg0: boolean) => void
 }
 
-export default function RenameDialog({ id, title }: RenameDialogProps) {
+export default function RenameDialog({
+	id,
+	title,
+	isDialogOpen,
+	setIsDialogOpen,
+}: RenameDialogProps) {
 	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<DropdownMenuItem>
-					<PenLine className="size-4" />
-					<span>Rename</span>
-				</DropdownMenuItem>
-			</DialogTrigger>
+		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Rename Board</DialogTitle>
@@ -43,7 +42,12 @@ export default function RenameDialog({ id, title }: RenameDialogProps) {
 					</div>
 				</form>
 				<DialogFooter>
-					<Button variant="outline">Cancel</Button>
+					<Button
+						variant="outline"
+						onClick={() => setIsDialogOpen(false)}
+					>
+						Cancel
+					</Button>
 					<Button type="submit">Save changes</Button>
 				</DialogFooter>
 			</DialogContent>

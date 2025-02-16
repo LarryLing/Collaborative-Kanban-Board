@@ -1,20 +1,27 @@
-import { Button } from "@/components/ui/button"
 import {
 	DropdownMenu,
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
 } from "@/components/ui/dropdown-menu"
-import { Ellipsis, SquareArrowOutUpRight, Trash2 } from "lucide-react"
-import RenameDialog from "./rename-dialog"
+import { Button } from "@/components/ui/button"
+import { Ellipsis, PenLine, SquareArrowOutUpRight, Trash2 } from "lucide-react"
+import React from "react"
 import Link from "next/link"
 
 type OptionsDropdownProps = {
 	id: string
 	title: string
+	isDialogOpen: boolean
+	setIsDialogOpen: (arg0: boolean) => void
 }
 
-export default function OptionsDropdown({ id, title }: OptionsDropdownProps) {
+export default function OptionsDropdown({
+	id,
+	title,
+	isDialogOpen,
+	setIsDialogOpen,
+}: OptionsDropdownProps) {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -23,7 +30,10 @@ export default function OptionsDropdown({ id, title }: OptionsDropdownProps) {
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side="top">
-				<RenameDialog id={id} title={title} />
+				<DropdownMenuItem onClick={() => setIsDialogOpen(true)}>
+					<PenLine className="size-4" />
+					<span>Rename</span>
+				</DropdownMenuItem>
 				<DropdownMenuItem>
 					<Trash2 className="size-4" />
 					<span>Delete</span>

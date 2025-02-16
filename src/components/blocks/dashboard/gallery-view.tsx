@@ -6,8 +6,9 @@ import { getLastOpened } from "@/lib/utils"
 import { Plus, Users } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import React from "react"
+import React, { useState } from "react"
 import OptionsDropdown from "./options-dropdown"
+import RenameDialog from "./rename-dialog"
 
 export default function GalleryView({ boards }: { boards: BoardType[] }) {
 	return (
@@ -21,8 +22,10 @@ export default function GalleryView({ boards }: { boards: BoardType[] }) {
 }
 
 function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false)
+
 	return (
-		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden">
+		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative">
 			<Link href={`/boards/${id}`}>
 				<div className="h-[188px] bg-border relative">
 					{cover ? (
@@ -40,17 +43,28 @@ function BoardItem({ id, owner, cover, title, last_opened }: BoardType) {
 					<span className="font-semibold text-md text-left">
 						{title}
 					</span>
-					<div className="flex justify-between items-center">
-						<div className="flex justify-center items-center gap-2">
-							<Users className="size-4 inline-block" />
-							<span className="font-normal text-sm">
-								Opened {getLastOpened(last_opened)}
-							</span>
-						</div>
-						<OptionsDropdown id={id} title={title} />
+					<div className="flex justify-start items-center gap-2 basis-[40px]">
+						<Users className="size-4 inline-block" />
+						<span className="font-normal text-sm">
+							Opened {getLastOpened(last_opened)}
+						</span>
 					</div>
 				</div>
 			</Link>
+			<div className="absolute bottom-4 right-4">
+				<OptionsDropdown
+					id={id}
+					title={title}
+					isDialogOpen={isDialogOpen}
+					setIsDialogOpen={setIsDialogOpen}
+				/>
+			</div>
+			<RenameDialog
+				id={id}
+				title={title}
+				isDialogOpen={isDialogOpen}
+				setIsDialogOpen={setIsDialogOpen}
+			/>
 		</div>
 	)
 }
