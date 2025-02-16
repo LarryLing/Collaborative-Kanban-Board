@@ -16,6 +16,7 @@ import React from "react"
 import Link from "next/link"
 
 type OptionsDropdownProps = {
+	side: "top" | "right" | "bottom" | "left" | undefined
 	id: string
 	title: string
 	bookmarked: boolean
@@ -23,7 +24,8 @@ type OptionsDropdownProps = {
 	setIsDeleteDialogOpen: (arg0: boolean) => void
 }
 
-export default function OptionsDropdown({
+export default function BoardOptionsDropdown({
+	side,
 	id,
 	title,
 	setIsRenameDialogOpen,
@@ -36,7 +38,7 @@ export default function OptionsDropdown({
 					<Ellipsis className="size-5" />
 				</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent side="top">
+			<DropdownMenuContent side={side}>
 				<DropdownMenuItem onClick={() => setIsRenameDialogOpen(true)}>
 					<PenLine className="size-4" />
 					<span>Rename</span>

@@ -7,8 +7,8 @@ import { Bookmark, Plus, Users } from "lucide-react"
 import Link from "next/link"
 import React, { useState } from "react"
 import RenameDialog from "./rename-dialog"
-import OptionsDropdown from "./options-dropdown"
 import DeleteDialog from "./delete-dialog"
+import BoardOptionsDropdown from "./board-options-dropdown"
 
 export default function ListView({ boards }: { boards: BoardType[] }) {
 	return (
@@ -54,7 +54,8 @@ function BoardItem({
 				</div>
 			</Link>
 			<div className="absolute bottom-2.5 right-2">
-				<OptionsDropdown
+				<BoardOptionsDropdown
+					side="left"
 					id={id}
 					title={title}
 					bookmarked={bookmarked}

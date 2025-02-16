@@ -23,6 +23,7 @@ import {
 	ArrowDownAZ,
 	Bookmark,
 	Check,
+	Circle,
 	LayoutGrid,
 	List,
 	Plus,
@@ -112,11 +113,18 @@ function OwnershipDropdown({
 }: OwnershipDropdownProps) {
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button variant="outline" className="w-[160px]">
-					{ownership}
-				</Button>
-			</DropdownMenuTrigger>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" className="w-[160px]">
+								{ownership}
+							</Button>
+						</DropdownMenuTrigger>
+					</TooltipTrigger>
+					<TooltipContent>Ownership</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
 			<DropdownMenuContent>
 				<DropdownMenuRadioGroup
 					value={ownership}
@@ -294,7 +302,7 @@ function OptionsDropdown({
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline">Options</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<DropdownMenuContent align="end">
 				<DropdownMenuRadioGroup
 					value={ownership}
 					onValueChange={setOwnership}
@@ -325,43 +333,39 @@ function OptionsDropdown({
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuItem onSelect={() => setListView(false)}>
-						{!listView ? (
-							<Check className="size-4" />
-						) : (
-							<div className="size-4"></div>
-						)}
+				<DropdownMenuRadioGroup
+					value={listView ? "List view" : "Gallery view"}
+				>
+					<DropdownMenuRadioItem
+						value="Gallery view"
+						onSelect={() => setListView(false)}
+					>
 						<span>Gallery view</span>
-					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => setListView(true)}>
-						{listView ? (
-							<Check className="size-4" />
-						) : (
-							<div className="size-4"></div>
-						)}
+					</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem
+						value="List view"
+						onSelect={() => setListView(true)}
+					>
 						<span>List view</span>
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
+					</DropdownMenuRadioItem>
+				</DropdownMenuRadioGroup>
 				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuItem onSelect={() => setBookmarked(false)}>
-						{!bookmarked ? (
-							<Check className="size-4" />
-						) : (
-							<div className="size-4"></div>
-						)}
+				<DropdownMenuRadioGroup
+					value={bookmarked ? "Bookmarked" : "All"}
+				>
+					<DropdownMenuRadioItem
+						value="All"
+						onSelect={() => setBookmarked(false)}
+					>
 						<span>All</span>
-					</DropdownMenuItem>
-					<DropdownMenuItem onSelect={() => setBookmarked(true)}>
-						{bookmarked ? (
-							<Check className="size-4" />
-						) : (
-							<div className="size-4"></div>
-						)}
+					</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem
+						value="Bookmarked"
+						onSelect={() => setBookmarked(true)}
+					>
 						<span>Bookmarked</span>
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
+					</DropdownMenuRadioItem>
+				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	)
