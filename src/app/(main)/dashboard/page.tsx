@@ -47,7 +47,7 @@ export default async function DashboardPage() {
 	]
 
 	return (
-		<div className="py-4 px-8 w-full max-w-[450px] md:max-w-[656px] lg:max-w-[992px] space-y-4">
+		<div className="py-4 px-8 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-4">
 			<Dashboard fetchedBoards={fetchedBoards} />
 		</div>
 	)

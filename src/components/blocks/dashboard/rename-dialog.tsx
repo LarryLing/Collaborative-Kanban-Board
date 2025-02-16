@@ -7,7 +7,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog"
-
 import { Input } from "@/components/ui/input"
 
 type RenameDialogProps = {
@@ -46,7 +45,9 @@ export default function RenameDialog({
 					>
 						Cancel
 					</Button>
-					<Button type="submit">Save changes</Button>
+					<Button type="submit" className="mb-2 sm:mb-0">
+						Save changes
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

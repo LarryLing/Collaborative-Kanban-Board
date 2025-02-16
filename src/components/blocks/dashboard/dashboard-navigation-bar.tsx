@@ -1,17 +1,16 @@
 "use client"
 
 import React, { useEffect, useState } from "react"
-import Link from "next/link"
 import { UserProfile } from "@/lib/types"
 import { createClient } from "@/lib/supabase/client"
 import { User } from "@supabase/supabase-js"
-import { BrillianceIcon } from "@/components/icons/icon"
 import { NavigationMenu } from "@/components/ui/navigation-menu"
 import { Button } from "@/components/ui/button"
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import AvatarPopover from "./avatar-popover"
+import Branding from "../misc/branding"
 
 type DashboardNavigationBarProps = {
 	user: User
@@ -52,13 +51,7 @@ export default function DashboardNavigationBar({
 	return (
 		<>
 			<NavigationMenu className="sticky text-nowrap max-w-none w-full basis-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
-				<Link
-					href="/"
-					className="flex item-center font-bold text-2xl gap-3"
-				>
-					<BrillianceIcon />
-					<span className="hidden sm:inline">Kanban Board</span>
-				</Link>
+				<Branding />
 				<div className="flex justify-center items-center gap-4">
 					<Button
 						variant="ghost"

@@ -8,8 +8,6 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog"
 
-import { Input } from "@/components/ui/input"
-
 type DeleteDialogProps = {
 	id: string
 	isDeleteDialogOpen: boolean
@@ -37,7 +35,13 @@ export default function DeleteDialog({
 					>
 						Go back
 					</Button>
-					<Button type="submit">Delete</Button>
+					<Button
+						type="submit"
+						variant="destructive"
+						className="mb-2 sm:mb-0"
+					>
+						Delete
+					</Button>
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>

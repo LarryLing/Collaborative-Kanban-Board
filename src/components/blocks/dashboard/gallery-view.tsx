@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { BoardType } from "@/lib/types"
 import { getLastOpened } from "@/lib/utils"
-import { Bookmark, Delete, Plus, Users } from "lucide-react"
+import { Bookmark, Plus, Users } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import React, { useState } from "react"

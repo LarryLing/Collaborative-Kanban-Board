@@ -16,10 +16,18 @@ export default function Dashboard({ fetchedBoards }: DashboardProps) {
 	const [listView, setListView] = useState(false)
 	const [bookmarked, setBookmarked] = useState(false)
 	const [sortMethod, setSortMethod] = useState("Last opened")
+	const [query, setQuery] = useState("")
 
 	const processedBoards = useMemo(
-		() => processBoards(fetchedBoards, bookmarked, ownership, sortMethod),
-		[fetchedBoards, bookmarked, ownership, sortMethod],
+		() =>
+			processBoards(
+				fetchedBoards,
+				bookmarked,
+				ownership,
+				sortMethod,
+				query,
+			),
+		[fetchedBoards, bookmarked, ownership, sortMethod, query],
 	)
 
 	return (
@@ -33,6 +41,8 @@ export default function Dashboard({ fetchedBoards }: DashboardProps) {
 				setBookmarked={setBookmarked}
 				sortMethod={sortMethod}
 				setSortMethod={setSortMethod}
+				query={query}
+				setQuery={setQuery}
 			/>
 			<Separator className="w-full" />
 			{listView ? (
@@ -49,6 +59,7 @@ function processBoards(
 	bookmarked: boolean,
 	ownership: string,
 	sortMethod: string,
+	query: string,
 ) {
 	let processedBoards = [...fetchedBoards]
 
@@ -77,6 +88,10 @@ function processBoards(
 	} else if (sortMethod === "Sort descending") {
 		processedBoards.sort((a, b) => b.title.localeCompare(a.title))
 	}
+
+	processedBoards = processedBoards.filter((board) =>
+		board.title.toLowerCase().includes(query.toLowerCase()),
+	)
 
 	return processedBoards
 }

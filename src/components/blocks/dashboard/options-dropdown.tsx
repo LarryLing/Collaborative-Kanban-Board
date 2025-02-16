@@ -41,11 +41,9 @@ export default function OptionsDropdown({
 					<PenLine className="size-4" />
 					<span>Rename</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem className="group">
-					<Bookmark className="size-4 group-hover:stroke-yellow-500" />
-					<span className="group-hover:text-yellow-500">
-						Bookmark
-					</span>
+				<DropdownMenuItem>
+					<Bookmark className="size-4" />
+					<span>Bookmark</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					className="group"

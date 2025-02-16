@@ -11,6 +11,13 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { Input } from "@/components/ui/input"
 import { Toggle } from "@/components/ui/toggle"
 import {
 	ArrowDownAZ,
@@ -19,8 +26,9 @@ import {
 	LayoutGrid,
 	List,
 	Plus,
+	Search,
 } from "lucide-react"
-import React from "react"
+import React, { useState } from "react"
 
 type BoardsDisplayHeaderProps = {
 	ownership: string
@@ -31,6 +39,8 @@ type BoardsDisplayHeaderProps = {
 	setBookmarked: (arg0: boolean) => void
 	sortMethod: string
 	setSortMethod: (arg0: string) => void
+	query: string
+	setQuery: (arg0: string) => void
 }
 
 export default function BoardsDisplayHeader({
@@ -42,40 +52,49 @@ export default function BoardsDisplayHeader({
 	setBookmarked,
 	sortMethod,
 	setSortMethod,
+	query,
+	setQuery,
 }: BoardsDisplayHeaderProps) {
 	return (
 		<div className="flex flex-col gap-4">
 			<h2 className="font-semibold text-3xl">My Boards</h2>
 			<div className="flex justify-between">
 				<Button>
-					<Plus className="size-4" /> New Board
+					<Plus className="size-4" />
+					<span>New Board</span>
 				</Button>
-				<div className="md:flex hidden gap-2">
-					<OwnershipDropdown
-						ownership={ownership}
-						setOwnership={setOwnership}
-					/>
-					<SortDropdown
-						sortMethod={sortMethod}
-						setSortMethod={setSortMethod}
-					/>
-					<ViewToggle listView={listView} setListView={setListView} />
-					<BookmarkToggle
-						bookmarked={bookmarked}
-						setBookmarked={setBookmarked}
-					/>
-				</div>
-				<div className="block md:hidden">
-					<OptionsDropdown
-						ownership={ownership}
-						setOwnership={setOwnership}
-						listView={listView}
-						setListView={setListView}
-						bookmarked={bookmarked}
-						setBookmarked={setBookmarked}
-						sortMethod={sortMethod}
-						setSortMethod={setSortMethod}
-					/>
+				<div className="flex gap-2 items-center">
+					<div className="md:flex hidden gap-2">
+						<OwnershipDropdown
+							ownership={ownership}
+							setOwnership={setOwnership}
+						/>
+						<SortDropdown
+							sortMethod={sortMethod}
+							setSortMethod={setSortMethod}
+						/>
+						<ViewButton
+							listView={listView}
+							setListView={setListView}
+						/>
+						<BookmarkToggle
+							bookmarked={bookmarked}
+							setBookmarked={setBookmarked}
+						/>
+					</div>
+					<div className="block md:hidden">
+						<OptionsDropdown
+							ownership={ownership}
+							setOwnership={setOwnership}
+							listView={listView}
+							setListView={setListView}
+							bookmarked={bookmarked}
+							setBookmarked={setBookmarked}
+							sortMethod={sortMethod}
+							setSortMethod={setSortMethod}
+						/>
+					</div>
+					<SearchBar query={query} setQuery={setQuery} />
 				</div>
 			</div>
 		</div>
@@ -118,25 +137,34 @@ function OwnershipDropdown({
 	)
 }
 
-type ViewToggleProps = {
+type ViewButtonProps = {
 	listView: boolean
 	setListView: (arg0: boolean) => void
 }
 
-function ViewToggle({ listView, setListView }: ViewToggleProps) {
+function ViewButton({ listView, setListView }: ViewButtonProps) {
 	return (
-		<Toggle
-			aria-label="Toggle view"
-			variant="outline"
-			pressed={listView}
-			onPressedChange={() => setListView(!listView)}
-		>
-			{listView ? (
-				<List className="size-4" />
-			) : (
-				<LayoutGrid className="size-4" />
-			)}
-		</Toggle>
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<Button
+						aria-label="Toggle view"
+						variant="outline"
+						onClick={() => setListView(!listView)}
+						size="icon"
+					>
+						{listView ? (
+							<LayoutGrid className="size-4" />
+						) : (
+							<List className="size-4" />
+						)}
+					</Button>
+				</TooltipTrigger>
+				<TooltipContent>
+					{listView ? "Gallery view" : "List view"}
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	)
 }
 
@@ -147,14 +175,23 @@ type BookmarkToggleProps = {
 
 function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
 	return (
-		<Toggle
-			aria-label="Toggle view"
-			variant="outline"
-			pressed={bookmarked}
-			onPressedChange={() => setBookmarked(!bookmarked)}
-		>
-			<Bookmark className="size-4" />
-		</Toggle>
+		<TooltipProvider>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<div>
+						<Toggle
+							aria-label="Toggle view"
+							variant="outline"
+							pressed={bookmarked}
+							onPressedChange={() => setBookmarked(!bookmarked)}
+						>
+							<Bookmark className="size-4" />
+						</Toggle>
+					</div>
+				</TooltipTrigger>
+				<TooltipContent>Bookmarked</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	)
 }
 
@@ -166,12 +203,19 @@ type SortDropdownProps = {
 function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button variant="outline" className="px-2 py-0">
-					<ArrowDownAZ className="size-4" />
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<DropdownMenuTrigger asChild>
+							<Button variant="outline" className="px-2 py-0">
+								<ArrowDownAZ className="size-4" />
+							</Button>
+						</DropdownMenuTrigger>
+					</TooltipTrigger>
+					<TooltipContent>Sort Options</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+			<DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<DropdownMenuRadioGroup
 					value={sortMethod}
 					onValueChange={setSortMethod}
@@ -191,6 +235,47 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 	)
 }
 
+type SearchBarProps = {
+	query: string
+	setQuery: (arg0: string) => void
+}
+
+function SearchBar({ query, setQuery }: SearchBarProps) {
+	const [isSearchOpen, setIsSearchOpen] = useState(false)
+
+	return (
+		<div className="hidden md:flex space-x-2">
+			<TooltipProvider>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<div>
+							<Toggle
+								variant="outline"
+								pressed={isSearchOpen}
+								onPressedChange={() =>
+									setIsSearchOpen(!isSearchOpen)
+								}
+							>
+								<Search className="size-5" />
+							</Toggle>
+						</div>
+					</TooltipTrigger>
+					<TooltipContent>Search</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+			{isSearchOpen && (
+				<Input
+					type="search"
+					value={query}
+					onChange={(e) => setQuery(e.target.value)}
+					className="w-[100px] md:w-[150px] lg:w-[175px] text-sm"
+					placeholder="Search..."
+				/>
+			)}
+		</div>
+	)
+}
+
 function OptionsDropdown({
 	ownership,
 	setOwnership,
@@ -201,7 +286,7 @@ function OptionsDropdown({
 	sortMethod,
 	setSortMethod,
 }: OwnershipDropdownProps &
-	ViewToggleProps &
+	ViewButtonProps &
 	BookmarkToggleProps &
 	SortDropdownProps) {
 	return (
@@ -209,7 +294,7 @@ function OptionsDropdown({
 			<DropdownMenuTrigger asChild>
 				<Button variant="outline">Options</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent align="end">
+			<DropdownMenuContent>
 				<DropdownMenuRadioGroup
 					value={ownership}
 					onValueChange={setOwnership}
