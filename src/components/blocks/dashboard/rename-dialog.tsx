@@ -10,14 +10,14 @@ import {
 import { Input } from "@/components/ui/input"
 
 type RenameDialogProps = {
-	id: string
+	board_id: string
 	title: string
 	isRenameDialogOpen: boolean
 	setIsRenameDialogOpen: (arg0: boolean) => void
 }
 
 export default function RenameDialog({
-	id,
+	board_id,
 	title,
 	isRenameDialogOpen,
 	setIsRenameDialogOpen,

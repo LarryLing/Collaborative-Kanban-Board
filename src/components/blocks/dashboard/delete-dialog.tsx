@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -6,16 +6,16 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 type DeleteDialogProps = {
-	id: string
-	isDeleteDialogOpen: boolean
-	setIsDeleteDialogOpen: (arg0: boolean) => void
-}
+	board_id: string;
+	isDeleteDialogOpen: boolean;
+	setIsDeleteDialogOpen: (arg0: boolean) => void;
+};
 
 export default function DeleteDialog({
-	id,
+	board_id,
 	isDeleteDialogOpen,
 	setIsDeleteDialogOpen,
 }: DeleteDialogProps) {
@@ -45,5 +45,5 @@ export default function DeleteDialog({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

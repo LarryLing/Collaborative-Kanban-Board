@@ -1,52 +1,31 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { UserProfile } from "@/lib/types"
-import { createClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
-import { NavigationMenu } from "@/components/ui/navigation-menu"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import AvatarPopover from "./avatar-popover"
-import Branding from "../misc/branding"
-
-type DashboardNavigationBarProps = {
-	user: User
-}
+import React from "react";
+import { UserProfile } from "@/lib/types";
+import { NavigationMenu } from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import AvatarPopover from "./avatar-popover";
+import Branding from "../misc/branding";
 
 export default function DashboardNavigationBar({
-	user,
-}: DashboardNavigationBarProps) {
-	const supabase = createClient()
-	const { theme, setTheme } = useTheme()
-	const [userProfile, setUserProfile] = useState<UserProfile>()
-
-	useEffect(() => {
-		async function getUserProfile(user: User) {
-			let tempProfile = null
-
-			const { data: profileData } = await supabase
-				.from("profiles")
-				.select("id, display_name, email, role, bio, avatar")
-				.eq("id", user.id)
-				.single()
-
-			tempProfile = profileData as UserProfile
-
-			if (profileData && profileData.avatar) {
-				const { data: avatarUrl } = await supabase.storage
-					.from("avatars")
-					.getPublicUrl(profileData.avatar)
-				tempProfile.avatar = avatarUrl.publicUrl
-			}
-
-			setUserProfile(tempProfile)
-		}
-
-		getUserProfile(user)
-	}, [user, supabase])
+	id,
+	display_name,
+	email,
+	role,
+	bio,
+	avatar,
+}: UserProfile) {
+	const { theme, setTheme } = useTheme();
+	const userProfile: UserProfile = {
+		id,
+		display_name,
+		email,
+		role,
+		bio,
+		avatar,
+	};
 
 	return (
 		<>
@@ -66,9 +45,9 @@ export default function DashboardNavigationBar({
 							<Moon className="size-4" />
 						)}
 					</Button>
-					<AvatarPopover userProfile={userProfile!} />
+					<AvatarPopover {...userProfile} />
 				</div>
 			</NavigationMenu>
 		</>
-	)
+	);
 }

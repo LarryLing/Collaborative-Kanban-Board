@@ -69,11 +69,11 @@ function processBoards(
 
 	if (ownership === "Owned by me") {
 		processedBoards = processedBoards.filter(
-			(board) => board.owner === "John Doe",
+			(board) => board.owner_id === "John Doe",
 		)
 	} else if (ownership === "Not owned by me") {
 		processedBoards = processedBoards.filter(
-			(board) => board.owner !== "John Doe",
+			(board) => board.owner_id !== "John Doe",
 		)
 	}
 

@@ -125,7 +125,7 @@ function OwnershipDropdown({
 					<TooltipContent>Ownership</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
-			<DropdownMenuContent>
+			<DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<DropdownMenuRadioGroup
 					value={ownership}
 					onValueChange={setOwnership}

@@ -1,41 +1,42 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { BoardType } from "@/lib/types"
-import { getLastOpened } from "@/lib/utils"
-import { Bookmark, Plus, Users } from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import React, { useState } from "react"
-import BoardOptionsDropdown from "./board-options-dropdown"
-import RenameDialog from "./rename-dialog"
-import DeleteDialog from "./delete-dialog"
+import { Button } from "@/components/ui/button";
+import { BoardType } from "@/lib/types";
+import { getLastOpened } from "@/lib/utils";
+import { Bookmark, Plus, Users } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useState } from "react";
+import BoardOptionsDropdown from "./board-options-dropdown";
+import RenameDialog from "./rename-dialog";
+import DeleteDialog from "./delete-dialog";
 
 export default function GalleryView({ boards }: { boards: BoardType[] }) {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{boards.map((board) => {
-				return <BoardItem {...board} key={board.id} />
+				return <BoardItem {...board} key={board.board_id} />;
 			})}
 			<NewBoardItem />
 		</div>
-	)
+	);
 }
 
 function BoardItem({
-	id,
-	owner,
+	board_id,
+	owner_id,
 	cover,
+	collaborative,
 	bookmarked,
 	title,
 	last_opened,
 }: BoardType) {
-	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false)
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
 		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative">
-			<Link href={`/boards/${id}`}>
+			<Link href={`/board/${board_id}`}>
 				<div className="h-[188px] bg-border relative">
 					{cover ? (
 						<Image
@@ -53,13 +54,12 @@ function BoardItem({
 						{title}
 					</span>
 					<div className="flex justify-start items-center gap-2 basis-[40px]">
-						<Users className="size-4 inline-block" />
-						{bookmarked ? (
-							<Bookmark className="size-4 inline-block" />
-						) : (
-							<></>
+						{collaborative && (
+							<Users className="size-4 inline-block" />
 						)}
-						{/* <div className="size-4 inline-block" /> //TODO: use this div to differentiate between collaborative and solo boards*/}
+						{bookmarked && (
+							<Bookmark className="size-4 inline-block" />
+						)}
 						<span className="font-normal text-sm">
 							Opened {getLastOpened(last_opened)}
 						</span>
@@ -69,26 +69,25 @@ function BoardItem({
 			<div className="absolute bottom-4 right-4">
 				<BoardOptionsDropdown
 					side="top"
-					id={id}
-					title={title}
+					board_id={board_id}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
-				id={id}
+				board_id={board_id}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
 			<DeleteDialog
-				id={id}
+				board_id={board_id}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>
 		</div>
-	)
+	);
 }
 
 function NewBoardItem() {
@@ -100,5 +99,5 @@ function NewBoardItem() {
 			<Plus className="size-4" />
 			<span className="font-semibold text-md">New Board</span>
 		</Button>
-	)
+	);
 }

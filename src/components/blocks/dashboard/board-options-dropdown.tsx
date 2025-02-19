@@ -16,18 +16,16 @@ import React from "react"
 import Link from "next/link"
 
 type OptionsDropdownProps = {
-	side: "top" | "right" | "bottom" | "left" | undefined
-	id: string
-	title: string
-	bookmarked: boolean
-	setIsRenameDialogOpen: (arg0: boolean) => void
-	setIsDeleteDialogOpen: (arg0: boolean) => void
-}
+	side: "top" | "right" | "bottom" | "left" | undefined;
+	board_id: string;
+	bookmarked: boolean;
+	setIsRenameDialogOpen: (arg0: boolean) => void;
+	setIsDeleteDialogOpen: (arg0: boolean) => void;
+};
 
 export default function BoardOptionsDropdown({
 	side,
-	id,
-	title,
+	board_id,
 	setIsRenameDialogOpen,
 	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
@@ -55,7 +53,7 @@ export default function BoardOptionsDropdown({
 					<span className="group-hover:text-destructive">Delete</span>
 				</DropdownMenuItem>
 				<Link
-					href={`/boards/${id}`}
+					href={`/board/${board_id}`}
 					target="_blank"
 					rel="noopener noreferrer"
 				>
@@ -66,5 +64,5 @@ export default function BoardOptionsDropdown({
 				</Link>
 			</DropdownMenuContent>
 		</DropdownMenu>
-	)
+	);
 }
