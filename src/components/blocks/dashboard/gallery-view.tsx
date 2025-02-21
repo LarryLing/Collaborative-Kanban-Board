@@ -35,21 +35,19 @@ function BoardItem({
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
-		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative">
+		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative group">
 			<Link href={`/board/${board_id}`}>
-				<div className="h-[188px] bg-border relative">
-					{cover ? (
+				<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
+					{cover && (
 						<Image
 							src={cover}
 							alt=""
 							objectFit="cover"
 							layout="fill"
 						/>
-					) : (
-						<></>
 					)}
 				</div>
-				<div className="h-[92px] p-4 flex flex-col justify-start items-between">
+				<div className="h-[92px] p-4 flex flex-col justify-start items-between bg-inherit group-hover:bg-accent/60 transition-colors">
 					<span className="font-semibold text-md text-left">
 						{title}
 					</span>

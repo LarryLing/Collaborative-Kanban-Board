@@ -33,7 +33,7 @@ function BoardItem({
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
-		<div className="w-full h-auto border border-border rounded-md overflow-hidden relative">
+		<div className="w-full h-auto border border-border rounded-md overflow-hidden relative hover:bg-accent/60 hover:text-accent-foreground transition-colors">
 			<Link href={`/board/${board_id}`}>
 				<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
 					<span className="font-semibold text-md">{title}</span>

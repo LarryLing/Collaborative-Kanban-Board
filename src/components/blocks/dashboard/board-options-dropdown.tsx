@@ -3,17 +3,17 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 	DropdownMenuContent,
-} from "@/components/ui/dropdown-menu"
-import { Button } from "@/components/ui/button"
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import {
 	Bookmark,
 	Ellipsis,
 	PenLine,
 	SquareArrowOutUpRight,
 	Trash2,
-} from "lucide-react"
-import React from "react"
-import Link from "next/link"
+} from "lucide-react";
+import React from "react";
+import Link from "next/link";
 
 type OptionsDropdownProps = {
 	side: "top" | "right" | "bottom" | "left" | undefined;
@@ -45,12 +45,9 @@ export default function BoardOptionsDropdown({
 					<Bookmark className="size-4" />
 					<span>Bookmark</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem
-					className="group"
-					onClick={() => setIsDeleteDialogOpen(true)}
-				>
-					<Trash2 className="size-4 group-hover:stroke-destructive" />
-					<span className="group-hover:text-destructive">Delete</span>
+				<DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
+					<Trash2 className="size-4" />
+					<span>Delete</span>
 				</DropdownMenuItem>
 				<Link
 					href={`/board/${board_id}`}
