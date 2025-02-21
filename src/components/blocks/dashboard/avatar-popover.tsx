@@ -8,10 +8,18 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LogOut, Settings2 } from "lucide-react";
+import { LinkIcon, LogOut, Settings2 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signout } from "@/lib/actions";
+import {
+	FacebookIcon,
+	GithubIcon,
+	InstagramIcon,
+	LinkedInIcon,
+	TwitterXIcon,
+} from "@/components/icons/icon";
+import Link from "next/link";
 
 export default function AvatarPopover({
 	id,
@@ -21,6 +29,12 @@ export default function AvatarPopover({
 	bio,
 	avatar,
 }: UserProfile) {
+	const test_socials = [
+		"https://www.linkedin.com/in/larry-ling-student/",
+		"https://github.com/LarryLing",
+		"https://x.com/sza",
+	];
+
 	return (
 		<Popover>
 			<PopoverTrigger>
@@ -50,21 +64,11 @@ export default function AvatarPopover({
 					</div>
 				</div>
 				<Separator className="w-full" />
-				{bio && (
-					<>
-						<div className="space-y-1">
-							<h3 className="font-medium">About Me</h3>
-							{<p className="text-sm text-zinc-500">{bio}</p>}
-						</div>
-						<Separator className="w-full" />
-					</>
-				)}
 				<div className="space-y-1">
-					<h3 className="font-medium">URLs</h3>
-					<ul className="underline text-sm space-y-1 text-zinc-500">
-						<li>https://canvas.northwestern.edu/</li>
-						<li>https://caesar.northwestern.edu/</li>
-					</ul>
+					<p className="text-sm">{bio}</p>
+				</div>
+				<div className="space-y-1">
+					<Socials socials={test_socials} />
 				</div>
 				<Separator className="w-full" />
 				<div className="flex justify-center items-center gap-5 h-9">
@@ -80,5 +84,105 @@ export default function AvatarPopover({
 				</div>
 			</PopoverContent>
 		</Popover>
+	);
+}
+
+type SocialsProps = {
+	socials: string[];
+};
+
+function Socials({ socials }: SocialsProps) {
+	function getSocialIcon(social: string) {
+		const url = new URL(social);
+
+		switch (url.hostname) {
+			case "www.linkedin.com":
+				return (
+					<>
+						<LinkedInIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+
+			case "github.com":
+				return (
+					<>
+						<GithubIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+
+			case "www.instagram.com":
+				return (
+					<>
+						<InstagramIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+
+			case "www.facebook.com":
+				return (
+					<>
+						<FacebookIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+
+			case "x.com":
+				return (
+					<>
+						<TwitterXIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+
+			default:
+				return (
+					<>
+						<LinkIcon className="size-4" fill="currentColor" />
+						<Link
+							href={social}
+							className="underline-offset-4 hover:underline"
+						>
+							{url.pathname.substring(1)}
+						</Link>
+					</>
+				);
+		}
+	}
+
+	return (
+		<ul className="text-sm space-y-2">
+			{socials.map((social) => (
+				<li key={social} className="flex items-center gap-2">
+					{getSocialIcon(social)}
+				</li>
+			))}
+		</ul>
 	);
 }
