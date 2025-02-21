@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header"
-import { Separator } from "@/components/ui/separator"
-import { Skeleton } from "@/components/ui/skeleton"
+import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header";
+import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
 	return (
@@ -16,6 +16,8 @@ export default function DashboardLoading() {
 				setBookmarked={(bookmarked: boolean) => {}}
 				sortMethod="Last opened"
 				setSortMethod={(sortMethod: string) => {}}
+				query=""
+				setQuery={(qeury: string) => {}}
 			/>
 			<Separator className="w-full" />
 			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -24,5 +26,5 @@ export default function DashboardLoading() {
 				<Skeleton />
 			</div>
 		</div>
-	)
+	);
 }
