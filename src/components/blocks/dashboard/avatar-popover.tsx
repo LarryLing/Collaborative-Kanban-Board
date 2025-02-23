@@ -21,19 +21,22 @@ import {
 } from "@/components/icons/icon";
 import Link from "next/link";
 
+type AvatarPopoverProps = {
+	userProfile: UserProfile;
+	setIsSettingsDialogOpen: (arg0: boolean) => void;
+};
+
 export default function AvatarPopover({
-	id,
-	display_name,
-	email,
-	role,
-	bio,
-	avatar,
-}: UserProfile) {
+	userProfile,
+	setIsSettingsDialogOpen,
+}: AvatarPopoverProps) {
 	const test_socials = [
 		"https://www.linkedin.com/in/larry-ling-student/",
 		"https://github.com/LarryLing",
 		"https://x.com/sza",
 	];
+
+	const { display_name, email, bio, avatar } = userProfile;
 
 	return (
 		<Popover>
@@ -72,7 +75,10 @@ export default function AvatarPopover({
 				</div>
 				<Separator className="w-full" />
 				<div className="flex justify-center items-center gap-5 h-9">
-					<Button variant="ghost">
+					<Button
+						variant="ghost"
+						onClick={() => setIsSettingsDialogOpen(true)}
+					>
 						<Settings2 />
 						Settings
 					</Button>
