@@ -7,13 +7,14 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import EditProfileCard from "./edit-profile-card";
 import UpdateEmailCard from "./update-email-card";
-import ChangePasswordCard from "./change-password-card";
+import ChangePasswordCard from "./account-settings";
 import DeleteAccountCard from "./delete-account-card";
 import { UserProfile } from "@/lib/types";
 import UploadAvatarCard from "./upload-avatar-card";
 import { Button } from "@/components/ui/button";
+import ProfileSettings from "./profile-settings";
+import AccountSettings from "./account-settings";
 
 type SettingsDialogProps = {
 	userProfile: UserProfile;
@@ -37,7 +38,7 @@ export default function SettingsDialog({
 			open={isSettingsDialogOpen}
 			onOpenChange={setIsSettingsDialogOpen}
 		>
-			<DialogContent className="max-w-[1024px] max-h-[600px] overflow-y-auto gap-6">
+			<DialogContent className="max-w-[1024px] max-h-[800px] overflow-y-auto gap-6">
 				<DialogHeader>
 					<DialogTitle>Settings</DialogTitle>
 				</DialogHeader>
@@ -74,7 +75,10 @@ export default function SettingsDialog({
 					</div>
 					<div className="w-full">
 						{currentTab === "Profile" && (
-							<EditProfileCard userProfile={userProfile} />
+							<ProfileSettings userProfile={userProfile} />
+						)}
+						{currentTab === "Account" && (
+							<AccountSettings userProfile={userProfile} />
 						)}
 					</div>
 				</div>

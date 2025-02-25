@@ -18,11 +18,11 @@ import { useToast } from "@/hooks/use-toast";
 import { Link } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
-type EditProfileCardProps = {
+type ProfileSettingsProps = {
 	userProfile: UserProfile;
 };
 
-export default function EditProfileCard({ userProfile }: EditProfileCardProps) {
+export default function ProfileSettings({ userProfile }: ProfileSettingsProps) {
 	const { toast } = useToast();
 	const [state, action, pending] = useActionState(
 		updateUserProfile,
@@ -81,7 +81,7 @@ export default function EditProfileCard({ userProfile }: EditProfileCardProps) {
 							</p>
 						)}
 					</div>
-					<div className="space-y-2">
+					<div className="space-y-1">
 						<Label htmlFor="social">Social Accounts</Label>
 						<div className="flex justify-center items-center gap-2">
 							<Link className="size-4" />
