@@ -7,7 +7,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import UpdateEmailCard from "./update-email-card";
+import UpdateEmailCard from "./appearance-settings";
 import ChangePasswordCard from "./account-settings";
 import DeleteAccountCard from "./delete-account-card";
 import { UserProfile } from "@/lib/types";
@@ -15,6 +15,7 @@ import UploadAvatarCard from "./upload-avatar-card";
 import { Button } from "@/components/ui/button";
 import ProfileSettings from "./profile-settings";
 import AccountSettings from "./account-settings";
+import AppearanceSettings from "./appearance-settings";
 
 type SettingsDialogProps = {
 	userProfile: UserProfile;
@@ -80,6 +81,7 @@ export default function SettingsDialog({
 						{currentTab === "Account" && (
 							<AccountSettings userProfile={userProfile} />
 						)}
+						{currentTab === "Appearance" && <AppearanceSettings />}
 					</div>
 				</div>
 			</DialogContent>

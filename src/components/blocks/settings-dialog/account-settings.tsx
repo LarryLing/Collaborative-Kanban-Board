@@ -69,11 +69,6 @@ export default function AccountSettings({ userProfile }: AccountSettingsProps) {
 								</SelectGroup>
 							</SelectContent>
 						</Select>
-						{/* {state?.errors?.displayName && (
-							<p className="text-sm text-destructive">
-								{state.errors.displayName}
-							</p>
-						)} */}
 						<p className="text-sm text-muted-foreground font-normal">
 							This is the language that will be used in the
 							dashboard.
