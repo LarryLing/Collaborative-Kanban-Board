@@ -15,7 +15,6 @@ import { Separator } from "../../ui/separator";
 import AvatarPopover from "../dashboard/avatar-popover";
 import ThemeDropdown from "./theme-dropdown";
 import UserWidget from "./user-widget";
-import SettingsDialog from "../settings/settings-dialog";
 import { UserProfile } from "@/lib/types";
 import { signout } from "@/lib/actions";
 import { createClient } from "@/lib/supabase/client";
@@ -130,10 +129,7 @@ export default function NavigationBar({ user }: NavigationBarProps) {
 								Action Button
 							</Button>
 							<div className="hidden md:flex justify-center items-center gap-4">
-								<AvatarPopover
-									userProfile={userProfile}
-									openSettingsDialog={openSettingsDialog}
-								/>
+								<AvatarPopover userProfile={userProfile} />
 							</div>
 						</>
 					) : (
@@ -221,14 +217,6 @@ export default function NavigationBar({ user }: NavigationBarProps) {
 					)}
 				</div>
 			</NavigationMenu>
-			{userProfile && (
-				<SettingsDialog
-					userProfile={userProfile}
-					setUserProfile={setUserProfile}
-					isSettingsDialogOpen={isSettingsDialogOpen}
-					setIsSettingsDialogOpen={setIsSettingsDialogOpen}
-				/>
-			)}
 		</>
 	);
 }

@@ -71,7 +71,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 				</div>
 				<Separator className="w-full" />
 				<div className="flex justify-center items-center gap-5 h-9">
-					<Link href="/settings">
+					<Link href="/settings/profile">
 						<Button variant="ghost">
 							<Settings2 />
 							Settings

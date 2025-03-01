@@ -52,32 +52,30 @@ export default function NavigationBar({ user }: HomeNavigationBarProps) {
 	}, [user, supabase]);
 
 	return (
-		<>
-			<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
-				<Link
-					href="/"
-					className="flex item-center font-bold text-2xl gap-3"
-				>
-					<BrillianceIcon />
-					<span className="hidden sm:inline">Kanban Board</span>
-				</Link>
-				<div className="flex justify-center items-center gap-4">
-					{userProfile ? (
-						<Link href="/dashboard">
-							<Button>Dashboard</Button>
+		<NavigationMenu className="sticky text-nowrap max-w-none w-full h-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
+			<Link
+				href="/"
+				className="flex item-center font-bold text-2xl gap-3"
+			>
+				<BrillianceIcon />
+				<span className="hidden sm:inline">Kanban Board</span>
+			</Link>
+			<div className="flex justify-center items-center gap-4">
+				{userProfile ? (
+					<Link href="/dashboard">
+						<Button>Dashboard</Button>
+					</Link>
+				) : (
+					<>
+						<Link href="/login">
+							<Button variant="link">Login</Button>
 						</Link>
-					) : (
-						<>
-							<Link href="/login">
-								<Button variant="link">Login</Button>
-							</Link>
-							<Link href="/signup">
-								<Button>Sign Up</Button>
-							</Link>
-						</>
-					)}
-				</div>
-			</NavigationMenu>
-		</>
+						<Link href="/signup">
+							<Button>Sign Up</Button>
+						</Link>
+					</>
+				)}
+			</div>
+		</NavigationMenu>
 	);
 }

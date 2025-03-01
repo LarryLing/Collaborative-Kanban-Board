@@ -27,14 +27,14 @@ export default function AppearanceSettings() {
 
 	return (
 		<Card className="border-none shadow-none">
-			<CardHeader className="pt-0">
+			<CardHeader className="pt-0 pr-0">
 				<CardTitle>Appearance</CardTitle>
 				<CardDescription>
 					Choose how the site looks to you. Selections are applied
 					immediately and saved automatically.
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="space-y-6">
+			<CardContent className="space-y-6 pr-0">
 				<Separator className="w-full" />
 				<div className="space-y-1">
 					<Label htmlFor="language">Font</Label>

@@ -21,7 +21,7 @@ export default async function DashboardLayout({
 
 	return (
 		<section className="flex flex-col justify-center items-center">
-			<DashboardNavigationBar {...(userProfile as UserProfile)} />
+			<DashboardNavigationBar userProfile={userProfile as UserProfile} />
 			{children}
 		</section>
 	);
