@@ -34,15 +34,15 @@ export default function AccountSettings({ userProfile }: AccountSettingsProps) {
 
 	return (
 		<Card className="border-none shadow-none">
-			<CardHeader className="pt-0">
+			<CardHeader className="pt-0 pr-0">
 				<CardTitle>Account</CardTitle>
 				<CardDescription>
 					Set your preferred language and manage your account
 					credentials.
 				</CardDescription>
 			</CardHeader>
-			<form action={action}>
-				<CardContent className="space-y-6">
+			<CardContent className="space-y-6 pr-0">
+				<form action={action} className="space-y-6">
 					<Separator className="w-full" />
 					<div className="space-y-1">
 						<Label htmlFor="language">Language</Label>
@@ -140,8 +140,15 @@ export default function AccountSettings({ userProfile }: AccountSettingsProps) {
 					<Button type="submit" disabled={pending}>
 						Update Account
 					</Button>
-				</CardContent>
-			</form>
+				</form>
+				<div className="space-y-1">
+					<Label>Delete Account</Label>
+					<p className="text-sm text-muted-foreground font-normal">
+						This action cannot be undone. Please be certain
+					</p>
+					<Button variant="destructive">Delete Account</Button>
+				</div>
+			</CardContent>
 		</Card>
 	);
 }

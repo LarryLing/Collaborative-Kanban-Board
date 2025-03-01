@@ -52,7 +52,7 @@ export default async function DashboardPage() {
 	];
 
 	return (
-		<div className="p-8 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-4">
+		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<Dashboard fetchedBoards={fetchedBoards} />
 		</div>
 	);

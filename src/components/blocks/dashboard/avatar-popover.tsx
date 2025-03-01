@@ -23,13 +23,9 @@ import Link from "next/link";
 
 type AvatarPopoverProps = {
 	userProfile: UserProfile;
-	setIsSettingsDialogOpen: (arg0: boolean) => void;
 };
 
-export default function AvatarPopover({
-	userProfile,
-	setIsSettingsDialogOpen,
-}: AvatarPopoverProps) {
+export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 	const test_socials = [
 		"https://www.linkedin.com/in/larry-ling-student/",
 		"https://github.com/LarryLing",
@@ -75,13 +71,12 @@ export default function AvatarPopover({
 				</div>
 				<Separator className="w-full" />
 				<div className="flex justify-center items-center gap-5 h-9">
-					<Button
-						variant="ghost"
-						onClick={() => setIsSettingsDialogOpen(true)}
-					>
-						<Settings2 />
-						Settings
-					</Button>
+					<Link href="/settings">
+						<Button variant="ghost">
+							<Settings2 />
+							Settings
+						</Button>
+					</Link>
 					<Separator orientation="vertical" />
 					<Button variant="ghost" onClick={signout}>
 						<LogOut />

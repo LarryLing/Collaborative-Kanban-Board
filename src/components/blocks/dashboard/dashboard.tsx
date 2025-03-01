@@ -6,7 +6,6 @@ import BoardsDisplayHeader from "./boards-display-header";
 import { Separator } from "@/components/ui/separator";
 import GalleryView from "./gallery-view";
 import ListView from "./list-view";
-import SettingsDialog from "../settings-dialog/settings-dialog";
 
 type DashboardProps = {
 	fetchedBoards: BoardType[];
@@ -18,7 +17,6 @@ export default function Dashboard({ fetchedBoards }: DashboardProps) {
 	const [bookmarked, setBookmarked] = useState(false);
 	const [sortMethod, setSortMethod] = useState("Last opened");
 	const [query, setQuery] = useState("");
-	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 
 	const processedBoards = useMemo(
 		() =>

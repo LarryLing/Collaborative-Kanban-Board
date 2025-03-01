@@ -7,11 +7,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import React, { useState } from "react";
-import UpdateEmailCard from "./appearance-settings";
-import ChangePasswordCard from "./account-settings";
-import DeleteAccountCard from "./delete-account-card";
 import { UserProfile } from "@/lib/types";
-import UploadAvatarCard from "./upload-avatar-card";
 import { Button } from "@/components/ui/button";
 import ProfileSettings from "./profile-settings";
 import AccountSettings from "./account-settings";
@@ -24,7 +20,7 @@ type SettingsDialogProps = {
 	setIsSettingsDialogOpen: (arg0: boolean) => void;
 };
 
-type Tabs = "Profile" | "Account" | "Appearance" | "Danger Zone";
+type Tabs = "Profile" | "Account" | "Password" | "Appearance" | "Danger Zone";
 
 export default function SettingsDialog({
 	userProfile,
@@ -61,17 +57,17 @@ export default function SettingsDialog({
 						</Button>
 						<Button
 							variant="ghost"
+							className={`justify-start ${currentTab === "Password" ? "bg-accent" : ""}`}
+							onClick={() => setCurrentTab("Password")}
+						>
+							Password
+						</Button>
+						<Button
+							variant="ghost"
 							className={`justify-start ${currentTab === "Appearance" ? "bg-accent" : ""}`}
 							onClick={() => setCurrentTab("Appearance")}
 						>
 							Appearance
-						</Button>
-						<Button
-							variant="ghost"
-							className={`justify-start ${currentTab === "Danger Zone" ? "bg-accent" : ""}`}
-							onClick={() => setCurrentTab("Danger Zone")}
-						>
-							Danger Zone
 						</Button>
 					</div>
 					<div className="w-full">

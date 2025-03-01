@@ -8,7 +8,6 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import AvatarPopover from "./avatar-popover";
 import Branding from "../misc/branding";
-import SettingsDialog from "../settings-dialog/settings-dialog";
 
 export default function DashboardNavigationBar({
 	id,
@@ -18,7 +17,6 @@ export default function DashboardNavigationBar({
 	bio,
 	avatar,
 }: UserProfile) {
-	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
 	const [userProfile, setUserProfile] = useState<UserProfile>({
 		id,
 		display_name,
@@ -47,18 +45,9 @@ export default function DashboardNavigationBar({
 							<Moon className="size-4" />
 						)}
 					</Button>
-					<AvatarPopover
-						userProfile={userProfile}
-						setIsSettingsDialogOpen={setIsSettingsDialogOpen}
-					/>
+					<AvatarPopover userProfile={userProfile} />
 				</div>
 			</NavigationMenu>
-			<SettingsDialog
-				userProfile={userProfile}
-				setUserProfile={setUserProfile}
-				isSettingsDialogOpen={isSettingsDialogOpen}
-				setIsSettingsDialogOpen={setIsSettingsDialogOpen}
-			/>
 		</>
 	);
 }

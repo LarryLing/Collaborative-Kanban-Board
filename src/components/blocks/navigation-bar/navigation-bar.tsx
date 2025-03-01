@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import Link from "next/link"
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import {
 	NavigationMenu,
 	NavigationMenuItem,
 	NavigationMenuLink,
 	NavigationMenuList,
 	navigationMenuTriggerStyle,
-} from "../../ui/navigation-menu"
-import { Button } from "../../ui/button"
-import { LogIn, MenuIcon, PlusIcon, Settings, XIcon } from "lucide-react"
-import { Separator } from "../../ui/separator"
-import AvatarPopover from "../dashboard/avatar-popover"
-import ThemeDropdown from "./theme-dropdown"
-import UserWidget from "./user-widget"
-import SettingsDialog from "../settings-dialog/settings-dialog"
-import { UserProfile } from "@/lib/types"
-import { signout } from "@/lib/actions"
-import { createClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
-import { BrillianceIcon } from "@/components/icons/icon"
+} from "../../ui/navigation-menu";
+import { Button } from "../../ui/button";
+import { LogIn, MenuIcon, PlusIcon, Settings, XIcon } from "lucide-react";
+import { Separator } from "../../ui/separator";
+import AvatarPopover from "../dashboard/avatar-popover";
+import ThemeDropdown from "./theme-dropdown";
+import UserWidget from "./user-widget";
+import SettingsDialog from "../settings/settings-dialog";
+import { UserProfile } from "@/lib/types";
+import { signout } from "@/lib/actions";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { BrillianceIcon } from "@/components/icons/icon";
 
 const NavbarItems = [
 	{
@@ -39,55 +39,55 @@ const NavbarItems = [
 		name: "Item 4",
 		href: "/item4",
 	},
-]
+];
 
 type NavigationBarProps = {
-	user: User | null
-}
+	user: User | null;
+};
 
 export default function NavigationBar({ user }: NavigationBarProps) {
-	const supabase = createClient()
+	const supabase = createClient();
 
-	const [isMenuOpen, setIsMenuOpen] = useState(false)
-	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false)
-	const [isAvatarPopoverOpen, setIsAvatarPopoverOpen] = useState(false)
-	const [userProfile, setUserProfile] = useState<UserProfile | null>()
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+	const [isAvatarPopoverOpen, setIsAvatarPopoverOpen] = useState(false);
+	const [userProfile, setUserProfile] = useState<UserProfile | null>();
 
 	function openSettingsDialog() {
-		if (isMenuOpen) setIsMenuOpen(false)
-		if (isAvatarPopoverOpen) setIsAvatarPopoverOpen(false)
-		setIsSettingsDialogOpen(true)
+		if (isMenuOpen) setIsMenuOpen(false);
+		if (isAvatarPopoverOpen) setIsAvatarPopoverOpen(false);
+		setIsSettingsDialogOpen(true);
 	}
 
 	useEffect(() => {
 		async function getUserProfile(user: User | null) {
 			if (!user) {
-				setUserProfile(null)
-				return
+				setUserProfile(null);
+				return;
 			}
 
-			let tempProfile = null
+			let tempProfile = null;
 
 			const { data: profileData } = await supabase
 				.from("profiles")
 				.select("id, display_name, email, role, bio, avatar")
 				.eq("id", user.id)
-				.single()
+				.single();
 
-			tempProfile = profileData as UserProfile
+			tempProfile = profileData as UserProfile;
 
 			if (profileData && profileData.avatar) {
 				const { data: avatarUrl } = await supabase.storage
 					.from("avatars")
-					.getPublicUrl(profileData.avatar)
-				tempProfile.avatar = avatarUrl.publicUrl
+					.getPublicUrl(profileData.avatar);
+				tempProfile.avatar = avatarUrl.publicUrl;
 			}
 
-			setUserProfile(tempProfile)
+			setUserProfile(tempProfile);
 		}
 
-		getUserProfile(user)
-	}, [user, supabase])
+		getUserProfile(user);
+	}, [user, supabase]);
 
 	return (
 		<>
@@ -118,7 +118,7 @@ export default function NavigationBar({ user }: NavigationBarProps) {
 										</NavigationMenuLink>
 									</Link>
 								</NavigationMenuItem>
-							)
+							);
 						})}
 					</NavigationMenuList>
 				</div>
@@ -186,7 +186,7 @@ export default function NavigationBar({ user }: NavigationBarProps) {
 										</NavigationMenuLink>
 									</Link>
 								</NavigationMenuItem>
-							)
+							);
 						})}
 					</NavigationMenuList>
 					{userProfile && (
@@ -230,5 +230,5 @@ export default function NavigationBar({ user }: NavigationBarProps) {
 				/>
 			)}
 		</>
-	)
+	);
 }

@@ -40,14 +40,14 @@ export default function ProfileSettings({ userProfile }: ProfileSettingsProps) {
 
 	return (
 		<Card className="border-none shadow-none">
-			<CardHeader className="pt-0">
+			<CardHeader className="pt-0 pr-0">
 				<CardTitle>Profile</CardTitle>
 				<CardDescription>
 					This is how others will see you on the site.
 				</CardDescription>
 			</CardHeader>
 			<form action={action}>
-				<CardContent className="space-y-6">
+				<CardContent className="space-y-6 pr-0">
 					<Separator className="w-full" />
 					<div className="space-y-1">
 						<Label htmlFor="displayName">Display Name</Label>
