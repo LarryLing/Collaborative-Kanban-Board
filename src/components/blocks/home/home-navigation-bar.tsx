@@ -1,55 +1,55 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import Link from "next/link"
-import { UserProfile } from "@/lib/types"
-import { createClient } from "@/lib/supabase/client"
-import { User } from "@supabase/supabase-js"
-import { BrillianceIcon } from "@/components/icons/icon"
-import { NavigationMenu } from "@/components/ui/navigation-menu"
-import { Button } from "@/components/ui/button"
-import { Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
-import Branding from "../misc/branding"
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { UserProfile } from "@/lib/types";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
+import { BrillianceIcon } from "@/components/icons/icon";
+import { NavigationMenu } from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
+import Branding from "../misc/branding";
 
 type HomeNavigationBarProps = {
-	user: User | null
-}
+	user: User | null;
+};
 
 export default function NavigationBar({ user }: HomeNavigationBarProps) {
-	const supabase = createClient()
-	const { theme, setTheme } = useTheme()
-	const [userProfile, setUserProfile] = useState<UserProfile | null>()
+	const supabase = createClient();
+	const { theme, setTheme } = useTheme();
+	const [userProfile, setUserProfile] = useState<UserProfile | null>();
 
 	useEffect(() => {
 		async function getUserProfile(user: User | null) {
 			if (!user) {
-				setUserProfile(null)
-				return
+				setUserProfile(null);
+				return;
 			}
 
-			let tempProfile = null
+			let tempProfile = null;
 
 			const { data: profileData } = await supabase
 				.from("profiles")
 				.select("id, display_name, email, role, bio, avatar")
 				.eq("id", user.id)
-				.single()
+				.single();
 
-			tempProfile = profileData as UserProfile
+			tempProfile = profileData as UserProfile;
 
 			if (profileData && profileData.avatar) {
 				const { data: avatarUrl } = await supabase.storage
 					.from("avatars")
-					.getPublicUrl(profileData.avatar)
-				tempProfile.avatar = avatarUrl.publicUrl
+					.getPublicUrl(profileData.avatar);
+				tempProfile.avatar = avatarUrl.publicUrl;
 			}
 
-			setUserProfile(tempProfile)
+			setUserProfile(tempProfile);
 		}
 
-		getUserProfile(user)
-	}, [user, supabase])
+		getUserProfile(user);
+	}, [user, supabase]);
 
 	return (
 		<>
@@ -62,19 +62,6 @@ export default function NavigationBar({ user }: HomeNavigationBarProps) {
 					<span className="hidden sm:inline">Kanban Board</span>
 				</Link>
 				<div className="flex justify-center items-center gap-4">
-					<Button
-						variant="ghost"
-						size="icon"
-						onClick={() =>
-							setTheme(theme === "light" ? "dark" : "light")
-						}
-					>
-						{theme === "light" ? (
-							<Sun className="size-4" />
-						) : (
-							<Moon className="size-4" />
-						)}
-					</Button>
 					{userProfile ? (
 						<Link href="/dashboard">
 							<Button>Dashboard</Button>
@@ -92,5 +79,5 @@ export default function NavigationBar({ user }: HomeNavigationBarProps) {
 				</div>
 			</NavigationMenu>
 		</>
-	)
+	);
 }
