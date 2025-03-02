@@ -37,15 +37,15 @@ export default function AccountSettings({ userProfile }: AccountSettingsProps) {
 
 	return (
 		<>
-			<Card className="border-none shadow-none">
-				<CardHeader className="pt-0 pr-0">
+			<Card className="border-none shadow-none flex-auto">
+				<CardHeader className="md:pt-0">
 					<CardTitle>Account</CardTitle>
 					<CardDescription>
 						Set your preferred language and manage your account
 						credentials.
 					</CardDescription>
 				</CardHeader>
-				<CardContent className="space-y-6 pr-0">
+				<CardContent className="space-y-6">
 					<Separator className="w-full" />
 					<div className="space-y-1">
 						<Label>Email</Label>
@@ -207,24 +207,13 @@ function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
-					<DialogTitle>Confirm Delete</DialogTitle>
+					<DialogTitle>Update Password</DialogTitle>
 					<DialogDescription>
-						Are you sure you want to delete this board?
+						You will be asked to sign in again after confirming your
+						password.
 					</DialogDescription>
 				</DialogHeader>
 				<form className="flex flex-col justify-center items-start gap-2">
-					<Input
-						id="currentPassword"
-						name="currentPassword"
-						type="password"
-						placeholder="Current Password"
-						className="max-w-[400px]"
-					/>
-					{/* {state?.errors?.password && (
-									<p className="text-sm text-destructive">
-										{state.errors.password}
-									</p>
-								)} */}
 					<Input
 						id="newPassword"
 						name="newPassword"

@@ -20,21 +20,22 @@ import { Label } from "@/components/ui/label";
 import React, { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useTheme } from "next-themes";
+import Image from "next/image";
 
 export default function AppearanceSettings() {
 	const { theme, setTheme } = useTheme();
 	const [font, setFont] = useState("Inter");
 
 	return (
-		<Card className="border-none shadow-none">
-			<CardHeader className="pt-0 pr-0">
+		<Card className="border-none shadow-none flex-auto">
+			<CardHeader className="md:pt-0">
 				<CardTitle>Appearance</CardTitle>
 				<CardDescription>
 					Choose how the site looks to you. Selections are applied
 					immediately and saved automatically.
 				</CardDescription>
 			</CardHeader>
-			<CardContent className="space-y-6 pr-0">
+			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="space-y-1">
 					<Label htmlFor="language">Font</Label>
@@ -57,17 +58,20 @@ export default function AppearanceSettings() {
 					<p className="text-sm text-muted-foreground font-normal">
 						Switch between light and dark themes.
 					</p>
-					<div className="space-x-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 						<ThemeOption
-							theme="Light"
-							background="bg-white"
-							skeleton="black"
+							currentTheme={theme}
+							theme="System"
 							setTheme={setTheme}
 						/>
 						<ThemeOption
+							currentTheme={theme}
+							theme="Light"
+							setTheme={setTheme}
+						/>
+						<ThemeOption
+							currentTheme={theme}
 							theme="Dark"
-							background="bg-black"
-							skeleton="white"
 							setTheme={setTheme}
 						/>
 					</div>
@@ -78,41 +82,28 @@ export default function AppearanceSettings() {
 }
 
 type ThemeOptionProps = {
+	currentTheme: string | undefined;
 	theme: string;
-	background: string;
-	skeleton: string;
 	setTheme: React.Dispatch<React.SetStateAction<string>>;
 };
 
-function ThemeOption({
-	theme,
-	background,
-	skeleton,
-	setTheme,
-}: ThemeOptionProps) {
+function ThemeOption({ currentTheme, theme, setTheme }: ThemeOptionProps) {
 	return (
 		<div
-			className="max-w-[240px] w-full inline-block space-y-1 cursor-pointer"
+			className="w-full h-[180px] cursor-pointer rounded-md border border-border overflow-hidden group"
 			onClick={() => setTheme(theme.toLowerCase())}
 		>
-			<div className="md:max-h-none h-[160px] border border-border rounded-md overflow-hidden group">
-				<div
-					className={`h-full flex flex-col justify-center items-center space-y-3 ${background}`}
-				>
-					<div
-						className={`h-[75px] w-[200px] rounded-[6px] border border-${skeleton}/30`}
-					/>
-					<div className="space-y-2">
-						<div
-							className={`h-4 w-[200px] rounded-[6px] bg-${skeleton}`}
-						/>
-						<div
-							className={`h-4 w-[150px] rounded-[6px] bg-${skeleton}`}
-						/>
-					</div>
-				</div>
+			<div className="w-full h-[130px] relative">
+				<Image
+					src="https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0"
+					alt=""
+					objectFit="cover"
+					layout="fill"
+				/>
 			</div>
-			<p className="font-semibold text-sm text-center">{theme}</p>
+			<div className="h-[50px] flex justify-start items-center px-4 bg-inherit hover:bg-accent/60 transition-colors">
+				<p className="font-semibold text-sm text-center">{theme}</p>
+			</div>
 		</div>
 	);
 }

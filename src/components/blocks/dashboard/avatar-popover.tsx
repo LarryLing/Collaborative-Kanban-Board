@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LinkIcon, LogOut, Settings2 } from "lucide-react";
+import { LayoutGrid, LinkIcon, LogOut, Settings2 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signout } from "@/lib/actions";
@@ -45,7 +45,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 				</Avatar>
 			</PopoverTrigger>
 			<PopoverContent
-				className="z-[9999] w-[312px] hidden md:block p-4 space-y-3"
+				className="z-[9999] w-[312px] hidden md:block space-y-3"
 				hideWhenDetached
 			>
 				<div className="flex justify-start items-center">
@@ -63,22 +63,38 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 					</div>
 				</div>
 				<Separator className="w-full" />
-				<div className="space-y-1">
-					<p className="text-sm">{bio}</p>
-				</div>
-				<div className="space-y-1">
-					<Socials socials={test_socials} />
-				</div>
+				<p className="text-sm">{bio}</p>
+				<Socials socials={test_socials} />
+
+				{/* <div className="space-y-1 px-4"></div>
+				<div className="space-y-1 px-4"></div> */}
 				<Separator className="w-full" />
-				<div className="flex justify-center items-center gap-5 h-9">
-					<Link href="/settings/profile">
-						<Button variant="ghost">
+				<div className="flex flex-col justify-center items-center gap-2">
+					<Button
+						variant="ghost"
+						className="w-full justify-start"
+						asChild
+					>
+						<Link href="/dashboard">
+							<LayoutGrid />
+							Dashboard
+						</Link>
+					</Button>
+					<Button
+						variant="ghost"
+						className="w-full justify-start"
+						asChild
+					>
+						<Link href="/settings/profile">
 							<Settings2 />
 							Settings
-						</Button>
-					</Link>
-					<Separator orientation="vertical" />
-					<Button variant="ghost" onClick={signout}>
+						</Link>
+					</Button>
+					<Button
+						variant="ghost"
+						className="w-full justify-start"
+						onClick={signout}
+					>
 						<LogOut />
 						Sign Out
 					</Button>
@@ -178,11 +194,11 @@ function Socials({ socials }: SocialsProps) {
 	}
 
 	return (
-		<ul className="text-sm space-y-2">
+		<ul className="text-sm space-y-1">
 			{socials.map((social) => (
-				<li key={social} className="flex items-center gap-2">
+				<Button variant="link" className="flex" key={social}>
 					{getSocialIcon(social)}
-				</li>
+				</Button>
 			))}
 		</ul>
 	);
