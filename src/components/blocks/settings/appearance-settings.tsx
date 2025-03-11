@@ -4,7 +4,6 @@ import {
 	Card,
 	CardContent,
 	CardDescription,
-	CardFooter,
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
@@ -23,8 +22,8 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 
 export default function AppearanceSettings() {
-	const { theme, setTheme } = useTheme();
 	const [font, setFont] = useState("Inter");
+	const { theme, setTheme } = useTheme();
 
 	return (
 		<Card className="border-none shadow-none flex-auto">

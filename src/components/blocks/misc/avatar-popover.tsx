@@ -8,38 +8,31 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LayoutGrid, LinkIcon, LogOut, Settings2 } from "lucide-react";
+import { LayoutGrid, LogOut, Settings2 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signout } from "@/lib/actions";
-import {
-	FacebookIcon,
-	GithubIcon,
-	InstagramIcon,
-	LinkedInIcon,
-	TwitterXIcon,
-} from "@/components/icons/icon";
 import Link from "next/link";
-import { usePublicAvatar } from "@/hooks/use-public-avatar";
+import { getSocialIcon } from "@/lib/utils";
 
 type AvatarPopoverProps = {
 	userProfile: UserProfile;
 };
 
 export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
-	const { publicAvatarUrl } = usePublicAvatar(userProfile.avatar);
-
 	const test_socials = [
 		"https://www.linkedin.com/in/larry-ling-student/",
 		"https://github.com/LarryLing",
-		"https://x.com/sza",
+		"https://www.instagram.com/larryling.04/",
 	];
+
+	const urls = test_socials.map((test_social) => new URL(test_social));
 
 	return (
 		<Popover>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={publicAvatarUrl} />
+					<AvatarImage src={userProfile.avatarUrl} />
 					<AvatarFallback>
 						{userProfile.display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
@@ -51,7 +44,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 			>
 				<div className="flex justify-start items-center">
 					<Avatar>
-						<AvatarImage src={publicAvatarUrl} />
+						<AvatarImage src={userProfile.avatarUrl} />
 						<AvatarFallback>
 							{userProfile.display_name
 								.substring(0, 2)
@@ -69,7 +62,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 				</div>
 				<Separator className="w-full" />
 				<p className="text-sm">{userProfile.bio}</p>
-				<Socials socials={test_socials} />
+				<Socials urls={urls} />
 
 				{/* <div className="space-y-1 px-4"></div>
 				<div className="space-y-1 px-4"></div> */}
@@ -110,99 +103,21 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 }
 
 type SocialsProps = {
-	socials: string[];
+	urls: URL[];
 };
 
-function Socials({ socials }: SocialsProps) {
-	function getSocialIcon(social: string) {
-		const url = new URL(social);
-
-		switch (url.hostname) {
-			case "www.linkedin.com":
-				return (
-					<>
-						<LinkedInIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-
-			case "github.com":
-				return (
-					<>
-						<GithubIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-
-			case "www.instagram.com":
-				return (
-					<>
-						<InstagramIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-
-			case "www.facebook.com":
-				return (
-					<>
-						<FacebookIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-
-			case "x.com":
-				return (
-					<>
-						<TwitterXIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-
-			default:
-				return (
-					<>
-						<LinkIcon className="size-4" fill="currentColor" />
-						<Link
-							href={social}
-							className="underline-offset-4 hover:underline"
-						>
-							{url.pathname.substring(1)}
-						</Link>
-					</>
-				);
-		}
-	}
-
+function Socials({ urls }: SocialsProps) {
 	return (
 		<ul className="text-sm space-y-1">
-			{socials.map((social) => (
-				<Button variant="link" className="flex" key={social}>
-					{getSocialIcon(social)}
+			{urls.map((url) => (
+				<Button variant="link" className="flex" key={url.hostname}>
+					{getSocialIcon(url.hostname)}
+					<Link
+						href={url.href}
+						className="underline-offset-4 hover:underline"
+					>
+						{url.pathname.substring(1)}
+					</Link>
 				</Button>
 			))}
 		</ul>

@@ -12,25 +12,44 @@ export function useClientUser() {
 		email: "",
 		role: "",
 		bio: "",
-		avatar: "",
+		avatarUrl: "",
 	});
 
 	useEffect(() => {
 		async function fetchUser() {
 			const supabase = await createClient();
-			const { data: userData } = await supabase.auth.getUser();
+			const { data: user } = await supabase.auth.getUser();
 
-			if (!userData.user) redirect("/login");
+			if (!user.user) redirect("/login");
 
-			const { data: userProfile } = await supabase
+			const { data: profile } = await supabase
 				.from("profiles")
 				.select("id, display_name, email, role, bio, avatar")
-				.eq("id", userData.user.id)
+				.eq("id", user.user.id)
 				.single();
+
+			const userProfile: UserProfile = {
+				id: profile?.id,
+				display_name: profile?.display_name,
+				email: profile?.email,
+				role: profile?.role,
+				bio: profile?.bio,
+				avatarUrl: "",
+			};
+
+			if (profile && profile.avatar) {
+				const supabase = await createClient();
+				const { data: publicUrl } = await supabase.storage
+					.from("avatars")
+					.getPublicUrl(profile.avatar);
+
+				userProfile.avatarUrl = publicUrl.publicUrl;
+			}
 
 			setUserProfile(userProfile as UserProfile);
 
-			if (userProfile === null) redirect("/login");
+			if (userProfile === null)
+				throw new Error("could not fetch user data");
 		}
 
 		fetchUser();

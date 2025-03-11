@@ -15,11 +15,10 @@ import { updateUserProfile } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { usePublicAvatar } from "@/hooks/use-public-avatar";
+import { getSocialIcon } from "@/lib/utils";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
@@ -31,8 +30,6 @@ export default function ProfileSettings({
 	setUserProfile,
 }: ProfileSettingsProps) {
 	const supabase = createClient();
-
-	const { publicAvatarUrl } = usePublicAvatar(userProfile.avatar);
 
 	const [uploading, setUploading] = useState(false);
 	const [imageTooLarge, setImageTooLarge] = useState(false);
@@ -86,10 +83,15 @@ export default function ProfileSettings({
 
 		if (profileError) throw profileError;
 
+		const { data: publicUrl } = await supabase.storage
+			.from("avatars")
+			.getPublicUrl(filePath);
+
 		setUserProfile({
 			...userProfile,
-			avatar: filePath,
+			avatarUrl: publicUrl.publicUrl,
 		});
+
 		setUploading(false);
 
 		toast({
@@ -97,6 +99,14 @@ export default function ProfileSettings({
 			description: "Your avatar was successfully updated!",
 		});
 	}
+
+	const test_socials = [
+		"https://www.linkedin.com/in/larry-ling-student/",
+		"https://github.com/LarryLing",
+		"https://www.instagram.com/larryling.04/",
+	];
+
+	const urls = test_socials.map((test_social) => new URL(test_social));
 
 	return (
 		<Card className="border-none shadow-none flex-auto">
@@ -112,7 +122,7 @@ export default function ProfileSettings({
 					<form className="space-y-2">
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
-							<AvatarImage src={publicAvatarUrl} />
+							<AvatarImage src={userProfile.avatarUrl} />
 							<AvatarFallback>
 								{userProfile.display_name
 									.substring(0, 2)
@@ -170,30 +180,33 @@ export default function ProfileSettings({
 						<div className="space-y-1">
 							<Label htmlFor="social">Social Accounts</Label>
 							<div className="flex justify-center items-center gap-2">
-								<Link className="size-4" />
+								{getSocialIcon(urls[0].hostname)}
 								<Input
 									id="social1"
 									name="social1"
 									type="text"
 									placeholder="Link to social profile"
+									defaultValue={urls[0].href}
 								/>
 							</div>
 							<div className="flex justify-center items-center gap-2">
-								<Link className="size-4" />
+								{getSocialIcon(urls[1].hostname)}
 								<Input
 									id="social2"
 									name="social2"
 									type="text"
 									placeholder="Link to social profile"
+									defaultValue={urls[1].href}
 								/>
 							</div>
 							<div className="flex justify-center items-center gap-2">
-								<Link className="size-4" />
+								{getSocialIcon(urls[2].hostname)}
 								<Input
 									id="social3"
 									name="social3"
 									type="text"
 									placeholder="Link to social profile"
+									defaultValue={urls[2].href}
 								/>
 							</div>
 						</div>

@@ -1,17 +1,17 @@
-import Branding from "@/components/blocks/misc/branding"
-import { createClient } from "@/lib/supabase/server"
-import { redirect } from "next/navigation"
+import Branding from "@/components/blocks/misc/branding";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 export default async function AuthenticationLayout({
 	children,
 }: {
-	children: React.ReactNode
+	children: React.ReactNode;
 }) {
-	const supabase = await createClient()
+	const supabase = await createClient();
 
-	const { data } = await supabase.auth.getUser()
+	const { data } = await supabase.auth.getUser();
 	if (data.user) {
-		redirect("/")
+		redirect("/");
 	}
 
 	return (
@@ -23,5 +23,5 @@ export default async function AuthenticationLayout({
 			</div>
 			{children}
 		</section>
-	)
+	);
 }

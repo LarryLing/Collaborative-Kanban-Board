@@ -4,7 +4,7 @@ export type UserProfile = {
 	email: string;
 	role: string;
 	bio: string;
-	avatar: string | undefined;
+	avatarUrl: string | undefined;
 };
 
 export type BoardType = {
@@ -16,6 +16,3 @@ export type BoardType = {
 	title: string;
 	last_opened: string;
 };
-
-type OwnershipTypes = "Owned by anyone" | "Owned by me" | "Not owned by me";
-type SortMethodTypes = "Last opened" | "Sort ascending" | "Sort descending";

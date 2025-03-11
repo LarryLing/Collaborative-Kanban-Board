@@ -1,6 +1,6 @@
 "use client";
 
-import DashboardNavigationBar from "@/components/blocks/dashboard/dashboard-navigation-bar";
+import AuthenticatedNavigationBar from "@/components/blocks/misc/authenticated-navigation-bar";
 import AccountSettings from "@/components/blocks/settings/account-settings";
 import AppearanceSettings from "@/components/blocks/settings/appearance-settings";
 import ProfileSettings from "@/components/blocks/settings/profile-settings";
@@ -17,8 +17,8 @@ export default function ProfileSettingsPage() {
 	>("profile");
 
 	return (
-		<section className="flex flex-col justify-center items-center">
-			<DashboardNavigationBar userProfile={userProfile} />
+		<div className="flex flex-col justify-center items-center">
+			<AuthenticatedNavigationBar userProfile={userProfile} />
 			<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 				<div className="flex flex-col gap-4">
 					<h2 className="font-semibold text-3xl">Settings</h2>
@@ -66,6 +66,6 @@ export default function ProfileSettingsPage() {
 					{activeTab === "appearance" && <AppearanceSettings />}
 				</div>
 			</div>
-		</section>
+		</div>
 	);
 }
