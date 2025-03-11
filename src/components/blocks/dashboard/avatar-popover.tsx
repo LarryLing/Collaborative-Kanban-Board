@@ -20,27 +20,28 @@ import {
 	TwitterXIcon,
 } from "@/components/icons/icon";
 import Link from "next/link";
+import { usePublicAvatar } from "@/hooks/use-public-avatar";
 
 type AvatarPopoverProps = {
 	userProfile: UserProfile;
 };
 
 export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
+	const { publicAvatarUrl } = usePublicAvatar(userProfile.avatar);
+
 	const test_socials = [
 		"https://www.linkedin.com/in/larry-ling-student/",
 		"https://github.com/LarryLing",
 		"https://x.com/sza",
 	];
 
-	const { display_name, email, bio, avatar } = userProfile;
-
 	return (
 		<Popover>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={avatar} />
+					<AvatarImage src={publicAvatarUrl} />
 					<AvatarFallback>
-						{display_name.substring(0, 2).toUpperCase()}
+						{userProfile.display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
@@ -50,20 +51,24 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 			>
 				<div className="flex justify-start items-center">
 					<Avatar>
-						<AvatarImage src={avatar} />
+						<AvatarImage src={publicAvatarUrl} />
 						<AvatarFallback>
-							{display_name.substring(0, 2).toUpperCase()}
+							{userProfile.display_name
+								.substring(0, 2)
+								.toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div className="ml-2">
-						<h3 className="font-bold">{display_name}</h3>
+						<h3 className="font-bold">
+							{userProfile.display_name}
+						</h3>
 						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
-							{email}
+							{userProfile.email}
 						</p>
 					</div>
 				</div>
 				<Separator className="w-full" />
-				<p className="text-sm">{bio}</p>
+				<p className="text-sm">{userProfile.bio}</p>
 				<Socials socials={test_socials} />
 
 				{/* <div className="space-y-1 px-4"></div>
@@ -85,7 +90,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 						className="w-full justify-start"
 						asChild
 					>
-						<Link href="/settings/profile">
+						<Link href="/settings">
 							<Settings2 />
 							Settings
 						</Link>

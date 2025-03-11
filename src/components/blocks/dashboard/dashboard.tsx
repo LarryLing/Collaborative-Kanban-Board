@@ -31,7 +31,7 @@ export default function Dashboard({ fetchedBoards }: DashboardProps) {
 	);
 
 	return (
-		<>
+		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<BoardsDisplayHeader
 				ownership={ownership}
 				setOwnership={setOwnership}
@@ -50,7 +50,7 @@ export default function Dashboard({ fetchedBoards }: DashboardProps) {
 			) : (
 				<GalleryView boards={processedBoards} />
 			)}
-		</>
+		</div>
 	);
 }
 

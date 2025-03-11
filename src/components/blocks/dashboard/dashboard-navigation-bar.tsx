@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import { UserProfile } from "@/lib/types";
 import { NavigationMenu } from "@/components/ui/navigation-menu";

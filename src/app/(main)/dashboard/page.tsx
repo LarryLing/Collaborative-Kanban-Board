@@ -1,5 +1,8 @@
 import Dashboard from "@/components/blocks/dashboard/dashboard";
-import { BoardType } from "@/lib/types";
+import DashboardNavigationBar from "@/components/blocks/dashboard/dashboard-navigation-bar";
+import { createClient } from "@/lib/supabase/server";
+import { BoardType, UserProfile } from "@/lib/types";
+import { redirect } from "next/navigation";
 import React from "react";
 
 export default async function DashboardPage() {
@@ -51,8 +54,20 @@ export default async function DashboardPage() {
 		},
 	];
 
+	const supabase = await createClient();
+	const { data: userData } = await supabase.auth.getUser();
+
+	if (!userData.user) redirect("/login");
+
+	const { data: userProfile } = await supabase
+		.from("profiles")
+		.select("id, display_name, email, role, bio, avatar")
+		.eq("id", userData.user.id)
+		.single();
+
 	return (
-		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
+		<div className="flex flex-col justify-center items-center">
+			<DashboardNavigationBar userProfile={userProfile as UserProfile} />
 			<Dashboard fetchedBoards={fetchedBoards} />
 		</div>
 	);
