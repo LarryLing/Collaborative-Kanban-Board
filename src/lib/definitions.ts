@@ -1,4 +1,4 @@
-import { z } from "zod"
+import { z } from "zod";
 
 export const SignupFormSchema = z
 	.object({
@@ -28,16 +28,16 @@ export const SignupFormSchema = z
 	.refine((data) => /^[a-zA-Z0-9 ]*$/gi.test(data.displayName), {
 		message: "Name cannot contain special characters",
 		path: ["displayName"],
-	})
+	});
 
 export const LoginFormSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email." }),
 	password: z.string().min(1, { message: "Please enter a password." }).trim(),
-})
+});
 
 export const EmailFormSchema = z.object({
 	email: z.string().email({ message: "Please enter a valid email." }),
-})
+});
 
 export const ResetPasswordFormSchema = z
 	.object({
@@ -56,7 +56,7 @@ export const ResetPasswordFormSchema = z
 	.refine((data) => data.newPassword === data.confirmPassword, {
 		message: "Passwords don't match",
 		path: ["confirmPassword"],
-	})
+	});
 
 export const ResetForgottenPasswordFormSchema = z
 	.object({
@@ -74,7 +74,7 @@ export const ResetForgottenPasswordFormSchema = z
 	.refine((data) => data.newPassword === data.confirmPassword, {
 		message: "Passwords don't match",
 		path: ["confirmPassword"],
-	})
+	});
 
 export const EditProfileFormSchema = z.object({
 	displayName: z
@@ -84,21 +84,24 @@ export const EditProfileFormSchema = z.object({
 			message: "Name must start with non-whitespace character",
 		})
 		.trim(),
-	role: z.string().trim(),
-	bio: z.string().trim(),
-})
+	aboutMe: z.string().trim(),
+	social0: z.string().url().optional().or(z.literal("")),
+	social1: z.string().url().optional().or(z.literal("")),
+	social2: z.string().url().optional().or(z.literal("")),
+	social3: z.string().url().optional().or(z.literal("")),
+});
 
 export type FormState =
 	| {
 			errors?: {
-				displayName?: string[]
-				email?: string[]
-				password?: string[]
-				newPassword?: string[]
-				confirmPassword?: string[]
-				role?: string[]
-				bio?: string[]
-				success?: string[]
-			}
+				displayName?: string[];
+				email?: string[];
+				password?: string[];
+				newPassword?: string[];
+				confirmPassword?: string[];
+				role?: string[];
+				bio?: string[];
+				success?: string[];
+			};
 	  }
-	| undefined
+	| undefined;

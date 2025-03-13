@@ -49,7 +49,15 @@ export function getLastOpened(datetime: string) {
 	);
 }
 
-export function getSocialIcon(hostname: string) {
+export function getSocialIcon(socialUrl: string) {
+	let url;
+
+	try {
+		url = new URL(socialUrl);
+	} catch {
+		return <LinkIcon className="size-4" />;
+	}
+
 	const socialIconMap = {
 		"www.linkedin.com": (
 			<LinkedInIcon className="size-4" fill="currentColor" />
@@ -65,14 +73,14 @@ export function getSocialIcon(hostname: string) {
 	};
 
 	if (
-		hostname !== "www.linkedin.com" &&
-		hostname !== "github.com" &&
-		hostname !== "www.instagram.com" &&
-		hostname !== "www.facebook.com" &&
-		hostname !== "x.com"
+		url.hostname !== "www.linkedin.com" &&
+		url.hostname !== "github.com" &&
+		url.hostname !== "www.instagram.com" &&
+		url.hostname !== "www.facebook.com" &&
+		url.hostname !== "x.com"
 	) {
 		return <LinkIcon className="size-4" />;
 	}
 
-	return <>{socialIconMap[hostname]}</>;
+	return <>{socialIconMap[url.hostname]}</>;
 }

@@ -7,6 +7,7 @@ import ProfileSettings from "@/components/blocks/settings/profile-settings";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useClientUser } from "@/hooks/use-client-user";
+import { useToast } from "@/hooks/use-toast";
 import { Brush, Settings, User } from "lucide-react";
 import React, { useState } from "react";
 
@@ -15,6 +16,7 @@ export default function ProfileSettingsPage() {
 	const [activeTab, setActiveTab] = useState<
 		"profile" | "account" | "appearance"
 	>("profile");
+	const { toast } = useToast();
 
 	return (
 		<div className="flex flex-col justify-center items-center">
@@ -55,12 +57,14 @@ export default function ProfileSettingsPage() {
 						<ProfileSettings
 							userProfile={userProfile}
 							setUserProfile={setUserProfile}
+							toast={toast}
 						/>
 					)}
 					{activeTab === "account" && (
 						<AccountSettings
 							userProfile={userProfile}
 							setUserProfile={setUserProfile}
+							toast={toast}
 						/>
 					)}
 					{activeTab === "appearance" && <AppearanceSettings />}

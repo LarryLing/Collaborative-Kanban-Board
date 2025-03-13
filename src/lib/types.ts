@@ -4,7 +4,7 @@ export type UserProfile = {
 	email: string;
 	aboutMe: string;
 	avatarUrl?: string;
-	socials: URL[];
+	socials: string[];
 };
 
 export type BoardType = {

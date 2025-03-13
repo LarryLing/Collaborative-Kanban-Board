@@ -30,14 +30,23 @@ export function useClientUser() {
 			if (profileError) throw profileError;
 
 			const { data: socialsData, error: socialsError } = await supabase
-				.from("profiles_socials_bridge")
-				.select("social_id, socials(id, url)")
+				.from("socials")
+				.select("url")
 				.eq("profile_id", user.user.id);
 
 			if (socialsError) throw socialsError;
 
-			let avatarUrl;
+			// const socials = [];
+			// const socialsDataLength = socialsData.length;
+			// for (let i = 0; i < 4; i++) {
+			// 	if (i < socialsDataLength) {
+			// 		socials.push(new URL(socialsData[i].url));
+			// 	} else {
+			// 		socials.push(undefined);
+			// 	}
+			// }
 
+			let avatarUrl;
 			if (profileData && profileData.avatar_path) {
 				const supabase = await createClient();
 				const { data: publicUrl } = await supabase.storage
@@ -53,9 +62,7 @@ export function useClientUser() {
 				email: profileData.email,
 				aboutMe: profileData.about_me,
 				avatarUrl: avatarUrl,
-				socials: socialsData.map(
-					(socialData) => new URL(socialData.socials.url),
-				),
+				socials: socialsData.map((social) => social.url),
 			};
 
 			setUserProfile(userProfile as UserProfile);

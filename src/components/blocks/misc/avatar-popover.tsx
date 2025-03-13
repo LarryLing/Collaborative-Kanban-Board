@@ -60,21 +60,25 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 					<>
 						<Separator className="w-full" />
 						<div className="text-sm space-y-1">
-							{userProfile.socials.map((social, index) => (
-								<Button
-									variant="link"
-									className="flex"
-									key={`social_${index}`}
-								>
-									{getSocialIcon(social.hostname)}
-									<Link
-										href={social.href}
-										className="underline-offset-4 hover:underline"
+							{userProfile.socials
+								.filter((social) => social !== "")
+								.map((social, index) => (
+									<Button
+										variant="link"
+										className="flex"
+										key={`social_${index}`}
 									>
-										{social.pathname.substring(1)}
-									</Link>
-								</Button>
-							))}
+										{getSocialIcon(social)}
+										<Link
+											href={social}
+											className="underline-offset-4 hover:underline"
+										>
+											{new URL(social).pathname.substring(
+												1,
+											)}
+										</Link>
+									</Button>
+								))}
 						</div>
 					</>
 				)}

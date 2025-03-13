@@ -25,11 +25,13 @@ import { Input } from "@/components/ui/input";
 type AccountSettingsProps = {
 	userProfile: UserProfile;
 	setUserProfile: (arg0: UserProfile) => void;
+	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function AccountSettings({
 	userProfile,
 	setUserProfile,
+	toast,
 }: AccountSettingsProps) {
 	const [isAccountDeleteDialogOpen, setIsAccountDeleteDialogOpen] =
 		useState(false);

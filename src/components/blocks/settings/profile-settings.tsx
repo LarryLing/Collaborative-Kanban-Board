@@ -10,96 +10,54 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
+import React, { useActionState, useEffect } from "react";
 import { updateUserProfile } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
-import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
 import { LinkIcon } from "lucide-react";
+import { useProfile } from "@/hooks/use-profile";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
 	setUserProfile: (arg0: UserProfile) => void;
+	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function ProfileSettings({
 	userProfile,
 	setUserProfile,
+	toast,
 }: ProfileSettingsProps) {
-	const supabase = createClient();
-
-	const [uploading, setUploading] = useState(false);
-	const [imageTooLarge, setImageTooLarge] = useState(false);
-	const MAX_FILE_SIZE = 6000000;
-
-	const { toast } = useToast();
-
+	const { uploadAvatar, uploading, error } = useProfile(
+		userProfile,
+		setUserProfile,
+		toast,
+	);
 	const [state, action, pending] = useActionState(
 		updateUserProfile,
 		undefined,
 	);
 
 	useEffect(() => {
-		if (state?.message !== undefined) {
+		if (state?.updatedProfile !== undefined) {
+			setUserProfile({
+				id: userProfile.id,
+				email: userProfile.email,
+				displayName: state.updatedProfile.displayName,
+				aboutMe: state.updatedProfile.aboutMe,
+				avatarUrl: userProfile.avatarUrl,
+				socials: state.updatedProfile.socials
+			});
+
 			toast({
 				title: "Success",
-				description: state.message,
+				description: "Your profile has been successfully updated!",
 			});
 		}
-	}, [state?.message]);
-
-	async function uploadAvatar(e: ChangeEvent<HTMLInputElement>) {
-		setUploading(true);
-
-		if (!e.target.files || e.target.files?.length === 0) {
-			setUploading(false);
-			return;
-		}
-		setImageTooLarge(e.target.files[0].size > MAX_FILE_SIZE);
-		if (e.target.files[0].size > MAX_FILE_SIZE) {
-			setUploading(false);
-			return;
-		}
-
-		const file = e.target.files[0];
-		const fileExt = file.name.split(".").pop();
-		const filePath = `${userProfile.id}/avatar_${Date.now()}.${fileExt}`;
-
-		const { error: uploadError } = await supabase.storage
-			.from("avatars")
-			.upload(filePath, file);
-
-		if (uploadError) throw uploadError;
-
-		const { error: profileError } = await supabase
-			.from("profiles")
-			.update({
-				avatar_path: filePath,
-			})
-			.eq("id", userProfile.id);
-
-		if (profileError) throw profileError;
-
-		const { data: publicUrl } = await supabase.storage
-			.from("avatars")
-			.getPublicUrl(filePath);
-
-		setUserProfile({
-			...userProfile,
-			avatarUrl: publicUrl.publicUrl,
-		});
-
-		setUploading(false);
-
-		toast({
-			title: "Success",
-			description: "Your avatar was successfully updated!",
-		});
-	}
+	}, [state?.updatedProfile]);
 
 	return (
 		<Card className="border-none shadow-none flex-auto">
@@ -112,7 +70,7 @@ export default function ProfileSettings({
 			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="flex flex-col lg:flex-row-reverse gap-6">
-					<form className="space-y-2">
+					<form className="space-y-2" action={action}>
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
 							<AvatarImage src={userProfile.avatarUrl} />
@@ -131,10 +89,8 @@ export default function ProfileSettings({
 							disabled={uploading}
 							className="justify-center items-center"
 						/>
-						{imageTooLarge && (
-							<p className="text-sm text-destructive">
-								Max file size is 6MB
-							</p>
+						{error && (
+							<p className="text-sm text-destructive">{error}</p>
 						)}
 					</form>
 					<form action={action} className="basis-[500px] space-y-6">
@@ -156,17 +112,17 @@ export default function ProfileSettings({
 							</p>
 						</div>
 						<div className="space-y-1">
-							<Label htmlFor="bio">About Me</Label>
+							<Label htmlFor="aboutMe">About Me</Label>
 							<Textarea
 								placeholder="Tell us a little bit about yourself"
 								defaultValue={userProfile.aboutMe}
-								id="bio"
-								name="bio"
+								id="aboutMe"
+								name="aboutMe"
 								className="resize-none h-[100px]"
 							/>
-							{state?.errors?.bio && (
+							{state?.errors?.aboutMe && (
 								<p className="text-sm text-destructive">
-									{state.errors.bio}
+									{state.errors.aboutMe}
 								</p>
 							)}
 						</div>
@@ -175,23 +131,43 @@ export default function ProfileSettings({
 							{userProfile.socials.map((social, index) => {
 								return (
 									<div
-										key={`social_${index}`}
+										key={`social${index}`}
 										className="flex justify-center items-center gap-2"
 									>
-										{getSocialIcon(social.hostname)}
+										{getSocialIcon(social)}
 										<Input
-											id={`social_${index}`}
-											name={`social_${index}`}
+											id={`social${index}`}
+											name={`social${index}`}
 											type="text"
 											placeholder="Link to social profile"
-											defaultValue={social.href}
+											defaultValue={social}
 										/>
 									</div>
 								);
 							})}
+							{state?.errors?.social0 && (
+								<p className="text-sm text-destructive">
+									{state?.errors?.social0}
+								</p>
+							)}
+							{state?.errors?.social1 && (
+								<p className="text-sm text-destructive">
+									{state?.errors?.social1}
+								</p>
+							)}
+							{state?.errors?.social2 && (
+								<p className="text-sm text-destructive">
+									{state?.errors?.social2}
+								</p>
+							)}
+							{state?.errors?.social3 && (
+								<p className="text-sm text-destructive">
+									{state?.errors?.social3}
+								</p>
+							)}
 						</div>
 						<Button type="submit" disabled={pending}>
-							Update Profile
+							{pending ? "Updating..." : "Update Profile"}
 						</Button>
 					</form>
 				</div>
