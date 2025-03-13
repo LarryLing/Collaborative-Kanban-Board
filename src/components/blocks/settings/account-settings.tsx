@@ -94,7 +94,7 @@ export default function AccountSettings({
 			<DeleteAccountDialog
 				isDialogOpen={isAccountDeleteDialogOpen}
 				setIsDialogOpen={setIsAccountDeleteDialogOpen}
-				displayname={userProfile.display_name}
+				displayname={userProfile.displayName}
 			/>
 			<UpdateEmailDialog
 				isDialogOpen={isUpdateEmailDialogOpen}

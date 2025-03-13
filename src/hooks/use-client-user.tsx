@@ -8,11 +8,10 @@ import { useEffect, useState } from "react";
 export function useClientUser() {
 	const [userProfile, setUserProfile] = useState<UserProfile>({
 		id: "",
-		display_name: "",
+		displayName: "",
 		email: "",
-		role: "",
-		bio: "",
-		avatarUrl: "",
+		aboutMe: "",
+		socials: [],
 	});
 
 	useEffect(() => {
@@ -22,29 +21,42 @@ export function useClientUser() {
 
 			if (!user.user) redirect("/login");
 
-			const { data: profile } = await supabase
+			const { data: profileData, error: profileError } = await supabase
 				.from("profiles")
-				.select("id, display_name, email, role, bio, avatar")
+				.select()
 				.eq("id", user.user.id)
 				.single();
 
-			const userProfile: UserProfile = {
-				id: profile?.id,
-				display_name: profile?.display_name,
-				email: profile?.email,
-				role: profile?.role,
-				bio: profile?.bio,
-				avatarUrl: "",
-			};
+			if (profileError) throw profileError;
 
-			if (profile && profile.avatar) {
+			const { data: socialsData, error: socialsError } = await supabase
+				.from("profiles_socials_bridge")
+				.select("social_id, socials(id, url)")
+				.eq("profile_id", user.user.id);
+
+			if (socialsError) throw socialsError;
+
+			let avatarUrl;
+
+			if (profileData && profileData.avatar_path) {
 				const supabase = await createClient();
 				const { data: publicUrl } = await supabase.storage
 					.from("avatars")
-					.getPublicUrl(profile.avatar);
+					.getPublicUrl(profileData.avatar_path);
 
-				userProfile.avatarUrl = publicUrl.publicUrl;
+				avatarUrl = publicUrl.publicUrl;
 			}
+
+			const userProfile: UserProfile = {
+				id: user.user.id,
+				displayName: profileData.display_name,
+				email: profileData.email,
+				aboutMe: profileData.about_me,
+				avatarUrl: avatarUrl,
+				socials: socialsData.map(
+					(socialData) => new URL(socialData.socials.url),
+				),
+			};
 
 			setUserProfile(userProfile as UserProfile);
 

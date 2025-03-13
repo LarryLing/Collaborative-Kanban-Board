@@ -20,21 +20,13 @@ type AvatarPopoverProps = {
 };
 
 export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
-	const test_socials = [
-		"https://www.linkedin.com/in/larry-ling-student/",
-		"https://github.com/LarryLing",
-		"https://www.instagram.com/larryling.04/",
-	];
-
-	const urls = test_socials.map((test_social) => new URL(test_social));
-
 	return (
 		<Popover>
 			<PopoverTrigger>
 				<Avatar>
 					<AvatarImage src={userProfile.avatarUrl} />
 					<AvatarFallback>
-						{userProfile.display_name.substring(0, 2).toUpperCase()}
+						{userProfile.displayName.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
@@ -46,26 +38,46 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 					<Avatar>
 						<AvatarImage src={userProfile.avatarUrl} />
 						<AvatarFallback>
-							{userProfile.display_name
+							{userProfile.displayName
 								.substring(0, 2)
 								.toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div className="ml-2">
-						<h3 className="font-bold">
-							{userProfile.display_name}
-						</h3>
+						<h3 className="font-bold">{userProfile.displayName}</h3>
 						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
 							{userProfile.email}
 						</p>
 					</div>
 				</div>
-				<Separator className="w-full" />
-				<p className="text-sm">{userProfile.bio}</p>
-				<Socials urls={urls} />
-
-				{/* <div className="space-y-1 px-4"></div>
-				<div className="space-y-1 px-4"></div> */}
+				{userProfile.aboutMe && (
+					<>
+						<Separator className="w-full" />
+						<p className="text-sm">{userProfile.aboutMe}</p>
+					</>
+				)}
+				{userProfile.socials.length > 0 && (
+					<>
+						<Separator className="w-full" />
+						<div className="text-sm space-y-1">
+							{userProfile.socials.map((social, index) => (
+								<Button
+									variant="link"
+									className="flex"
+									key={`social_${index}`}
+								>
+									{getSocialIcon(social.hostname)}
+									<Link
+										href={social.href}
+										className="underline-offset-4 hover:underline"
+									>
+										{social.pathname.substring(1)}
+									</Link>
+								</Button>
+							))}
+						</div>
+					</>
+				)}
 				<Separator className="w-full" />
 				<div className="flex flex-col justify-center items-center gap-2">
 					<Button
@@ -99,27 +111,5 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 				</div>
 			</PopoverContent>
 		</Popover>
-	);
-}
-
-type SocialsProps = {
-	urls: URL[];
-};
-
-function Socials({ urls }: SocialsProps) {
-	return (
-		<ul className="text-sm space-y-1">
-			{urls.map((url) => (
-				<Button variant="link" className="flex" key={url.hostname}>
-					{getSocialIcon(url.hostname)}
-					<Link
-						href={url.href}
-						className="underline-offset-4 hover:underline"
-					>
-						{url.pathname.substring(1)}
-					</Link>
-				</Button>
-			))}
-		</ul>
 	);
 }

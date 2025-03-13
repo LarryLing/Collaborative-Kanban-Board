@@ -1,10 +1,10 @@
 export type UserProfile = {
 	id: string;
-	display_name: string;
+	displayName: string;
 	email: string;
-	role: string;
-	bio: string;
-	avatarUrl: string | undefined;
+	aboutMe: string;
+	avatarUrl?: string;
+	socials: URL[];
 };
 
 export type BoardType = {

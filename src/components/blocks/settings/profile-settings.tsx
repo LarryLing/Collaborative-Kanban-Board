@@ -19,6 +19,7 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
+import { LinkIcon } from "lucide-react";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
@@ -77,7 +78,7 @@ export default function ProfileSettings({
 		const { error: profileError } = await supabase
 			.from("profiles")
 			.update({
-				avatar: filePath,
+				avatar_path: filePath,
 			})
 			.eq("id", userProfile.id);
 
@@ -100,14 +101,6 @@ export default function ProfileSettings({
 		});
 	}
 
-	const test_socials = [
-		"https://www.linkedin.com/in/larry-ling-student/",
-		"https://github.com/LarryLing",
-		"https://www.instagram.com/larryling.04/",
-	];
-
-	const urls = test_socials.map((test_social) => new URL(test_social));
-
 	return (
 		<Card className="border-none shadow-none flex-auto">
 			<CardHeader className="md:pt-0">
@@ -124,7 +117,7 @@ export default function ProfileSettings({
 						<Avatar className="size-[200px]">
 							<AvatarImage src={userProfile.avatarUrl} />
 							<AvatarFallback>
-								{userProfile.display_name
+								{userProfile.displayName
 									.substring(0, 2)
 									.toUpperCase()}
 							</AvatarFallback>
@@ -151,7 +144,7 @@ export default function ProfileSettings({
 								id="displayName"
 								name="displayName"
 								type="text"
-								defaultValue={userProfile.display_name}
+								defaultValue={userProfile.displayName}
 							/>
 							{state?.errors?.displayName && (
 								<p className="text-sm text-destructive">
@@ -166,7 +159,7 @@ export default function ProfileSettings({
 							<Label htmlFor="bio">About Me</Label>
 							<Textarea
 								placeholder="Tell us a little bit about yourself"
-								defaultValue={userProfile.bio}
+								defaultValue={userProfile.aboutMe}
 								id="bio"
 								name="bio"
 								className="resize-none h-[100px]"
@@ -179,36 +172,23 @@ export default function ProfileSettings({
 						</div>
 						<div className="space-y-1">
 							<Label htmlFor="social">Social Accounts</Label>
-							<div className="flex justify-center items-center gap-2">
-								{getSocialIcon(urls[0].hostname)}
-								<Input
-									id="social1"
-									name="social1"
-									type="text"
-									placeholder="Link to social profile"
-									defaultValue={urls[0].href}
-								/>
-							</div>
-							<div className="flex justify-center items-center gap-2">
-								{getSocialIcon(urls[1].hostname)}
-								<Input
-									id="social2"
-									name="social2"
-									type="text"
-									placeholder="Link to social profile"
-									defaultValue={urls[1].href}
-								/>
-							</div>
-							<div className="flex justify-center items-center gap-2">
-								{getSocialIcon(urls[2].hostname)}
-								<Input
-									id="social3"
-									name="social3"
-									type="text"
-									placeholder="Link to social profile"
-									defaultValue={urls[2].href}
-								/>
-							</div>
+							{userProfile.socials.map((social, index) => {
+								return (
+									<div
+										key={`social_${index}`}
+										className="flex justify-center items-center gap-2"
+									>
+										{getSocialIcon(social.hostname)}
+										<Input
+											id={`social_${index}`}
+											name={`social_${index}`}
+											type="text"
+											placeholder="Link to social profile"
+											defaultValue={social.href}
+										/>
+									</div>
+								);
+							})}
 						</div>
 						<Button type="submit" disabled={pending}>
 							Update Profile

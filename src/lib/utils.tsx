@@ -1,11 +1,17 @@
-import React from "react"
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
-import { FacebookIcon, GithubIcon, InstagramIcon, LinkedInIcon, TwitterXIcon } from "@/components/icons/icon"
-import { LinkIcon } from "lucide-react"
+import React from "react";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+import {
+	FacebookIcon,
+	GithubIcon,
+	InstagramIcon,
+	LinkedInIcon,
+	TwitterXIcon,
+} from "@/components/icons/icon";
+import { LinkIcon } from "lucide-react";
 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs))
+	return twMerge(clsx(inputs));
 }
 
 export function getLastOpened(datetime: string) {
@@ -22,16 +28,16 @@ export function getLastOpened(datetime: string) {
 		"Oct",
 		"Nov",
 		"Dec",
-	]
+	];
 
-	const date = new Date(datetime)
-	const today = new Date()
+	const date = new Date(datetime);
+	const today = new Date();
 
 	if (date.toDateString() === today.toDateString()) {
 		const shortTime = new Intl.DateTimeFormat("en-US", {
 			timeStyle: "short",
-		})
-		return shortTime.format(date)
+		});
+		return shortTime.format(date);
 	}
 
 	return (
@@ -40,33 +46,33 @@ export function getLastOpened(datetime: string) {
 		date.getDate() +
 		", " +
 		date.getFullYear()
-	)
+	);
 }
 
 export function getSocialIcon(hostname: string) {
-    const socialIconMap = {
-        "www.linkedin.com": (
-            <LinkedInIcon className="size-4" fill="currentColor" />
-        ),
-        "github.com": <GithubIcon className="size-4" fill="currentColor" />,
-        "www.instagram.com": (
-            <InstagramIcon className="size-4" fill="currentColor" />
-        ),
-        "www.facebook.com": (
-            <FacebookIcon className="size-4" fill="currentColor" />
-        ),
-        "x.com": <TwitterXIcon className="size-4" fill="currentColor" />,
-    };
+	const socialIconMap = {
+		"www.linkedin.com": (
+			<LinkedInIcon className="size-4" fill="currentColor" />
+		),
+		"github.com": <GithubIcon className="size-4" fill="currentColor" />,
+		"www.instagram.com": (
+			<InstagramIcon className="size-4" fill="currentColor" />
+		),
+		"www.facebook.com": (
+			<FacebookIcon className="size-4" fill="currentColor" />
+		),
+		"x.com": <TwitterXIcon className="size-4" fill="currentColor" />,
+	};
 
-    if (
-        hostname !== "www.linkedin.com" &&
-        hostname !== "github.com" &&
-        hostname !== "www.instagram.com" &&
-        hostname !== "www.facebook.com" &&
-        hostname !== "x.com"
-    ) {
-        return <LinkIcon className="size-4" fill="currentColor" />;
-    }
+	if (
+		hostname !== "www.linkedin.com" &&
+		hostname !== "github.com" &&
+		hostname !== "www.instagram.com" &&
+		hostname !== "www.facebook.com" &&
+		hostname !== "x.com"
+	) {
+		return <LinkIcon className="size-4" />;
+	}
 
-    return <>{socialIconMap[hostname]}</>;
+	return <>{socialIconMap[hostname]}</>;
 }
