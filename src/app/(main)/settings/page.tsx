@@ -2,20 +2,19 @@
 
 import AuthenticatedNavigationBar from "@/components/blocks/misc/authenticated-navigation-bar";
 import AccountSettings from "@/components/blocks/settings/account-settings";
-import AppearanceSettings from "@/components/blocks/settings/appearance-settings";
 import ProfileSettings from "@/components/blocks/settings/profile-settings";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useClientUser } from "@/hooks/use-client-user";
 import { useToast } from "@/hooks/use-toast";
-import { Brush, Settings, User } from "lucide-react";
+import { Settings, User } from "lucide-react";
 import React, { useState } from "react";
 
 export default function ProfileSettingsPage() {
 	const { userProfile, setUserProfile } = useClientUser();
-	const [activeTab, setActiveTab] = useState<
-		"profile" | "account" | "appearance"
-	>("profile");
+	const [activeTab, setActiveTab] = useState<"profile" | "account">(
+		"profile",
+	);
 	const { toast } = useToast();
 
 	return (
@@ -44,14 +43,6 @@ export default function ProfileSettingsPage() {
 							<Settings />
 							<span>Account</span>
 						</Button>
-						<Button
-							variant="ghost"
-							className={`w-full justify-start ${activeTab === "appearance" ? "bg-accent" : ""}`}
-							onClick={() => setActiveTab("appearance")}
-						>
-							<Brush />
-							<span>Appearance</span>
-						</Button>
 					</div>
 					{activeTab === "profile" && (
 						<ProfileSettings
@@ -67,7 +58,6 @@ export default function ProfileSettingsPage() {
 							toast={toast}
 						/>
 					)}
-					{activeTab === "appearance" && <AppearanceSettings />}
 				</div>
 			</div>
 		</div>

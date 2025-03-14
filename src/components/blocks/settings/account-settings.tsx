@@ -153,13 +153,7 @@ function DeleteAccountDialog({
 							{state.errors.displayName}
 						</p>
 					)}
-					<div>
-						<Button
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go back
-						</Button>
+					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<Button
 							type="submit"
 							variant="destructive"
@@ -170,7 +164,6 @@ function DeleteAccountDialog({
 						</Button>
 					</div>
 				</form>
-				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);
@@ -231,19 +224,12 @@ function UpdateEmailDialog({
 							{state.errors.email}
 						</p>
 					)}
-					<div>
-						<Button
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go back
-						</Button>
+					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<Button type="submit" className="mb-2 sm:mb-0">
 							{pending ? "Updating..." : "Update Email"}
 						</Button>
 					</div>
 				</form>
-				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);
@@ -277,14 +263,11 @@ function UpdatePasswordDialog({
 				<DialogHeader>
 					<DialogTitle>Update Password</DialogTitle>
 					<DialogDescription>
-						You will be asked to sign in again after confirming your
-						password.
+						Please enter your new password below and confirm it.
+						Make sure to use a strong password for security.
 					</DialogDescription>
 				</DialogHeader>
-				<form
-					className="flex flex-col justify-center items-start gap-2"
-					action={action}
-				>
+				<form action={action}>
 					<Input
 						id="newPassword"
 						name="newPassword"
@@ -302,20 +285,14 @@ function UpdatePasswordDialog({
 						name="confirmPassword"
 						type="password"
 						placeholder="Confirm Password"
-						className="max-w-[400px]"
+						className="max-w-[400px] mt-2"
 					/>
 					{state?.errors?.confirmPassword && (
 						<p className="text-sm text-destructive">
 							{state.errors.confirmPassword}
 						</p>
 					)}
-					<div>
-						<Button
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go back
-						</Button>
+					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<Button
 							type="submit"
 							disabled={pending}
@@ -325,7 +302,6 @@ function UpdatePasswordDialog({
 						</Button>
 					</div>
 				</form>
-				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);
