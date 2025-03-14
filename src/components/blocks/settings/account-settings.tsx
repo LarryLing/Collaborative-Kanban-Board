@@ -21,7 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import React, { useActionState, useEffect, useState } from "react";
 import { UserProfile } from "@/lib/types";
 import { Input } from "@/components/ui/input";
-import { resetPassword, updateEmail } from "@/lib/actions";
+import { deleteAccount, updateEmail, updatePassword } from "@/lib/actions";
 
 type AccountSettingsProps = {
 	userProfile: UserProfile;
@@ -109,6 +109,7 @@ export default function AccountSettings({
 			<UpdatePasswordDialog
 				isDialogOpen={isUpdatePasswordDialogOpen}
 				setIsDialogOpen={setIsUpdatePasswordIsDialogOpen}
+				toast={toast}
 			/>
 		</>
 	);
@@ -128,6 +129,8 @@ function DeleteAccountDialog({
 	setIsDialogOpen,
 	displayname,
 }: DialogProps & DeleteAccountDialogProps) {
+	const [state, action, pending] = useActionState(deleteAccount, undefined);
+
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
@@ -137,30 +140,37 @@ function DeleteAccountDialog({
 						Please type your username below to confirm this action.
 					</DialogDescription>
 				</DialogHeader>
-				<form>
+				<form action={action}>
 					<Input
-						id="delete"
-						name="delete"
+						id="displayName"
+						name="displayName"
 						type="text"
 						placeholder={displayname}
 						className="max-w-[400px]"
 					/>
+					{state?.errors?.displayName && (
+						<p className="text-sm text-destructive">
+							{state.errors.displayName}
+						</p>
+					)}
+					<div>
+						<Button
+							variant="outline"
+							onClick={() => setIsDialogOpen(false)}
+						>
+							Go back
+						</Button>
+						<Button
+							type="submit"
+							variant="destructive"
+							className="mb-2 sm:mb-0"
+							disabled={pending}
+						>
+							{pending ? "Deleting..." : "Delete Account"}
+						</Button>
+					</div>
 				</form>
-				<DialogFooter>
-					<Button
-						variant="outline"
-						onClick={() => setIsDialogOpen(false)}
-					>
-						Go back
-					</Button>
-					<Button
-						type="submit"
-						variant="destructive"
-						className="mb-2 sm:mb-0"
-					>
-						Delete Account
-					</Button>
-				</DialogFooter>
+				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);
@@ -189,10 +199,12 @@ function UpdateEmailDialog({
 			});
 
 			toast({
-				title: "Success",
+				title: "Success!",
 				description:
-					"Please check your inboxes for the confirmation emails",
+					"Please check your inboxes for the confirmation emails.",
 			});
+
+			setIsDialogOpen(false);
 		}
 	}, [state?.updatedEmail]);
 
@@ -237,8 +249,27 @@ function UpdateEmailDialog({
 	);
 }
 
-function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
-	const [state, action, pending] = useActionState(resetPassword, undefined);
+type UpdatePasswordDialogProps = {
+	toast: (arg0: { title: string; description: string }) => void;
+};
+
+function UpdatePasswordDialog({
+	isDialogOpen,
+	setIsDialogOpen,
+	toast,
+}: DialogProps & UpdatePasswordDialogProps) {
+	const [state, action, pending] = useActionState(updatePassword, undefined);
+
+	useEffect(() => {
+		if (state?.toast !== undefined) {
+			toast({
+				title: "Success!",
+				description: state?.toast,
+			});
+
+			setIsDialogOpen(false);
+		}
+	}, [state?.toast]);
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -17,7 +17,6 @@ import { UserProfile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
-import { LinkIcon } from "lucide-react";
 import { useProfile } from "@/hooks/use-profile";
 
 type ProfileSettingsProps = {
@@ -49,12 +48,12 @@ export default function ProfileSettings({
 				displayName: state.updatedProfile.displayName,
 				aboutMe: state.updatedProfile.aboutMe,
 				avatarUrl: userProfile.avatarUrl,
-				socials: state.updatedProfile.socials
+				socials: state.updatedProfile.socials,
 			});
 
 			toast({
-				title: "Success",
-				description: "Your profile has been successfully updated!",
+				title: "Success!",
+				description: "Your profile has been successfully updated.",
 			});
 		}
 	}, [state?.updatedProfile]);

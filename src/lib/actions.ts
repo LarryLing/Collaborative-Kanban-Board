@@ -11,9 +11,9 @@ import {
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	ResetForgottenPasswordFormSchema,
+	DeleteAccountFormSchema,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
-import { UserProfile } from "./types";
 
 export async function signup(formState: FormState, formData: FormData) {
 	const supabase = await createClient();
@@ -48,7 +48,7 @@ export async function signup(formState: FormState, formData: FormData) {
 			toast: {
 				title: "Something went wrong...",
 				message:
-					"We couldn't sign you up at this time. Please try again!",
+					"We couldn't sign you up at this time. Please try again.",
 			},
 		};
 	}
@@ -67,7 +67,7 @@ export async function signup(formState: FormState, formData: FormData) {
 
 		return {
 			errors: {
-				email: ["This email is already associated with an account"],
+				email: ["This email is already associated with an account."],
 			},
 		};
 	}
@@ -77,7 +77,7 @@ export async function signup(formState: FormState, formData: FormData) {
 	return {
 		toast: {
 			title: "Success!",
-			message: "Please check your inbox to confirm your signup",
+			message: "Please check your inbox to confirm your signup.",
 		},
 	};
 }
@@ -103,7 +103,7 @@ export async function login(formState: FormState, formData: FormData) {
 	if (signinError?.code === "invalid_credentials") {
 		return {
 			errors: {
-				email: ["Incorrect email or password"],
+				email: ["Incorrect email or password."],
 			},
 		};
 	} else if (signinError?.status && signinError.status >= 500) {
@@ -111,7 +111,7 @@ export async function login(formState: FormState, formData: FormData) {
 			toast: {
 				title: "Something went wrong...",
 				message:
-					"We couldn't log you in at this time. Please try again",
+					"We couldn't log you in at this time. Please try again.",
 			},
 		};
 	}
@@ -192,7 +192,7 @@ export async function sendPasswordReset(
 			toast: {
 				title: "Something went wrong...",
 				message:
-					"We couldn't send the password recovery email. Please try again",
+					"We couldn't send the password recovery email. Please try again.",
 			},
 		};
 	}
@@ -200,12 +200,12 @@ export async function sendPasswordReset(
 	return {
 		toast: {
 			title: "Success!",
-			message: "Please check your inbox to recover your password!",
+			message: "Please check your inbox to recover your password.",
 		},
 	};
 }
 
-export async function resetPassword(formState: FormState, formData: FormData) {
+export async function updatePassword(formState: FormState, formData: FormData) {
 	const supabase = await createClient();
 	const { data: userData, error: userError } = await supabase.auth.getUser();
 
@@ -234,12 +234,11 @@ export async function resetPassword(formState: FormState, formData: FormData) {
 
 	if (passwordError) throw passwordError;
 
-	const { error: signoutError } = await supabase.auth.signOut();
-
-	if (signoutError) throw signoutError;
-
 	revalidatePath("/");
-	redirect("/login");
+
+	return {
+		toast: "Your password has been successfully updated!",
+	};
 }
 
 export async function resetForgottenPassword(
@@ -292,7 +291,7 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 	if (emailExistsData.length > 0) {
 		return {
 			errors: {
-				email: ["This email is already associated with an account"],
+				email: ["This email is already associated with an account!"],
 			},
 		};
 	}
@@ -396,14 +395,34 @@ export async function updateUserProfile(
 	};
 }
 
-export async function deleteAccount() {
+export async function deleteAccount(formState: FormState, formData: FormData) {
 	const supabase = await createClient();
 
-	const { data: userData, error: userError } = await supabase.auth.getUser();
+	const validatedFields = DeleteAccountFormSchema.safeParse({
+		displayName: formData.get("displayName"),
+	});
 
-	if (userError) throw userError;
+	if (!validatedFields.success) {
+		return {
+			errors: validatedFields.error.flatten().fieldErrors,
+		};
+	}
 
-	const userId = userData.user.id;
+	const { data: userData, error: userError } = await supabase
+		.from("profiles")
+		.select("id")
+		.eq("display_name", validatedFields.data.displayName)
+		.single();
+
+	if (userError) {
+		return {
+			errors: {
+				displayName: ["Incorrect display name."],
+			},
+		};
+	}
+
+	const userId = userData.id as string;
 
 	const { data: folderData, error: folderError } = await supabase.storage
 		.from("avatars")

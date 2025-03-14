@@ -29,6 +29,7 @@ export function useClientUser() {
 
 			if (profileError) throw profileError;
 
+			const socials = ["", "", "", ""];
 			const { data: socialsData, error: socialsError } = await supabase
 				.from("socials")
 				.select("url")
@@ -36,15 +37,9 @@ export function useClientUser() {
 
 			if (socialsError) throw socialsError;
 
-			// const socials = [];
-			// const socialsDataLength = socialsData.length;
-			// for (let i = 0; i < 4; i++) {
-			// 	if (i < socialsDataLength) {
-			// 		socials.push(new URL(socialsData[i].url));
-			// 	} else {
-			// 		socials.push(undefined);
-			// 	}
-			// }
+			for (let i = 0; i < socialsData.length; i++) {
+				socials[i] = socialsData[i].url;
+			}
 
 			let avatarUrl;
 			if (profileData && profileData.avatar_path) {
@@ -62,7 +57,7 @@ export function useClientUser() {
 				email: profileData.email,
 				aboutMe: profileData.about_me,
 				avatarUrl: avatarUrl,
-				socials: socialsData.map((social) => social.url),
+				socials: socials,
 			};
 
 			setUserProfile(userProfile as UserProfile);
