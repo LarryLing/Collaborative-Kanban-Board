@@ -1,48 +1,44 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
 	DropdownMenuRadioGroup,
 	DropdownMenuRadioItem,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Input } from "@/components/ui/input"
-import { Toggle } from "@/components/ui/toggle"
+} from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Toggle } from "@/components/ui/toggle";
 import {
 	ArrowDownAZ,
 	Bookmark,
-	Check,
-	Circle,
 	LayoutGrid,
 	List,
 	Plus,
 	Search,
-} from "lucide-react"
-import React, { useState } from "react"
+} from "lucide-react";
+import React, { useState } from "react";
 
 type BoardsDisplayHeaderProps = {
-	ownership: string
-	setOwnership: (arg0: string) => void
-	listView: boolean
-	setListView: (arg0: boolean) => void
-	bookmarked: boolean
-	setBookmarked: (arg0: boolean) => void
-	sortMethod: string
-	setSortMethod: (arg0: string) => void
-	query: string
-	setQuery: (arg0: string) => void
-}
+	ownership: string;
+	setOwnership: (arg0: string) => void;
+	listView: boolean;
+	setListView: (arg0: boolean) => void;
+	bookmarked: boolean;
+	setBookmarked: (arg0: boolean) => void;
+	sortMethod: string;
+	setSortMethod: (arg0: string) => void;
+	query: string;
+	setQuery: (arg0: string) => void;
+};
 
 export default function BoardsDisplayHeader({
 	ownership,
@@ -58,7 +54,7 @@ export default function BoardsDisplayHeader({
 }: BoardsDisplayHeaderProps) {
 	return (
 		<div className="flex flex-col gap-4">
-			<h2 className="font-semibold text-3xl">My Boards</h2>
+			<h2 className="font-semibold text-3xl">Dashboard</h2>
 			<div className="flex justify-between">
 				<Button>
 					<Plus className="size-4" />
@@ -99,13 +95,13 @@ export default function BoardsDisplayHeader({
 				</div>
 			</div>
 		</div>
-	)
+	);
 }
 
 type OwnershipDropdownProps = {
-	ownership: string
-	setOwnership: (arg0: string) => void
-}
+	ownership: string;
+	setOwnership: (arg0: string) => void;
+};
 
 function OwnershipDropdown({
 	ownership,
@@ -142,13 +138,13 @@ function OwnershipDropdown({
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
-	)
+	);
 }
 
 type ViewButtonProps = {
-	listView: boolean
-	setListView: (arg0: boolean) => void
-}
+	listView: boolean;
+	setListView: (arg0: boolean) => void;
+};
 
 function ViewButton({ listView, setListView }: ViewButtonProps) {
 	return (
@@ -173,13 +169,13 @@ function ViewButton({ listView, setListView }: ViewButtonProps) {
 				</TooltipContent>
 			</Tooltip>
 		</TooltipProvider>
-	)
+	);
 }
 
 type BookmarkToggleProps = {
-	bookmarked: boolean
-	setBookmarked: (arg0: boolean) => void
-}
+	bookmarked: boolean;
+	setBookmarked: (arg0: boolean) => void;
+};
 
 function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
 	return (
@@ -200,13 +196,13 @@ function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
 				<TooltipContent>Bookmarked</TooltipContent>
 			</Tooltip>
 		</TooltipProvider>
-	)
+	);
 }
 
 type SortDropdownProps = {
-	sortMethod: string
-	setSortMethod: (arg0: string) => void
-}
+	sortMethod: string;
+	setSortMethod: (arg0: string) => void;
+};
 
 function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 	return (
@@ -240,16 +236,16 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
-	)
+	);
 }
 
 type SearchBarProps = {
-	query: string
-	setQuery: (arg0: string) => void
-}
+	query: string;
+	setQuery: (arg0: string) => void;
+};
 
 function SearchBar({ query, setQuery }: SearchBarProps) {
-	const [isSearchOpen, setIsSearchOpen] = useState(false)
+	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	return (
 		<div className="hidden md:flex space-x-2">
@@ -281,7 +277,7 @@ function SearchBar({ query, setQuery }: SearchBarProps) {
 				/>
 			)}
 		</div>
-	)
+	);
 }
 
 function OptionsDropdown({
@@ -368,5 +364,5 @@ function OptionsDropdown({
 				</DropdownMenuRadioGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
-	)
+	);
 }
