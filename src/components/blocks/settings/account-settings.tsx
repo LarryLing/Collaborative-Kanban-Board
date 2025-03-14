@@ -18,9 +18,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import React, { useState } from "react";
+import React, { useActionState, useEffect, useState } from "react";
 import { UserProfile } from "@/lib/types";
 import { Input } from "@/components/ui/input";
+import { resetPassword, updateEmail } from "@/lib/actions";
 
 type AccountSettingsProps = {
 	userProfile: UserProfile;
@@ -101,7 +102,9 @@ export default function AccountSettings({
 			<UpdateEmailDialog
 				isDialogOpen={isUpdateEmailDialogOpen}
 				setIsDialogOpen={setIsUpdateEmailDialogOpen}
-				email={userProfile.email}
+				userProfile={userProfile}
+				setUserProfile={setUserProfile}
+				toast={toast}
 			/>
 			<UpdatePasswordDialog
 				isDialogOpen={isUpdatePasswordDialogOpen}
@@ -164,14 +167,35 @@ function DeleteAccountDialog({
 }
 
 type UpdateEmailDialogProps = {
-	email: string;
+	userProfile: UserProfile;
+	setUserProfile: (arg0: UserProfile) => void;
+	toast: (arg0: { title: string; description: string }) => void;
 };
 
 function UpdateEmailDialog({
 	isDialogOpen,
 	setIsDialogOpen,
-	email,
+	userProfile,
+	setUserProfile,
+	toast,
 }: DialogProps & UpdateEmailDialogProps) {
+	const [state, action, pending] = useActionState(updateEmail, undefined);
+
+	useEffect(() => {
+		if (state?.updatedEmail !== undefined) {
+			setUserProfile({
+				...userProfile,
+				email: state.updatedEmail,
+			});
+
+			toast({
+				title: "Success",
+				description:
+					"Please check your inboxes for the confirmation emails",
+			});
+		}
+	}, [state?.updatedEmail]);
+
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
@@ -182,32 +206,40 @@ function UpdateEmailDialog({
 						sent to your old and new inboxes.
 					</DialogDescription>
 				</DialogHeader>
-				<form>
+				<form action={action}>
 					<Input
-						id="delete"
-						name="delete"
+						id="email"
+						name="email"
 						type="text"
-						defaultValue={email}
+						defaultValue={userProfile.email}
 						className="max-w-[400px]"
 					/>
+					{state?.errors?.email && (
+						<p className="text-sm text-destructive">
+							{state.errors.email}
+						</p>
+					)}
+					<div>
+						<Button
+							variant="outline"
+							onClick={() => setIsDialogOpen(false)}
+						>
+							Go back
+						</Button>
+						<Button type="submit" className="mb-2 sm:mb-0">
+							{pending ? "Updating..." : "Update Email"}
+						</Button>
+					</div>
 				</form>
-				<DialogFooter>
-					<Button
-						variant="outline"
-						onClick={() => setIsDialogOpen(false)}
-					>
-						Go back
-					</Button>
-					<Button type="submit" className="mb-2 sm:mb-0">
-						Update Email
-					</Button>
-				</DialogFooter>
+				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);
 }
 
 function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
+	const [state, action, pending] = useActionState(resetPassword, undefined);
+
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogContent className="sm:max-w-[425px]">
@@ -218,7 +250,10 @@ function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
 						password.
 					</DialogDescription>
 				</DialogHeader>
-				<form className="flex flex-col justify-center items-start gap-2">
+				<form
+					className="flex flex-col justify-center items-start gap-2"
+					action={action}
+				>
 					<Input
 						id="newPassword"
 						name="newPassword"
@@ -226,11 +261,11 @@ function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
 						placeholder="New Password"
 						className="max-w-[400px]"
 					/>
-					{/* {state?.errors?.newPassword && (
-									<p className="text-sm text-destructive">
-										{state.errors.newPassword}
-									</p>
-								)} */}
+					{state?.errors?.newPassword && (
+						<p className="text-sm text-destructive">
+							{state.errors.newPassword}
+						</p>
+					)}
 					<Input
 						id="confirmPassword"
 						name="confirmPassword"
@@ -238,23 +273,28 @@ function UpdatePasswordDialog({ isDialogOpen, setIsDialogOpen }: DialogProps) {
 						placeholder="Confirm Password"
 						className="max-w-[400px]"
 					/>
-					{/* {state?.errors?.confirmPassword && (
-									<p className="text-sm text-destructive">
-										{state.errors.confirmPassword}
-									</p>
-								)} */}
+					{state?.errors?.confirmPassword && (
+						<p className="text-sm text-destructive">
+							{state.errors.confirmPassword}
+						</p>
+					)}
+					<div>
+						<Button
+							variant="outline"
+							onClick={() => setIsDialogOpen(false)}
+						>
+							Go back
+						</Button>
+						<Button
+							type="submit"
+							disabled={pending}
+							className="mb-2 sm:mb-0"
+						>
+							{pending ? "Updating..." : "Update Password"}
+						</Button>
+					</div>
 				</form>
-				<DialogFooter>
-					<Button
-						variant="outline"
-						onClick={() => setIsDialogOpen(false)}
-					>
-						Go back
-					</Button>
-					<Button type="submit" className="mb-2 sm:mb-0">
-						Update Password
-					</Button>
-				</DialogFooter>
+				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);

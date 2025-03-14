@@ -41,7 +41,6 @@ export const EmailFormSchema = z.object({
 
 export const ResetPasswordFormSchema = z
 	.object({
-		password: z.string().trim(),
 		newPassword: z
 			.string()
 			.min(6, { message: "Be at least 6 characters long." })
@@ -89,6 +88,10 @@ export const EditProfileFormSchema = z.object({
 	social1: z.string().url().optional().or(z.literal("")),
 	social2: z.string().url().optional().or(z.literal("")),
 	social3: z.string().url().optional().or(z.literal("")),
+});
+
+export const DeleteAccountFormSchema = z.object({
+	displayName: z.string().trim(),
 });
 
 export type FormState =

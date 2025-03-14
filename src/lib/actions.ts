@@ -214,7 +214,6 @@ export async function resetPassword(formState: FormState, formData: FormData) {
 	const userid = userData.user.id;
 
 	const validatedFields = ResetPasswordFormSchema.safeParse({
-		password: formData.get("password"),
 		newPassword: formData.get("newPassword"),
 		confirmPassword: formData.get("confirmPassword"),
 	});
@@ -225,24 +224,15 @@ export async function resetPassword(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { data: passwordData, error: passwordError } = await supabase.rpc(
+	const { error: passwordError } = await supabase.rpc(
 		"handle_password_change",
 		{
-			current: validatedFields.data.password,
-			new: validatedFields.data.newPassword,
+			newpassword: validatedFields.data.newPassword,
 			userid: userid,
 		},
 	);
 
 	if (passwordError) throw passwordError;
-
-	if (!(passwordData as boolean)) {
-		return {
-			errors: {
-				password: ["Incorrect password"],
-			},
-		};
-	}
 
 	const { error: signoutError } = await supabase.auth.signOut();
 
@@ -319,7 +309,7 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 	revalidatePath("/");
 
 	return {
-		message: "Please check your inboxes to confirm your new email!",
+		updatedEmail: validatedFields.data.email,
 	};
 }
 
