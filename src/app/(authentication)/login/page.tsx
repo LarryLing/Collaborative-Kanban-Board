@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { login, loginWithDiscord, loginWithGithub } from "@/lib/actions";
+import { login, loginWithGoogle, loginWithGithub } from "@/lib/actions";
 import Link from "next/link";
 import React, { useActionState, useEffect } from "react";
 
@@ -30,9 +30,9 @@ export default function LoginPage() {
 					<h2 className="font-semibold text-3xl">Welcome Back</h2>
 					<p>Sign into your account</p>
 				</div>
-				<div className="w-full space-y-3">
+				<form className="w-full space-y-3">
 					<Button
-						onClick={loginWithDiscord}
+						formAction={loginWithGoogle}
 						disabled={pending}
 						className="w-full bg-google hover:bg-google/90 text-background text-white"
 					>
@@ -40,14 +40,14 @@ export default function LoginPage() {
 						Continue with Google
 					</Button>
 					<Button
-						onClick={loginWithGithub}
+						formAction={loginWithGithub}
 						disabled={pending}
 						className="w-full bg-github hover:bg-github/90 text-background text-white"
 					>
 						<GithubIcon />
 						Continue with Github
 					</Button>
-				</div>
+				</form>
 				<div className="flex justify-center items-center text-sm w-full">
 					<Separator className="w-40" />
 					<span className="mx-1">or</span>

@@ -44,7 +44,7 @@ export default function UpdatePasswordDialog({
 						Make sure to use a strong password for security.
 					</DialogDescription>
 				</DialogHeader>
-				<form action={action}>
+				<form>
 					<Input
 						id="newPassword"
 						name="newPassword"
@@ -71,7 +71,16 @@ export default function UpdatePasswordDialog({
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<Button
+							type="button"
+							className="mb-2 sm:mb-0"
+							variant="outline"
+							onClick={() => setIsDialogOpen(false)}
+						>
+							Go Back
+						</Button>
+						<Button
 							type="submit"
+							formAction={action}
 							disabled={pending}
 							className="mb-2 sm:mb-0"
 						>

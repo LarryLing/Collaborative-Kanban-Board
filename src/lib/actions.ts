@@ -130,28 +130,28 @@ export async function login(formState: FormState, formData: FormData) {
 	redirect("/dashboard");
 }
 
-export async function loginWithDiscord() {
+export async function loginWithGoogle() {
 	const supabase = await createClient();
 	const origin = (await headers()).get("origin");
 
 	const { data: oauthData, error: oauthError } =
 		await supabase.auth.signInWithOAuth({
-			provider: "discord",
+			provider: "google",
 			options: {
 				redirectTo: `${origin}/auth/callback`,
 			},
 		});
 
-	if (oauthError) {
-		throw oauthError;
-	}
+	if (oauthError) throw oauthError;
 
-	redirect(oauthData.url);
+	if (oauthData.url) redirect(oauthData.url);
 }
 
 export async function loginWithGithub() {
 	const supabase = await createClient();
 	const origin = (await headers()).get("origin");
+
+	console.log(`${origin}/auth/callback`);
 
 	const { data: oauthData, error: oauthError } =
 		await supabase.auth.signInWithOAuth({
@@ -163,7 +163,7 @@ export async function loginWithGithub() {
 
 	if (oauthError) throw oauthError;
 
-	redirect(oauthData.url);
+	if (oauthData.url) redirect(oauthData.url);
 }
 
 export async function signout() {

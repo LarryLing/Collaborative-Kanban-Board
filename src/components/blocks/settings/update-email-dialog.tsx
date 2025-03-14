@@ -55,7 +55,7 @@ export default function UpdateEmailDialog({
 						sent to your old and new inboxes.
 					</DialogDescription>
 				</DialogHeader>
-				<form action={action}>
+				<form>
 					<Input
 						id="email"
 						name="email"
@@ -69,7 +69,20 @@ export default function UpdateEmailDialog({
 						</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button type="submit" className="mb-2 sm:mb-0">
+						<Button
+							type="button"
+							className="mb-2 sm:mb-0"
+							variant="outline"
+							onClick={() => setIsDialogOpen(false)}
+						>
+							Go Back
+						</Button>
+						<Button
+							type="submit"
+							className="mb-2 sm:mb-0"
+							formAction={action}
+							disabled={pending}
+						>
 							{pending ? "Updating..." : "Update Email"}
 						</Button>
 					</div>

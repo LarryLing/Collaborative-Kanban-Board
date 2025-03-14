@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
-import { loginWithDiscord, loginWithGithub, signup } from "@/lib/actions";
+import { loginWithGoogle, loginWithGithub, signup } from "@/lib/actions";
 import Link from "next/link";
 import React, { useActionState, useEffect } from "react";
 
@@ -30,9 +30,9 @@ export default function SignupPage() {
 					<h2 className="font-semibold text-3xl">Get Started</h2>
 					<p>Create a new account</p>
 				</div>
-				<div className="w-full space-y-3">
+				<form className="w-full space-y-3">
 					<Button
-						onClick={loginWithDiscord}
+						formAction={loginWithGoogle}
 						disabled={pending}
 						className="w-full bg-google hover:bg-google/90 text-background text-white"
 					>
@@ -40,14 +40,14 @@ export default function SignupPage() {
 						Continue with Google
 					</Button>
 					<Button
-						onClick={loginWithGithub}
+						formAction={loginWithGithub}
 						disabled={pending}
 						className="w-full bg-github hover:bg-github/90 text-background text-white"
 					>
 						<GithubIcon />
 						Continue with Github
 					</Button>
-				</div>
+				</form>
 				<div className="flex justify-center items-center text-sm w-full">
 					<Separator className="w-40" />
 					<span className="mx-1">or</span>
