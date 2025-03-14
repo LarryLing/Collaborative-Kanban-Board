@@ -1,27 +1,27 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useActionState, useEffect } from "react"
-import { loginWithDiscord, loginWithGithub, signup } from "@/lib/actions"
-import { Separator } from "@/components/ui/separator"
-import { GoogleIcon, GithubIcon } from "@/components/icons/icon"
-import Link from "next/link"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useActionState, useEffect } from "react";
+import { loginWithDiscord, loginWithGithub, signup } from "@/lib/actions";
+import { Separator } from "@/components/ui/separator";
+import { GoogleIcon, GithubIcon } from "@/components/icons/icon";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export function SignupForm() {
-	const { toast } = useToast()
-	const [state, action, pending] = useActionState(signup, undefined)
+	const { toast } = useToast();
+	const [state, action, pending] = useActionState(signup, undefined);
 
 	useEffect(() => {
 		if (state?.toast) {
 			toast({
 				title: state.toast.title,
 				description: state.toast.message,
-			})
+			});
 		}
-	}, [state?.toast])
+	}, [state?.toast]);
 
 	return (
 		<div className="h-full w-[350px] lg:w-[500px] py-20 px-4 lg:px-20 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
@@ -119,7 +119,7 @@ export function SignupForm() {
 					)}
 				</div>
 				<Button type="submit" disabled={pending} className="w-full">
-					Sign Up
+					{pending ? "Signing up..." : "Sign Up"}
 				</Button>
 				<div className="mt-3 text-center text-sm">
 					Have an account?{" "}
@@ -132,5 +132,5 @@ export function SignupForm() {
 				</div>
 			</form>
 		</div>
-	)
+	);
 }

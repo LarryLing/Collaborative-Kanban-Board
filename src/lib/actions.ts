@@ -10,7 +10,6 @@ import {
 	SignupFormSchema,
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
-	ResetForgottenPasswordFormSchema,
 	DeleteAccountFormSchema,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
@@ -101,11 +100,22 @@ export async function login(formState: FormState, formData: FormData) {
 	);
 
 	if (signinError?.code === "invalid_credentials") {
-		return {
-			errors: {
-				email: ["Incorrect email or password."],
-			},
-		};
+		const { error: updateError } = await supabase.auth.verifyOtp({
+			email: validatedFields.data.email,
+			token: validatedFields.data.password,
+			type: "email",
+		});
+
+		if (updateError) {
+			return {
+				errors: {
+					email: ["Incorrect email or password."],
+				},
+			};
+		}
+
+		revalidatePath("/", "layout");
+		redirect("/dashboard");
 	} else if (signinError?.status && signinError.status >= 500) {
 		return {
 			toast: {
@@ -167,10 +177,7 @@ export async function signout() {
 	redirect("/login");
 }
 
-export async function sendPasswordReset(
-	formState: unknown,
-	formData: FormData,
-) {
+export async function sendOtpEmail(formState: unknown, formData: FormData) {
 	const supabase = await createClient();
 
 	const validatedFields = EmailFormSchema.safeParse({
@@ -183,24 +190,19 @@ export async function sendPasswordReset(
 		};
 	}
 
-	const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-		validatedFields.data.email,
-	);
+	const { error: otpError } = await supabase.auth.signInWithOtp({
+		email: validatedFields.data.email,
+		options: {
+			shouldCreateUser: false,
+		},
+	});
 
-	if (resetError) {
-		return {
-			toast: {
-				title: "Something went wrong...",
-				message:
-					"We couldn't send the password recovery email. Please try again.",
-			},
-		};
-	}
+	if (otpError) throw otpError;
 
 	return {
 		toast: {
 			title: "Success!",
-			message: "Please check your inbox to recover your password.",
+			message: "Please check your inbox to see your one-time password.",
 		},
 	};
 }
@@ -237,35 +239,11 @@ export async function updatePassword(formState: FormState, formData: FormData) {
 	revalidatePath("/");
 
 	return {
-		toast: "Your password has been successfully updated!",
+		toast: {
+			title: "Success!",
+			message: "Your password has been successfully updated!",
+		},
 	};
-}
-
-export async function resetForgottenPassword(
-	formState: FormState,
-	formData: FormData,
-) {
-	const supabase = await createClient();
-
-	const validatedFields = ResetForgottenPasswordFormSchema.safeParse({
-		newPassword: formData.get("newPassword"),
-		confirmPassword: formData.get("confirmPassword"),
-	});
-
-	if (!validatedFields.success) {
-		return {
-			errors: validatedFields.error.flatten().fieldErrors,
-		};
-	}
-
-	const { error: updateError } = await supabase.auth.updateUser({
-		password: validatedFields.data.newPassword,
-	});
-
-	if (updateError) throw updateError;
-
-	revalidatePath("/");
-	redirect("/");
 }
 
 export async function updateEmail(formState: FormState, formData: FormData) {

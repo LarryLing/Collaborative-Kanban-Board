@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useActionState, useEffect } from "react"
-import { login, loginWithDiscord, loginWithGithub } from "@/lib/actions"
-import { Separator } from "@/components/ui/separator"
-import { GoogleIcon, GithubIcon } from "@/components/icons/icon"
-import Link from "next/link"
-import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useActionState, useEffect } from "react";
+import { login, loginWithDiscord, loginWithGithub } from "@/lib/actions";
+import { Separator } from "@/components/ui/separator";
+import { GoogleIcon, GithubIcon } from "@/components/icons/icon";
+import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
 
 export function LoginForm({
 	className,
 	...props
 }: React.ComponentPropsWithoutRef<"div">) {
-	const { toast } = useToast()
-	const [state, action, pending] = useActionState(login, undefined)
+	const { toast } = useToast();
+	const [state, action, pending] = useActionState(login, undefined);
 
 	useEffect(() => {
 		if (state?.toast) {
 			toast({
 				title: state.toast.title,
 				description: state.toast.message,
-			})
+			});
 		}
-	}, [state?.toast])
+	}, [state?.toast]);
 
 	return (
 		<div className="h-full w-[350px] lg:w-[500px] py-20 px-4 lg:px-20 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
@@ -75,7 +75,7 @@ export function LoginForm({
 					<div className="flex items-center">
 						<Label htmlFor="password">Password</Label>
 						<Link
-							href="/login/forgot-password"
+							href="/forgot-password"
 							className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
 						>
 							Forgot your password?
@@ -95,7 +95,7 @@ export function LoginForm({
 					)}
 				</div>
 				<Button type="submit" disabled={pending} className="w-full">
-					Login
+					{pending ? "Logging in..." : "Login"}
 				</Button>
 				<div className="text-center text-sm">
 					Don't have an account?{" "}
@@ -108,5 +108,5 @@ export function LoginForm({
 				</div>
 			</form>
 		</div>
-	)
+	);
 }

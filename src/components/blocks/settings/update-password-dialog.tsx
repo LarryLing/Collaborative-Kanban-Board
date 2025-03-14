@@ -26,8 +26,8 @@ export default function UpdatePasswordDialog({
 	useEffect(() => {
 		if (state?.toast !== undefined) {
 			toast({
-				title: "Success!",
-				description: state?.toast,
+				title: state.toast.title,
+				description: state.toast.message,
 			});
 
 			setIsDialogOpen(false);

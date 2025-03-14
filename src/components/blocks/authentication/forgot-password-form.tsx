@@ -1,42 +1,39 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardHeader,
 	CardTitle,
 	CardDescription,
 	CardContent,
-} from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { sendPasswordReset } from "@/lib/actions"
-import Link from "next/link"
-import React, { useActionState, useEffect } from "react"
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { sendOtpEmail } from "@/lib/actions";
+import Link from "next/link";
+import React, { useActionState, useEffect } from "react";
 
 export default function ForgotPasswordForm() {
-	const { toast } = useToast()
-	const [state, action, pending] = useActionState(
-		sendPasswordReset,
-		undefined,
-	)
+	const { toast } = useToast();
+	const [state, action, pending] = useActionState(sendOtpEmail, undefined);
 
 	useEffect(() => {
 		if (state?.toast) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.title,
-			})
+				description: state.toast.message,
+			});
 		}
-	}, [state?.toast])
+	}, [state?.toast]);
 
 	return (
 		<Card className="w-[384px] ">
 			<CardHeader>
 				<CardTitle className="text-2xl">Recover your account</CardTitle>
 				<CardDescription>
-					Enter your email to receive a password reset link
+					Enter your email to receive a one-time password.
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
@@ -57,7 +54,7 @@ export default function ForgotPasswordForm() {
 						)}
 					</div>
 					<Button type="submit" className="w-full" disabled={pending}>
-						Send Reset Email
+						{pending ? "Sending..." : "Send"}
 					</Button>
 					<div className="text-center text-sm">
 						Remember your password?{" "}
@@ -71,5 +68,5 @@ export default function ForgotPasswordForm() {
 				</form>
 			</CardContent>
 		</Card>
-	)
+	);
 }
