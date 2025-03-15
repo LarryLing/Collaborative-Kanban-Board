@@ -34,9 +34,8 @@ body {
 		--chart-5: 27 87% 67%;
 		--radius: 0.5rem;
 
-		--google: 5, 81%, 56%;
+		--google: 0, 0%, 94.9%;
 		--github: 210, 12%, 19%;
-		--discord: 227, 58%, 65%;
 		--sidebar-background: 0 0% 98%;
 		--sidebar-foreground: 240 5.3% 26.1%;
 		--sidebar-primary: 240 5.9% 10%;
@@ -91,13 +90,11 @@ body {
 	}
 }
 
-
-
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+	* {
+		@apply border-border outline-ring/50;
 	}
-  body {
-    @apply bg-background text-foreground;
+	body {
+		@apply bg-background text-foreground;
 	}
 }

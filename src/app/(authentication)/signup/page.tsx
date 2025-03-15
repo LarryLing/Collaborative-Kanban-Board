@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { loginWithGoogle, loginWithGithub, signup } from "@/lib/actions";
+import { mona_sans, roboto } from "@/lib/fonts";
 import Link from "next/link";
 import React, { useActionState, useEffect } from "react";
 
@@ -25,27 +26,37 @@ export default function SignupPage() {
 
 	return (
 		<div className="flex justify-center lg:justify-start h-screen">
-			<div className="h-full w-[350px] lg:w-[500px] py-20 px-4 lg:px-20 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
+			<div className="h-full w-[390px] lg:w-[475px] py-20 px-4 lg:px-14 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
 				<div className="w-full">
 					<h2 className="font-semibold text-3xl">Get Started</h2>
 					<p>Create a new account</p>
 				</div>
-				<div className="w-full space-y-3">
+				<div className="flex justify-center items-center gap-3 w-full">
 					<Button
 						onClick={loginWithGoogle}
 						disabled={pending}
-						className="w-full bg-google hover:bg-google/90 text-background text-white"
+						className={`${roboto.className} bg-google text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
 					>
-						<GoogleIcon />
-						Continue with Google
+						<GoogleIcon className="size-5" />
+						<span>
+							Sign in{" "}
+							<span className="hidden sm:inline">
+								with Google
+							</span>
+						</span>
 					</Button>
 					<Button
 						onClick={loginWithGithub}
 						disabled={pending}
-						className="w-full bg-github hover:bg-github/90 text-background text-white"
+						className={`${mona_sans.className}  bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
 					>
 						<GithubIcon />
-						Continue with Github
+						<span>
+							Sign in{" "}
+							<span className="hidden sm:inline">
+								with Github
+							</span>
+						</span>
 					</Button>
 				</div>
 				<div className="flex justify-center items-center text-sm w-full">
