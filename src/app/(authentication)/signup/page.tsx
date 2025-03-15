@@ -30,9 +30,9 @@ export default function SignupPage() {
 					<h2 className="font-semibold text-3xl">Get Started</h2>
 					<p>Create a new account</p>
 				</div>
-				<form className="w-full space-y-3">
+				<div className="w-full space-y-3">
 					<Button
-						formAction={loginWithGoogle}
+						onClick={loginWithGoogle}
 						disabled={pending}
 						className="w-full bg-google hover:bg-google/90 text-background text-white"
 					>
@@ -40,14 +40,14 @@ export default function SignupPage() {
 						Continue with Google
 					</Button>
 					<Button
-						formAction={loginWithGithub}
+						onClick={loginWithGithub}
 						disabled={pending}
 						className="w-full bg-github hover:bg-github/90 text-background text-white"
 					>
 						<GithubIcon />
 						Continue with Github
 					</Button>
-				</form>
+				</div>
 				<div className="flex justify-center items-center text-sm w-full">
 					<Separator className="w-40" />
 					<span className="mx-1">or</span>
