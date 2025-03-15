@@ -38,12 +38,7 @@ export default function SignupPage() {
 						className={`${roboto.className} bg-google text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
 					>
 						<GoogleIcon className="size-5" />
-						<span>
-							Sign in{" "}
-							<span className="hidden sm:inline">
-								with Google
-							</span>
-						</span>
+						<span>Sign in with Google</span>
 					</Button>
 					<Button
 						onClick={loginWithGithub}
@@ -51,12 +46,7 @@ export default function SignupPage() {
 						className={`${mona_sans.className}  bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
 					>
 						<GithubIcon />
-						<span>
-							Sign in{" "}
-							<span className="hidden sm:inline">
-								with Github
-							</span>
-						</span>
+						<span>Sign in with Github</span>
 					</Button>
 				</div>
 				<div className="flex justify-center items-center text-sm w-full">
