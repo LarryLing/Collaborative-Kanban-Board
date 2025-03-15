@@ -56,7 +56,8 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 						<p className="text-sm">{userProfile.aboutMe}</p>
 					</>
 				)}
-				{userProfile.socials.length > 0 && (
+				{userProfile.socials.filter((social) => social !== "").length >
+					0 && (
 					<>
 						<Separator className="w-full" />
 						<div className="text-sm space-y-1">

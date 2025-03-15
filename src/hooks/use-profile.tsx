@@ -32,11 +32,20 @@ export function useProfile(
 		const fileExt = file.name.split(".").pop();
 		const filePath = `${userProfile.id}/avatar_${Date.now()}.${fileExt}`;
 
+		console.log(filePath);
+
 		const { error: uploadError } = await supabase.storage
 			.from("avatars")
 			.upload(filePath, file);
 
-		if (uploadError) throw uploadError;
+		if (uploadError) {
+			toast({
+				title: "Something went wrong...",
+				description: "Failed to upload your avatar. Please try again.",
+			});
+			setUploading(false);
+			return;
+		}
 
 		const { error: profileError } = await supabase
 			.from("profiles")
@@ -45,7 +54,15 @@ export function useProfile(
 			})
 			.eq("id", userProfile.id);
 
-		if (profileError) throw profileError;
+		if (profileError) {
+			toast({
+				title: "Something went wrong...",
+				description:
+					"Failed to sync your profile with S3. Please try again.",
+			});
+			setUploading(false);
+			return;
+		}
 
 		const { data: publicUrl } = await supabase.storage
 			.from("avatars")

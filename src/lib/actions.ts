@@ -10,7 +10,6 @@ import {
 	SignupFormSchema,
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
-	ResetForgottenPasswordFormSchema,
 	DeleteAccountFormSchema,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
@@ -101,11 +100,22 @@ export async function login(formState: FormState, formData: FormData) {
 	);
 
 	if (signinError?.code === "invalid_credentials") {
-		return {
-			errors: {
-				email: ["Incorrect email or password."],
-			},
-		};
+		const { error: updateError } = await supabase.auth.verifyOtp({
+			email: validatedFields.data.email,
+			token: validatedFields.data.password,
+			type: "email",
+		});
+
+		if (updateError) {
+			return {
+				errors: {
+					email: ["Incorrect email or password."],
+				},
+			};
+		}
+
+		revalidatePath("/", "layout");
+		redirect("/dashboard");
 	} else if (signinError?.status && signinError.status >= 500) {
 		return {
 			toast: {
@@ -120,23 +130,21 @@ export async function login(formState: FormState, formData: FormData) {
 	redirect("/dashboard");
 }
 
-export async function loginWithDiscord() {
+export async function loginWithGoogle() {
 	const supabase = await createClient();
 	const origin = (await headers()).get("origin");
 
 	const { data: oauthData, error: oauthError } =
 		await supabase.auth.signInWithOAuth({
-			provider: "discord",
+			provider: "google",
 			options: {
 				redirectTo: `${origin}/auth/callback`,
 			},
 		});
 
-	if (oauthError) {
-		throw oauthError;
-	}
+	if (oauthError) throw oauthError;
 
-	redirect(oauthData.url);
+	if (oauthData.url) redirect(oauthData.url);
 }
 
 export async function loginWithGithub() {
@@ -153,7 +161,7 @@ export async function loginWithGithub() {
 
 	if (oauthError) throw oauthError;
 
-	redirect(oauthData.url);
+	if (oauthData.url) redirect(oauthData.url);
 }
 
 export async function signout() {
@@ -167,10 +175,7 @@ export async function signout() {
 	redirect("/login");
 }
 
-export async function sendPasswordReset(
-	formState: unknown,
-	formData: FormData,
-) {
+export async function sendOtpEmail(formState: unknown, formData: FormData) {
 	const supabase = await createClient();
 
 	const validatedFields = EmailFormSchema.safeParse({
@@ -183,24 +188,26 @@ export async function sendPasswordReset(
 		};
 	}
 
-	const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-		validatedFields.data.email,
-	);
+	const { error: otpError } = await supabase.auth.signInWithOtp({
+		email: validatedFields.data.email,
+		options: {
+			shouldCreateUser: false,
+		},
+	});
 
-	if (resetError) {
-		return {
-			toast: {
-				title: "Something went wrong...",
-				message:
-					"We couldn't send the password recovery email. Please try again.",
-			},
-		};
-	}
+	if (otpError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not send you a one-time password. Please try again.",
+            },
+        };
+    };
 
 	return {
 		toast: {
 			title: "Success!",
-			message: "Please check your inbox to recover your password.",
+			message: "Please check your inbox to see your one-time password.",
 		},
 	};
 }
@@ -232,40 +239,23 @@ export async function updatePassword(formState: FormState, formData: FormData) {
 		},
 	);
 
-	if (passwordError) throw passwordError;
+	if (passwordError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not update your password. Please try again.",
+            },
+        };
+    };
 
 	revalidatePath("/");
 
 	return {
-		toast: "Your password has been successfully updated!",
+		toast: {
+			title: "Success!",
+			message: "Your password has been successfully updated.",
+		},
 	};
-}
-
-export async function resetForgottenPassword(
-	formState: FormState,
-	formData: FormData,
-) {
-	const supabase = await createClient();
-
-	const validatedFields = ResetForgottenPasswordFormSchema.safeParse({
-		newPassword: formData.get("newPassword"),
-		confirmPassword: formData.get("confirmPassword"),
-	});
-
-	if (!validatedFields.success) {
-		return {
-			errors: validatedFields.error.flatten().fieldErrors,
-		};
-	}
-
-	const { error: updateError } = await supabase.auth.updateUser({
-		password: validatedFields.data.newPassword,
-	});
-
-	if (updateError) throw updateError;
-
-	revalidatePath("/");
-	redirect("/");
 }
 
 export async function updateEmail(formState: FormState, formData: FormData) {
@@ -286,7 +276,14 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 		.select("email")
 		.eq("email", validatedFields.data.email);
 
-	if (emailExistsError) throw emailExistsError;
+	if (emailExistsError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not determine if this email is in use. Please try again.",
+            },
+        };
+    };
 
 	if (emailExistsData.length > 0) {
 		return {
@@ -303,7 +300,14 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 		},
 	});
 
-	if (updateError) throw updateError;
+	if (updateError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not update your email. Please try again.",
+            },
+        };
+    };;
 
 	revalidatePath("/");
 
@@ -335,7 +339,14 @@ export async function updateUserProfile(
 
 	const { data: userData, error: userError } = await supabase.auth.getUser();
 
-	if (userError) throw userError;
+	if (userError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not retieve your ID. Please try again.",
+            },
+        };
+    };
 
 	const { error: profileError } = await supabase
 		.from("profiles")
@@ -345,14 +356,28 @@ export async function updateUserProfile(
 		})
 		.eq("id", userData.user.id);
 
-	if (profileError) throw profileError;
+	if (profileError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not update your profile information. Please try again.",
+            },
+        };
+    };
 
 	const { error: socialsDeleteError } = await supabase
 		.from("socials")
 		.delete()
 		.eq("profile_id", userData.user.id);
 
-	if (socialsDeleteError) throw socialsDeleteError;
+	if (socialsDeleteError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not delete uour old social data. Please try again.",
+            },
+        };
+    };
 
 	const { error: socialsInsertError } = await supabase
 		.from("socials")
@@ -375,7 +400,14 @@ export async function updateUserProfile(
 			},
 		]);
 
-	if (socialsInsertError) throw socialsInsertError;
+	if (socialsInsertError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not insert your new social data. Please try again.",
+            },
+        };
+    };
 
 	const socials = [
 		validatedFields.data.social0 || "",
@@ -428,7 +460,14 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
 		.from("avatars")
 		.list(`${userId}`);
 
-	if (folderError) throw folderError;
+	if (folderError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not retrieve the contents of your bucket folder. Please try again.",
+            },
+        };
+    };
 
 	if (folderData.length > 0) {
 		const files = folderData.map((file) => `${userId}/${file.name}`);
@@ -436,12 +475,26 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
 			.from("avatars")
 			.remove(files);
 
-		if (removeError) throw removeError;
+		if (removeError) {
+            return {
+                toast: {
+                    title: "Something went wrong...",
+                    message: "We could not clear your bucket folder. Please try again.",
+                },
+            };
+        };;
 	}
 
 	const { error: deleteError } = await supabase.rpc("handle_delete_user");
 
-	if (deleteError) throw deleteError;
+	if (deleteError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not delete your account. Please try again.",
+            },
+        };
+    };
 
 	const { error: signoutError } = await supabase.auth.signOut();
 
