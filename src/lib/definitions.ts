@@ -87,9 +87,11 @@ export type FormState =
 				password?: string[];
 				newPassword?: string[];
 				confirmPassword?: string[];
-				role?: string[];
-				bio?: string[];
-				success?: string[];
+				aboutMe?: string[];
+                social0?: string[];
+                social1?: string[];
+                social2?: string[];
+                social3?: string[];
 			};
 	  }
 	| undefined;

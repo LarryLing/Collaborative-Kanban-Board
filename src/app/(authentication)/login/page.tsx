@@ -26,7 +26,7 @@ export default function LoginPage() {
 
 	return (
 		<div className="flex justify-center lg:justify-start h-screen">
-			<div className="h-full w-[405px] lg:w-[490px] py-20 px-4 lg:px-14 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
+			<div className="h-full w-[390px] lg:w-[475px] py-20 px-4 lg:px-14 border-r-0 lg:border-r-[1px] border-border flex flex-col justify-center items-start gap-4">
 				<div className="w-full">
 					<h2 className="font-semibold text-3xl">Welcome Back</h2>
 					<p>Sign into your account</p>

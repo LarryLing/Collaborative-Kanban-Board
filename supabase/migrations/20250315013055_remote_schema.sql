@@ -93,8 +93,8 @@ ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."handle_password_change"("newpassword" "text", "userid" "uuid") RETURNS "void"
     LANGUAGE "plpgsql" SECURITY DEFINER
     AS $$BEGIN
-  UPDATE auth.users 
-  SET encrypted_password = crypt(newpassword, gen_salt('bf')) 
+  UPDATE auth.users
+  SET encrypted_password = crypt(newpassword, gen_salt('bf'))
   WHERE id = userid;
 END;$$;
 
