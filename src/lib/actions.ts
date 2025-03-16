@@ -11,6 +11,7 @@ import {
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
+    UploadSchema,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
 
@@ -311,7 +312,7 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 
 	revalidatePath("/");
 
-	 return {
+    return {
         toast: {
             title: "Success!",
             message:
@@ -325,9 +326,7 @@ export async function updateUserProfile(
 	formState: FormState,
 	formData: FormData,
 ) {
-	const supabase = await createClient();
-
-	const validatedFields = EditProfileFormSchema.safeParse({
+    const validatedFields = EditProfileFormSchema.safeParse({
 		displayName: formData.get("displayName"),
 		aboutMe: formData.get("aboutMe"),
 		social0: formData.get("social0"),
@@ -342,94 +341,128 @@ export async function updateUserProfile(
 		};
 	}
 
-	const { data: userData, error: userError } = await supabase.auth.getUser();
+    try {
+        const supabase = await createClient();
 
-	if (userError) {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({
+                display_name: validatedFields.data.displayName,
+                about_me: validatedFields.data.aboutMe,
+            })
+            .eq("id", userData.user.id);
+
+        if (profileError) throw profileError;
+
+        const { error: socialsDeleteError } = await supabase
+            .from("socials")
+            .delete()
+            .eq("profile_id", userData.user.id);
+
+        if (socialsDeleteError) socialsDeleteError;
+
+        const { error: socialsInsertError } = await supabase
+            .from("socials")
+            .insert([
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social0 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social1 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social2 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social3 || "",
+                },
+            ]);
+
+        if (socialsInsertError) throw socialsInsertError;
+
+        const { data: socialsSelectData, error: socialsSelectError } = await supabase
+            .from("socials")
+            .select("url")
+            .eq("profile_id", userData.user.id)
+
+        if (socialsSelectError) throw socialsSelectError;
+
+        revalidatePath("/");
+
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not retieve your ID. Please try again.",
+            updatedProfile: {
+                displayName: validatedFields.data.displayName,
+                aboutMe: validatedFields.data.aboutMe,
+                socials: socialsSelectData,
             },
         };
-    };
-
-	const { error: profileError } = await supabase
-		.from("profiles")
-		.update({
-			display_name: validatedFields.data.displayName,
-			about_me: validatedFields.data.aboutMe,
-		})
-		.eq("id", userData.user.id);
-
-	if (profileError) {
+    } catch {
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not update your profile information. Please try again.",
-            },
+            errorMessage: "We could not update your profile. Please try again.",
         };
-    };
+    }
+}
 
-	const { error: socialsDeleteError } = await supabase
-		.from("socials")
-		.delete()
-		.eq("profile_id", userData.user.id);
+export async function uploadAvatar(formState: FormState, formData: FormData) {
+    const validatedFields = UploadSchema.safeParse({
+        avatar: formData.get("avatar"),
+    })
 
-	if (socialsDeleteError) {
+    if (!validatedFields.success) {
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not delete uour old social data. Please try again.",
-            },
-        };
-    };
+            errors: validatedFields.error.flatten().fieldErrors,
+        }
+    }
 
-	const { error: socialsInsertError } = await supabase
-		.from("socials")
-		.insert([
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social0 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social1 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social2 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social3 || "",
-			},
-		]);
+    try {
+        const supabase = await createClient();
 
-	if (socialsInsertError) {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        const file = validatedFields.data.avatar;
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${userData.user.id}/avatar_${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from("avatars")
+            .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({
+                avatar_path: filePath,
+            })
+            .eq("id", userData.user.id);
+
+        if (profileError) throw profileError;
+
+        const { data: publicUrl } = await supabase.storage
+            .from("avatars")
+            .getPublicUrl(filePath);
+
+        revalidatePath("/");
+
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not insert your new social data. Please try again.",
-            },
+            publicUrl: publicUrl.publicUrl,
+        }
+
+    } catch {
+        return {
+            errorMessage: "We could not update your avatar. Please try again.",
         };
-    };
-
-    const { data: socialsSelectData, error: socialsSelectError } = await supabase
-        .from("socials")
-        .select("url")
-        .eq("profile_id", userData.user.id)
-
-    if (socialsSelectError) throw socialsSelectError;
-
-	revalidatePath("/");
-
-	return {
-		updatedProfile: {
-			displayName: validatedFields.data.displayName,
-			aboutMe: validatedFields.data.aboutMe,
-			socials: socialsSelectData,
-		},
-	};
+    }
 }
 
 export async function deleteAccount(formState: FormState, formData: FormData) {

@@ -1,4 +1,5 @@
 import DashboardClientComponent from "@/components/blocks/dashboard/dashboard-client-component";
+import AuthenticatedNavigationBar from "@/components/blocks/misc/authenticated-navigation-bar";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -31,10 +32,13 @@ export default async function DashboardPage() {
 
 	return (
 		<div className="flex flex-col justify-center items-center">
+			<AuthenticatedNavigationBar
+				userProfile={userProfile}
+				publicUrl={publicUrl.publicUrl}
+			/>
 			<DashboardClientComponent
 				boards={boards}
 				userProfile={userProfile}
-				publicUrl={publicUrl.publicUrl}
 			/>
 		</div>
 	);

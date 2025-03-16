@@ -26,7 +26,10 @@ export default function SettingsClientComponent({
 
 	return (
 		<>
-			<AuthenticatedNavigationBar userProfile={userProfile} publicUrl={publicUrl}/>
+			<AuthenticatedNavigationBar
+				userProfile={userProfile}
+				publicUrl={publicUrl}
+			/>
 			<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 				<div className="flex flex-col gap-4">
 					<h2 className="font-semibold text-3xl">Settings</h2>
@@ -54,7 +57,7 @@ export default function SettingsClientComponent({
 					{activeTab === "profile" && (
 						<ProfileSettings
 							userProfile={userProfile}
-                            publicUrl={publicUrl}
+							publicUrl={publicUrl}
 							toast={toast}
 						/>
 					)}

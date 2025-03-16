@@ -11,13 +11,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
-import { updateUserProfile } from "@/lib/actions";
+import { updateUserProfile, uploadAvatar } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
@@ -30,16 +29,19 @@ export default function ProfileSettings({
 	publicUrl,
 	toast,
 }: ProfileSettingsProps) {
-	const supabase = createClient();
-	const [state, action, pending] = useActionState(
+	const [profileState, profileAction, profilePending] = useActionState(
 		updateUserProfile,
 		undefined,
 	);
+	const [avatarState, avatarAction, avatarPending] = useActionState(
+		uploadAvatar,
+		undefined,
+	);
+	const [avatarPreview, setAvatarPreview] = useState(publicUrl);
 	const [uploading, setUploading] = useState(false);
-	const [error, setError] = useState<string | undefined>(undefined);
-	const MAX_FILE_SIZE = 6000000;
+	const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-	const uploadAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
+	async function handleChange(e: ChangeEvent<HTMLInputElement>) {
 		setUploading(true);
 
 		if (!e.target.files || e.target.files?.length === 0) {
@@ -48,61 +50,50 @@ export default function ProfileSettings({
 		}
 
 		if (e.target.files[0].size > MAX_FILE_SIZE) {
-			setError("Max file size is 6MB");
 			setUploading(false);
 			return;
 		}
 
 		const file = e.target.files[0];
-		const fileExt = file.name.split(".").pop();
-		const filePath = `${userProfile.id}/avatar_${Date.now()}.${fileExt}`;
-
-		const { error: uploadError } = await supabase.storage
-			.from("avatars")
-			.upload(filePath, file);
-
-		if (uploadError) {
-			toast({
-				title: "Something went wrong...",
-				description: "Failed to upload your avatar. Please try again.",
-			});
-			setUploading(false);
-			return;
-		}
-
-		const { error: profileError } = await supabase
-			.from("profiles")
-			.update({
-				avatar_path: filePath,
-			})
-			.eq("id", userProfile.id);
-
-		if (profileError) {
-			toast({
-				title: "Something went wrong...",
-				description:
-					"Failed to sync your profile with S3. Please try again.",
-			});
-			setUploading(false);
-			return;
-		}
-
+		setAvatarPreview(URL.createObjectURL(file));
 		setUploading(false);
-
-		toast({
-			title: "Success!",
-			description: "Your avatar was successfully updated",
-		});
-	};
+	}
 
 	useEffect(() => {
-		if (state?.updatedProfile !== undefined) {
+		if (profileState?.updatedProfile !== undefined) {
 			toast({
 				title: "Success!",
 				description: "Your profile has been successfully updated.",
 			});
 		}
-	}, [state?.updatedProfile]);
+
+		if (avatarState?.publicUrl !== undefined) {
+			setAvatarPreview(avatarState.publicUrl);
+			toast({
+				title: "Success!",
+				description: "Your avatar has been successfully updated.",
+			});
+		}
+
+		if (profileState?.errorMessage !== undefined) {
+			toast({
+				title: "Something went wrong...",
+				description: profileState.errorMessage,
+			});
+		}
+
+		if (avatarState?.errorMessage !== undefined) {
+			toast({
+				title: "Something went wrong...",
+				description: avatarState.errorMessage,
+			});
+		}
+	}, [
+		profileState?.updatedProfile,
+		avatarState?.publicUrl,
+		profileState?.errorMessage,
+		avatarState?.errorMessage,
+	]);
 
 	return (
 		<Card className="border-none shadow-none flex-auto">
@@ -115,10 +106,10 @@ export default function ProfileSettings({
 			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="flex flex-col lg:flex-row-reverse gap-6">
-					<form className="space-y-2" action={action}>
+					<form className="space-y-2" action={avatarAction}>
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
-							<AvatarImage src={publicUrl} />
+							<AvatarImage src={avatarPreview} />
 							<AvatarFallback>
 								{userProfile.display_name
 									.substring(0, 2)
@@ -130,15 +121,23 @@ export default function ProfileSettings({
 							name="avatar"
 							type="file"
 							accept="image/*"
-							onChange={(e) => uploadAvatar(e)}
+							onChange={(e) => handleChange(e)}
 							disabled={uploading}
 							className="justify-center items-center"
 						/>
-						{error && (
-							<p className="text-sm text-destructive">{error}</p>
+						{avatarState?.errors?.avatar && (
+							<p className="text-sm text-destructive">
+								{avatarState?.errors?.avatar}
+							</p>
 						)}
+						<Button type="submit" disabled={avatarPending}>
+							{avatarPending ? "Uploading..." : "Upload Avatar"}
+						</Button>
 					</form>
-					<form action={action} className="basis-[500px] space-y-6">
+					<form
+						action={profileAction}
+						className="basis-[500px] space-y-6"
+					>
 						<div className="space-y-1">
 							<Label htmlFor="displayName">Display Name</Label>
 							<Input
@@ -146,13 +145,13 @@ export default function ProfileSettings({
 								name="displayName"
 								type="text"
 								defaultValue={
-									state?.updatedProfile?.displayName ||
+									profileState?.updatedProfile?.displayName ||
 									userProfile.display_name
 								}
 							/>
-							{state?.errors?.displayName && (
+							{profileState?.errors?.displayName && (
 								<p className="text-sm text-destructive">
-									{state.errors.displayName}
+									{profileState.errors.displayName}
 								</p>
 							)}
 							<p className="text-sm text-muted-foreground font-normal">
@@ -167,13 +166,13 @@ export default function ProfileSettings({
 								name="aboutMe"
 								className="resize-none h-[100px]"
 								defaultValue={
-									state?.updatedProfile?.aboutMe ||
+									profileState?.updatedProfile?.aboutMe ||
 									userProfile.about_me
 								}
 							/>
-							{state?.errors?.aboutMe && (
+							{profileState?.errors?.aboutMe && (
 								<p className="text-sm text-destructive">
-									{state.errors.aboutMe}
+									{profileState.errors.aboutMe}
 								</p>
 							)}
 						</div>
@@ -196,29 +195,29 @@ export default function ProfileSettings({
 									</div>
 								);
 							})}
-							{state?.errors?.social0 && (
+							{profileState?.errors?.social0 && (
 								<p className="text-sm text-destructive">
-									{state?.errors?.social0}
+									{profileState?.errors?.social0}
 								</p>
 							)}
-							{state?.errors?.social1 && (
+							{profileState?.errors?.social1 && (
 								<p className="text-sm text-destructive">
-									{state?.errors?.social1}
+									{profileState?.errors?.social1}
 								</p>
 							)}
-							{state?.errors?.social2 && (
+							{profileState?.errors?.social2 && (
 								<p className="text-sm text-destructive">
-									{state?.errors?.social2}
+									{profileState?.errors?.social2}
 								</p>
 							)}
-							{state?.errors?.social3 && (
+							{profileState?.errors?.social3 && (
 								<p className="text-sm text-destructive">
-									{state?.errors?.social3}
+									{profileState?.errors?.social3}
 								</p>
 							)}
 						</div>
-						<Button type="submit" disabled={pending}>
-							{pending ? "Updating..." : "Update Profile"}
+						<Button type="submit" disabled={profilePending}>
+							{profilePending ? "Updating..." : "Update Profile"}
 						</Button>
 					</form>
 				</div>

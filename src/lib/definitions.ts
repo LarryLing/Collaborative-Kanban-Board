@@ -79,11 +79,24 @@ export const DeleteAccountFormSchema = z.object({
 	displayName: z.string().trim(),
 });
 
+export const FileSchema = z.object({
+    name: z.string(),
+    type: z.string().startsWith("image/"),
+    size: z.number().max(5 * 1024 * 1024),
+});
+
+export const UploadSchema = z.object({
+    avatar: z.instanceof(File).refine((file) => FileSchema.safeParse(file).success, {
+        message: "Invalid file type or size. Please upload a valid image file (max 5MB).",
+    }),
+});
+
 export type FormState =
 	| {
 			errors?: {
 				displayName?: string[];
 				email?: string[];
+                avatar?: string[];
 				password?: string[];
 				newPassword?: string[];
 				confirmPassword?: string[];
