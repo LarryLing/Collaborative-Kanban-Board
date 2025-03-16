@@ -32,7 +32,7 @@ export default function BoardOptionsDropdown({
 	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
 	return (
-		<DropdownMenu>
+		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
 				<Button variant="ghost" size="icon">
 					<Ellipsis className="size-5" />
