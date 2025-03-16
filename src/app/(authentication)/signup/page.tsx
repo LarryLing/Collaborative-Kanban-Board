@@ -88,17 +88,17 @@ export default function SignupPage() {
 					<div className="grid gap-2">
 						<Label htmlFor="password">Password</Label>
 						<Input
-							id="password"
-							name="password"
+							id="newPassword"
+							name="newPassword"
 							type="password"
 							placeholder="••••••••"
 							className="text-sm"
 						/>
-						{state?.errors?.password && (
+						{state?.errors?.newPassword && (
 							<div className="text-sm text-destructive">
 								<p>Password must:</p>
 								<ul>
-									{state.errors.password.map((error) => (
+									{state.errors.newPassword.map((error) => (
 										<li key={error}>- {error}</li>
 									))}
 								</ul>
@@ -108,15 +108,15 @@ export default function SignupPage() {
 					<div className="grid gap-2">
 						<Label htmlFor="confirm">Confirm Password</Label>
 						<Input
-							id="confirm"
-							name="confirm"
+							id="confirmPassword"
+							name="confirmPassword"
 							type="password"
 							placeholder="••••••••"
 							className="text-sm"
 						/>
-						{state?.errors?.confirm && (
+						{state?.errors?.confirmPassword && (
 							<p className="text-sm text-destructive">
-								{state.errors.confirm}
+								{state.errors.confirmPassword}
 							</p>
 						)}
 					</div>

@@ -10,7 +10,7 @@ export const SignupFormSchema = z
 			})
 			.trim(),
 		email: z.string().email({ message: "Please enter a valid email." }),
-		password: z
+		newPassword: z
 			.string()
 			.min(6, { message: "Be at least 6 characters long." })
 			.regex(/[a-zA-Z]/, { message: "Contain at least one letter." })
@@ -19,9 +19,9 @@ export const SignupFormSchema = z
 				message: "Contain at least one special character.",
 			})
 			.trim(),
-		confirm: z.string().trim(),
+		confirmPassword: z.string().trim(),
 	})
-	.refine((data) => data.password === data.confirm, {
+	.refine((data) => data.newPassword === data.confirmPassword, {
 		message: "Passwords don't match",
 		path: ["confirmPassword"],
 	})
@@ -95,7 +95,7 @@ export const RenameBoardSchema = z.object({
     title: z.string().min(1, { message: "Please enter a name for this board." }),
 })
 
-export type FormState =
+export type UserFormState =
 	| {
         errors?: {
             displayName?: string[];
@@ -113,7 +113,7 @@ export type FormState =
 	  }
 	| undefined;
 
-export type RenameBoardFormState =
+export type BoardFormState =
     | {
         errors?: {
             title?: string[];
