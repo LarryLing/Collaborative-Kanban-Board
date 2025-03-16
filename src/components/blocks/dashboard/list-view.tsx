@@ -9,6 +9,7 @@ import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
 import BoardOptionsDropdown from "./board-options-dropdown";
 import { Tables } from "../../../../database.types";
+import { createBoard } from "@/lib/actions";
 
 export default function ListView({ boards }: { boards: Tables<"boards">[] }) {
 	return (
@@ -23,7 +24,6 @@ export default function ListView({ boards }: { boards: Tables<"boards">[] }) {
 
 function BoardItem({
 	board_id,
-	profile_id,
 	title,
 	bookmarked,
 	collaborators,
@@ -81,6 +81,7 @@ function NewBoardItem() {
 		<Button
 			variant="outline"
 			className="w-full h-[56px] overflow-hidden flex justify-center items-center gap-2 pl-4 pr-2"
+			onClick={() => createBoard()}
 		>
 			<Plus className="size-4" />
 			<span className="font-semibold text-md">New Board</span>

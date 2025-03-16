@@ -7,6 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { deleteBoard } from "@/lib/actions";
 
 type DeleteDialogProps = {
 	boardId: string;
@@ -35,7 +36,12 @@ export default function DeleteDialog({
 					>
 						Go back
 					</Button>
-					<Button variant="destructive" className="mb-2 sm:mb-0">
+					<Button
+						variant="destructive"
+						type="submit"
+						className="mb-2 sm:mb-0"
+						onClick={() => deleteBoard(boardId)}
+					>
 						Delete
 					</Button>
 				</DialogFooter>

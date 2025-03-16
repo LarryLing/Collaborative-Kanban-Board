@@ -12,6 +12,8 @@ import {
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
     UploadSchema,
+    RenameBoardSchema,
+    RenameBoardFormState,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
 
@@ -526,7 +528,7 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
     const { error: socialsDeleteError } = await supabase
 		.from("socials")
 		.delete()
-		.eq("id", userId);
+		.eq("profile_id", userId);
 
 	if (socialsDeleteError) {
         return {
@@ -554,4 +556,80 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
 
 	revalidatePath("/");
 	redirect("/");
+}
+
+export async function createBoard() {
+    const supabase = await createClient();
+
+    const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    const board_id = crypto.randomUUID();
+
+    const { error: boardError } = await supabase.from("boards").insert({
+        board_id: board_id,
+        profile_id: userData.user.id,
+        title: "Untitled Board",
+    });
+
+    if (boardError) throw boardError;
+
+    redirect("/board/" + board_id);
+}
+
+export async function deleteBoard(boardId: string) {
+    const supabase = await createClient();
+
+    const { error: deleteError } = await supabase
+        .from("boards")
+        .delete()
+        .eq("board_id", boardId);
+
+    if (deleteError) throw deleteError;
+
+    revalidatePath("/")
+}
+
+export async function bookmarkBoard(boardId: string, currentlyBookmarked: boolean) {
+    const supabase = await createClient();
+
+    const { error: bookmarkError } = await supabase
+        .from("boards")
+        .update({bookmarked: !currentlyBookmarked})
+        .eq("board_id", boardId);
+
+    if (bookmarkError) throw bookmarkError;
+
+    revalidatePath("/")
+}
+
+export async function renameBoard(formState: RenameBoardFormState, formData: FormData) {
+    const validatedFields = RenameBoardSchema.safeParse({
+        title: formData.get("title")
+    })
+
+	if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+		};
+	}
+
+    try {
+        const supabase = await createClient();
+
+        const { error: renameError } = await supabase
+            .from("boards")
+            .update({title: validatedFields.data.title})
+            .eq("board_id", formState?.boardId!);
+
+        if (renameError) throw renameError;
+
+        revalidatePath("/")
+    } catch {
+        return {
+            updatedTitle: validatedFields.data.title,
+        }
+    }
 }

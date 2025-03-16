@@ -10,6 +10,7 @@ import BoardOptionsDropdown from "./board-options-dropdown";
 import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
 import { Tables } from "../../../../database.types";
+import { createBoard } from "@/lib/actions";
 
 export default function GalleryView({
 	boards,
@@ -28,7 +29,6 @@ export default function GalleryView({
 
 function BoardItem({
 	board_id,
-	profile_id,
 	title,
 	cover_path,
 	bookmarked,
@@ -97,6 +97,7 @@ function NewBoardItem() {
 		<Button
 			variant="outline"
 			className="w-full h-[280px] flex items-center justify-center gap-2"
+			onClick={() => createBoard()}
 		>
 			<Plus className="size-4" />
 			<span className="font-semibold text-md">New Board</span>

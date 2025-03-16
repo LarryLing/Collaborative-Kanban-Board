@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import React from "react";
 import Link from "next/link";
+import { bookmarkBoard } from "@/lib/actions";
 
 type OptionsDropdownProps = {
 	side: "top" | "right" | "bottom" | "left" | undefined;
@@ -26,6 +27,7 @@ type OptionsDropdownProps = {
 export default function BoardOptionsDropdown({
 	side,
 	boardId,
+	bookmarked,
 	setIsRenameDialogOpen,
 	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
@@ -41,7 +43,9 @@ export default function BoardOptionsDropdown({
 					<PenLine className="size-4" />
 					<span>Rename</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => bookmarkBoard(boardId, bookmarked)}
+				>
 					<Bookmark className="size-4" />
 					<span>Bookmark</span>
 				</DropdownMenuItem>

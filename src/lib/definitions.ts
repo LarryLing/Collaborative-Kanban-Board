@@ -63,7 +63,7 @@ export const ResetPasswordFormSchema = z
 export const EditProfileFormSchema = z.object({
 	displayName: z
 		.string()
-		.min(4, { message: "Name must be at least 4 characters long. " })
+		.min(4, { message: "Name must be at least 4 characters long." })
 		.regex(/^[a-zA-Z0-9]/, {
 			message: "Name must start with non-whitespace character",
 		})
@@ -91,20 +91,32 @@ export const UploadSchema = z.object({
     }),
 });
 
+export const RenameBoardSchema = z.object({
+    title: z.string().min(1, { message: "Please enter a name for this board." }),
+})
+
 export type FormState =
 	| {
-			errors?: {
-				displayName?: string[];
-				email?: string[];
-                avatar?: string[];
-				password?: string[];
-				newPassword?: string[];
-				confirmPassword?: string[];
-				aboutMe?: string[];
-                social0?: string[];
-                social1?: string[];
-                social2?: string[];
-                social3?: string[];
-			};
+        errors?: {
+            displayName?: string[];
+            email?: string[];
+            avatar?: string[];
+            password?: string[];
+            newPassword?: string[];
+            confirmPassword?: string[];
+            aboutMe?: string[];
+            social0?: string[];
+            social1?: string[];
+            social2?: string[];
+            social3?: string[];
+        };
 	  }
 	| undefined;
+
+export type RenameBoardFormState =
+    | {
+        errors?: {
+            title?: string[];
+        }
+        boardId?: string,
+    } | undefined;
