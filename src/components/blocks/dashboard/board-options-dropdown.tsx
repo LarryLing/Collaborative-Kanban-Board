@@ -17,7 +17,7 @@ import Link from "next/link";
 
 type OptionsDropdownProps = {
 	side: "top" | "right" | "bottom" | "left" | undefined;
-	board_id: string;
+	boardId: string;
 	bookmarked: boolean;
 	setIsRenameDialogOpen: (arg0: boolean) => void;
 	setIsDeleteDialogOpen: (arg0: boolean) => void;
@@ -25,7 +25,7 @@ type OptionsDropdownProps = {
 
 export default function BoardOptionsDropdown({
 	side,
-	board_id,
+	boardId,
 	setIsRenameDialogOpen,
 	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
@@ -50,7 +50,7 @@ export default function BoardOptionsDropdown({
 					<span>Delete</span>
 				</DropdownMenuItem>
 				<Link
-					href={`/board/${board_id}`}
+					href={`/board/${boardId}`}
 					target="_blank"
 					rel="noopener noreferrer"
 				>

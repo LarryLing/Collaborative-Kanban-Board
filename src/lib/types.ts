@@ -8,11 +8,10 @@ export type UserProfile = {
 };
 
 export type BoardType = {
-	board_id: string;
-	owner_id: string;
-	cover?: string;
-	collaborative: boolean;
+	boardId: string;
+	ownerId: string;
+	coverPath?: string;
 	bookmarked: boolean;
 	title: string;
-	last_opened: string;
+	lastOpened: string;
 };

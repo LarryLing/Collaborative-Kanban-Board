@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -6,18 +6,18 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 type RenameDialogProps = {
-	board_id: string
-	title: string
-	isRenameDialogOpen: boolean
-	setIsRenameDialogOpen: (arg0: boolean) => void
-}
+	boardId: string;
+	title: string;
+	isRenameDialogOpen: boolean;
+	setIsRenameDialogOpen: (arg0: boolean) => void;
+};
 
 export default function RenameDialog({
-	board_id,
+	boardId,
 	title,
 	isRenameDialogOpen,
 	setIsRenameDialogOpen,
@@ -40,6 +40,7 @@ export default function RenameDialog({
 				</form>
 				<DialogFooter>
 					<Button
+						type="button"
 						variant="outline"
 						onClick={() => setIsRenameDialogOpen(false)}
 					>
@@ -51,5 +52,5 @@ export default function RenameDialog({
 				</DialogFooter>
 			</DialogContent>
 		</Dialog>
-	)
+	);
 }

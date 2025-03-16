@@ -15,7 +15,7 @@ export default function GalleryView({ boards }: { boards: BoardType[] }) {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{boards.map((board) => {
-				return <BoardItem {...board} key={board.board_id} />;
+				return <BoardItem {...board} key={board.boardId} />;
 			})}
 			<NewBoardItem />
 		</div>
@@ -23,24 +23,23 @@ export default function GalleryView({ boards }: { boards: BoardType[] }) {
 }
 
 function BoardItem({
-	board_id,
-	owner_id,
-	cover,
-	collaborative,
+	boardId,
+	ownerId,
+	coverPath,
 	bookmarked,
 	title,
-	last_opened,
+	lastOpened,
 }: BoardType) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
 		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative group">
-			<Link href={`/board/${board_id}`}>
+			<Link href={`/board/${boardId}`}>
 				<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
-					{cover && (
+					{coverPath && (
 						<Image
-							src={cover}
+							src={coverPath}
 							alt=""
 							objectFit="cover"
 							layout="fill"
@@ -52,14 +51,14 @@ function BoardItem({
 						{title}
 					</span>
 					<div className="flex justify-start items-center gap-2 basis-[40px]">
-						{collaborative && (
+						{/* {collaborative && (
 							<Users className="size-4 inline-block" />
-						)}
+						)} */}
 						{bookmarked && (
 							<Bookmark className="size-4 inline-block" />
 						)}
 						<span className="font-normal text-sm">
-							Opened {getLastOpened(last_opened)}
+							Opened {getLastOpened(lastOpened)}
 						</span>
 					</div>
 				</div>
@@ -67,20 +66,20 @@ function BoardItem({
 			<div className="absolute bottom-4 right-4">
 				<BoardOptionsDropdown
 					side="top"
-					board_id={board_id}
+					boardId={boardId}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
-				board_id={board_id}
+				boardId={boardId}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
 			<DeleteDialog
-				board_id={board_id}
+				boardId={boardId}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>

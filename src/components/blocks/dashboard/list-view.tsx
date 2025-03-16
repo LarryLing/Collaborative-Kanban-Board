@@ -14,7 +14,7 @@ export default function ListView({ boards }: { boards: BoardType[] }) {
 	return (
 		<div className="space-y-2">
 			{boards.map((board) => {
-				return <BoardItem {...board} key={board.board_id} />;
+				return <BoardItem {...board} key={board.boardId} />;
 			})}
 			<NewBoardItem />
 		</div>
@@ -22,29 +22,28 @@ export default function ListView({ boards }: { boards: BoardType[] }) {
 }
 
 function BoardItem({
-	board_id,
-	owner_id,
-	collaborative,
+	boardId,
+	ownerId,
 	bookmarked,
 	title,
-	last_opened,
+	lastOpened,
 }: BoardType) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
 		<div className="w-full h-auto border border-border rounded-md overflow-hidden relative hover:bg-accent/60 hover:text-accent-foreground transition-colors">
-			<Link href={`/board/${board_id}`}>
+			<Link href={`/board/${boardId}`}>
 				<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
 					<span className="font-semibold text-md">{title}</span>
 					<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
 						<span className="w-[150px]">
-							Opened {getLastOpened(last_opened)}
+							Opened {getLastOpened(lastOpened)}
 						</span>
 						<div className="space-x-2">
-							{collaborative && (
+							{/* {collaborative && (
 								<Users className="size-4 inline-block" />
-							)}
+							)} */}
 							{bookmarked && (
 								<Bookmark className="size-4 inline-block" />
 							)}
@@ -55,20 +54,20 @@ function BoardItem({
 			<div className="absolute bottom-2.5 right-2">
 				<BoardOptionsDropdown
 					side="left"
-					board_id={board_id}
+					boardId={boardId}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
-				board_id={board_id}
+				boardId={boardId}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
 			<DeleteDialog
-				board_id={board_id}
+				boardId={boardId}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>

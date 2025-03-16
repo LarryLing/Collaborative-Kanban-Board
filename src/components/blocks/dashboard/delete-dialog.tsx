@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/dialog";
 
 type DeleteDialogProps = {
-	board_id: string;
+	boardId: string;
 	isDeleteDialogOpen: boolean;
 	setIsDeleteDialogOpen: (arg0: boolean) => void;
 };
 
 export default function DeleteDialog({
-	board_id,
+	boardId,
 	isDeleteDialogOpen,
 	setIsDeleteDialogOpen,
 }: DeleteDialogProps) {
@@ -35,11 +35,7 @@ export default function DeleteDialog({
 					>
 						Go back
 					</Button>
-					<Button
-						type="submit"
-						variant="destructive"
-						className="mb-2 sm:mb-0"
-					>
+					<Button variant="destructive" className="mb-2 sm:mb-0">
 						Delete
 					</Button>
 				</DialogFooter>
