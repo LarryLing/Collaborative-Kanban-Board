@@ -8,42 +8,33 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { updateEmail } from "@/lib/actions";
-import { UserProfile } from "@/lib/types";
 import { useActionState, useEffect } from "react";
 
 type UpdateEmailDialogProps = {
 	isDialogOpen: boolean;
 	setIsDialogOpen: (arg0: boolean) => void;
-	userProfile: UserProfile;
-	setUserProfile: (arg0: UserProfile) => void;
+	email: string;
 	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function UpdateEmailDialog({
 	isDialogOpen,
 	setIsDialogOpen,
-	userProfile,
-	setUserProfile,
+	email,
 	toast,
 }: UpdateEmailDialogProps) {
 	const [state, action, pending] = useActionState(updateEmail, undefined);
 
 	useEffect(() => {
-		if (state?.updatedEmail !== undefined) {
-			setUserProfile({
-				...userProfile,
-				email: state.updatedEmail,
-			});
-
+		if (state?.toast !== undefined) {
 			toast({
-				title: "Success!",
-				description:
-					"Please check your inboxes for the confirmation emails.",
+				title: state.toast.title,
+				description: state.toast.message,
 			});
 
 			setIsDialogOpen(false);
 		}
-	}, [state?.updatedEmail]);
+	}, [state?.toast]);
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -60,7 +51,7 @@ export default function UpdateEmailDialog({
 						id="email"
 						name="email"
 						type="text"
-						defaultValue={userProfile.email}
+						defaultValue={email}
 						className="max-w-[400px]"
 					/>
 					{state?.errors?.email && (

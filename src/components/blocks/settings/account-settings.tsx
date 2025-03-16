@@ -18,13 +18,11 @@ import UpdatePasswordDialog from "./update-password-dialog";
 
 type AccountSettingsProps = {
 	userProfile: UserProfile;
-	setUserProfile: (arg0: UserProfile) => void;
 	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function AccountSettings({
 	userProfile,
-	setUserProfile,
 	toast,
 }: AccountSettingsProps) {
 	const [isAccountDeleteDialogOpen, setIsAccountDeleteDialogOpen] =
@@ -90,13 +88,12 @@ export default function AccountSettings({
 			<DeleteAccountDialog
 				isDialogOpen={isAccountDeleteDialogOpen}
 				setIsDialogOpen={setIsAccountDeleteDialogOpen}
-				displayname={userProfile.displayName}
+				displayname={userProfile.display_name}
 			/>
 			<UpdateEmailDialog
 				isDialogOpen={isUpdateEmailDialogOpen}
 				setIsDialogOpen={setIsUpdateEmailDialogOpen}
-				userProfile={userProfile}
-				setUserProfile={setUserProfile}
+				email={userProfile.email}
 				toast={toast}
 			/>
 			<UpdatePasswordDialog

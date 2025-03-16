@@ -10,47 +10,93 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useActionState, useEffect } from "react";
+import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
 import { updateUserProfile } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
-import { useProfile } from "@/hooks/use-profile";
+import { createClient } from "@/lib/supabase/client";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
-	setUserProfile: (arg0: UserProfile) => void;
+	publicUrl: string;
 	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function ProfileSettings({
 	userProfile,
-	setUserProfile,
+	publicUrl,
 	toast,
 }: ProfileSettingsProps) {
-	const { uploadAvatar, uploading, error } = useProfile(
-		userProfile,
-		setUserProfile,
-		toast,
-	);
+	const supabase = createClient();
 	const [state, action, pending] = useActionState(
 		updateUserProfile,
 		undefined,
 	);
+	const [uploading, setUploading] = useState(false);
+	const [error, setError] = useState<string | undefined>(undefined);
+	const MAX_FILE_SIZE = 6000000;
+
+	const uploadAvatar = async (e: ChangeEvent<HTMLInputElement>) => {
+		setUploading(true);
+
+		if (!e.target.files || e.target.files?.length === 0) {
+			setUploading(false);
+			return;
+		}
+
+		if (e.target.files[0].size > MAX_FILE_SIZE) {
+			setError("Max file size is 6MB");
+			setUploading(false);
+			return;
+		}
+
+		const file = e.target.files[0];
+		const fileExt = file.name.split(".").pop();
+		const filePath = `${userProfile.id}/avatar_${Date.now()}.${fileExt}`;
+
+		const { error: uploadError } = await supabase.storage
+			.from("avatars")
+			.upload(filePath, file);
+
+		if (uploadError) {
+			toast({
+				title: "Something went wrong...",
+				description: "Failed to upload your avatar. Please try again.",
+			});
+			setUploading(false);
+			return;
+		}
+
+		const { error: profileError } = await supabase
+			.from("profiles")
+			.update({
+				avatar_path: filePath,
+			})
+			.eq("id", userProfile.id);
+
+		if (profileError) {
+			toast({
+				title: "Something went wrong...",
+				description:
+					"Failed to sync your profile with S3. Please try again.",
+			});
+			setUploading(false);
+			return;
+		}
+
+		setUploading(false);
+
+		toast({
+			title: "Success!",
+			description: "Your avatar was successfully updated",
+		});
+	};
 
 	useEffect(() => {
 		if (state?.updatedProfile !== undefined) {
-			setUserProfile({
-				id: userProfile.id,
-				email: userProfile.email,
-				displayName: state.updatedProfile.displayName,
-				aboutMe: state.updatedProfile.aboutMe,
-				avatarUrl: userProfile.avatarUrl,
-				socials: state.updatedProfile.socials,
-			});
-
 			toast({
 				title: "Success!",
 				description: "Your profile has been successfully updated.",
@@ -72,9 +118,9 @@ export default function ProfileSettings({
 					<form className="space-y-2" action={action}>
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
-							<AvatarImage src={userProfile.avatarUrl} />
+							<AvatarImage src={publicUrl} />
 							<AvatarFallback>
-								{userProfile.displayName
+								{userProfile.display_name
 									.substring(0, 2)
 									.toUpperCase()}
 							</AvatarFallback>
@@ -99,7 +145,10 @@ export default function ProfileSettings({
 								id="displayName"
 								name="displayName"
 								type="text"
-								defaultValue={userProfile.displayName}
+								defaultValue={
+									state?.updatedProfile?.displayName ||
+									userProfile.display_name
+								}
 							/>
 							{state?.errors?.displayName && (
 								<p className="text-sm text-destructive">
@@ -114,10 +163,13 @@ export default function ProfileSettings({
 							<Label htmlFor="aboutMe">About Me</Label>
 							<Textarea
 								placeholder="Tell us a little bit about yourself"
-								defaultValue={userProfile.aboutMe}
 								id="aboutMe"
 								name="aboutMe"
 								className="resize-none h-[100px]"
+								defaultValue={
+									state?.updatedProfile?.aboutMe ||
+									userProfile.about_me
+								}
 							/>
 							{state?.errors?.aboutMe && (
 								<p className="text-sm text-destructive">
@@ -133,13 +185,13 @@ export default function ProfileSettings({
 										key={`social${index}`}
 										className="flex justify-center items-center gap-2"
 									>
-										{getSocialIcon(social)}
+										{getSocialIcon(social.url)}
 										<Input
 											id={`social${index}`}
 											name={`social${index}`}
 											type="text"
 											placeholder="Link to social profile"
-											defaultValue={social}
+											defaultValue={social.url}
 										/>
 									</div>
 								);

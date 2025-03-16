@@ -307,13 +307,18 @@ export async function updateEmail(formState: FormState, formData: FormData) {
                 message: "We could not update your email. Please try again.",
             },
         };
-    };;
+    };
 
 	revalidatePath("/");
 
-	return {
-		updatedEmail: validatedFields.data.email,
-	};
+	 return {
+        toast: {
+            title: "Success!",
+            message:
+					"Please check your inboxes for the confirmation emails.",
+        },
+    };
+
 }
 
 export async function updateUserProfile(
@@ -409,12 +414,12 @@ export async function updateUserProfile(
         };
     };
 
-	const socials = [
-		validatedFields.data.social0 || "",
-		validatedFields.data.social1 || "",
-		validatedFields.data.social2 || "",
-		validatedFields.data.social3 || "",
-	];
+    const { data: socialsSelectData, error: socialsSelectError } = await supabase
+        .from("socials")
+        .select("url")
+        .eq("profile_id", userData.user.id)
+
+    if (socialsSelectError) throw socialsSelectError;
 
 	revalidatePath("/");
 
@@ -422,7 +427,7 @@ export async function updateUserProfile(
 		updatedProfile: {
 			displayName: validatedFields.data.displayName,
 			aboutMe: validatedFields.data.aboutMe,
-			socials: socials,
+			socials: socialsSelectData,
 		},
 	};
 }
@@ -484,6 +489,20 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
             };
         };;
 	}
+
+    const { error: socialsDeleteError } = await supabase
+		.from("socials")
+		.delete()
+		.eq("id", userId);
+
+	if (socialsDeleteError) {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not delete uour old social data. Please try again.",
+            },
+        };
+    };
 
 	const { error: deleteError } = await supabase.rpc("handle_delete_user");
 

@@ -1,5 +1,3 @@
-"use client";
-
 import React from "react";
 import {
 	Popover,
@@ -17,16 +15,20 @@ import { getSocialIcon } from "@/lib/utils";
 
 type AvatarPopoverProps = {
 	userProfile: UserProfile;
+	publicUrl: string;
 };
 
-export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
+export default function AvatarPopover({
+	userProfile,
+	publicUrl,
+}: AvatarPopoverProps) {
 	return (
 		<Popover>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={userProfile.avatarUrl} />
+					<AvatarImage src={publicUrl} />
 					<AvatarFallback>
-						{userProfile.displayName.substring(0, 2).toUpperCase()}
+						{userProfile.display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
@@ -36,47 +38,49 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 			>
 				<div className="flex justify-start items-center">
 					<Avatar>
-						<AvatarImage src={userProfile.avatarUrl} />
+						<AvatarImage src={publicUrl} />
 						<AvatarFallback>
-							{userProfile.displayName
+							{userProfile.display_name
 								.substring(0, 2)
 								.toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div className="ml-2">
-						<h3 className="font-bold">{userProfile.displayName}</h3>
+						<h3 className="font-bold">
+							{userProfile.display_name}
+						</h3>
 						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
 							{userProfile.email}
 						</p>
 					</div>
 				</div>
-				{userProfile.aboutMe && (
+				{userProfile.about_me && (
 					<>
 						<Separator className="w-full" />
-						<p className="text-sm">{userProfile.aboutMe}</p>
+						<p className="text-sm">{userProfile.about_me}</p>
 					</>
 				)}
-				{userProfile.socials.filter((social) => social !== "").length >
-					0 && (
+				{userProfile.socials.filter((social) => social.url !== "")
+					.length > 0 && (
 					<>
 						<Separator className="w-full" />
 						<div className="text-sm space-y-1">
 							{userProfile.socials
-								.filter((social) => social !== "")
+								.filter((social) => social.url !== "")
 								.map((social, index) => (
 									<Button
 										variant="link"
 										className="flex"
 										key={`social_${index}`}
 									>
-										{getSocialIcon(social)}
+										{getSocialIcon(social.url)}
 										<Link
-											href={social}
+											href={social.url}
 											className="underline-offset-4 hover:underline"
 										>
-											{new URL(social).pathname.substring(
-												1,
-											)}
+											{new URL(
+												social.url,
+											).pathname.substring(1)}
 										</Link>
 									</Button>
 								))}

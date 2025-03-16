@@ -37,19 +37,20 @@ export default function RenameDialog({
 						defaultValue={title}
 						className="col-span-3"
 					/>
+					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={() => setIsRenameDialogOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button type="submit" className="mb-2 sm:mb-0">
+							Save changes
+						</Button>
+					</div>
 				</form>
-				<DialogFooter>
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => setIsRenameDialogOpen(false)}
-					>
-						Cancel
-					</Button>
-					<Button type="submit" className="mb-2 sm:mb-0">
-						Save changes
-					</Button>
-				</DialogFooter>
+				{/* <DialogFooter></DialogFooter> */}
 			</DialogContent>
 		</Dialog>
 	);

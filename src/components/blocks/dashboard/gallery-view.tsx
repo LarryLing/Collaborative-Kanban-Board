@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { BoardType } from "@/lib/types";
 import { getLastOpened } from "@/lib/utils";
 import { Bookmark, Plus, Users } from "lucide-react";
 import Image from "next/image";
@@ -10,12 +9,17 @@ import React, { useState } from "react";
 import BoardOptionsDropdown from "./board-options-dropdown";
 import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
+import { Tables } from "../../../../database.types";
 
-export default function GalleryView({ boards }: { boards: BoardType[] }) {
+export default function GalleryView({
+	boards,
+}: {
+	boards: Tables<"boards">[];
+}) {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{boards.map((board) => {
-				return <BoardItem {...board} key={board.boardId} />;
+				return <BoardItem {...board} key={board.board_id} />;
 			})}
 			<NewBoardItem />
 		</div>
@@ -23,23 +27,24 @@ export default function GalleryView({ boards }: { boards: BoardType[] }) {
 }
 
 function BoardItem({
-	boardId,
-	ownerId,
-	coverPath,
-	bookmarked,
+	board_id,
+	profile_id,
 	title,
-	lastOpened,
-}: BoardType) {
+	cover_path,
+	bookmarked,
+	collaborators,
+	last_opened,
+}: Tables<"boards">) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 	return (
 		<div className="max-w-[450px] md:max-h-none w-full h-[280px] border border-border rounded-md overflow-hidden relative group">
-			<Link href={`/board/${boardId}`}>
+			<Link href={`/board/${board_id}`}>
 				<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
-					{coverPath && (
+					{cover_path && (
 						<Image
-							src={coverPath}
+							src={cover_path}
 							alt=""
 							objectFit="cover"
 							layout="fill"
@@ -51,14 +56,14 @@ function BoardItem({
 						{title}
 					</span>
 					<div className="flex justify-start items-center gap-2 basis-[40px]">
-						{/* {collaborative && (
+						{collaborators > 1 && (
 							<Users className="size-4 inline-block" />
-						)} */}
+						)}
 						{bookmarked && (
 							<Bookmark className="size-4 inline-block" />
 						)}
 						<span className="font-normal text-sm">
-							Opened {getLastOpened(lastOpened)}
+							Opened {getLastOpened(last_opened)}
 						</span>
 					</div>
 				</div>
@@ -66,20 +71,20 @@ function BoardItem({
 			<div className="absolute bottom-4 right-4">
 				<BoardOptionsDropdown
 					side="top"
-					boardId={boardId}
+					boardId={board_id}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
-				boardId={boardId}
+				boardId={board_id}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
 			<DeleteDialog
-				boardId={boardId}
+				boardId={board_id}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>

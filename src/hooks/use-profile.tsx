@@ -70,7 +70,7 @@ export function useProfile(
 
 		setUserProfile({
 			...userProfile,
-			avatarUrl: publicUrl.publicUrl,
+			avatar_path: publicUrl.publicUrl,
 		});
 
 		setUploading(false);

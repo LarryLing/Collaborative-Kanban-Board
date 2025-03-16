@@ -11,10 +11,12 @@ import { Moon, Sun } from "lucide-react";
 
 type AuthenticatedNavigationBarProps = {
 	userProfile: UserProfile;
+	publicUrl: string;
 };
 
 export default function AuthenticatedNavigationBar({
 	userProfile,
+	publicUrl,
 }: AuthenticatedNavigationBarProps) {
 	const { theme, setTheme } = useTheme();
 
@@ -35,7 +37,10 @@ export default function AuthenticatedNavigationBar({
 						<Moon className="size-4" />
 					)}
 				</Button>
-				<AvatarPopover userProfile={userProfile} />
+				<AvatarPopover
+					userProfile={userProfile}
+					publicUrl={publicUrl}
+				/>
 			</div>
 		</NavigationMenu>
 	);

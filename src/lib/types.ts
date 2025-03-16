@@ -1,17 +1,4 @@
-export type UserProfile = {
-	id: string;
-	displayName: string;
-	email: string;
-	aboutMe: string;
-	avatarUrl?: string;
-	socials: string[];
-};
+import { Tables } from "../../database.types";
 
-export type BoardType = {
-	boardId: string;
-	ownerId: string;
-	coverPath?: string;
-	bookmarked: boolean;
-	title: string;
-	lastOpened: string;
-};
+export type UserProfile = Tables<"profiles"> & { socials: { url: string }[]; }
+export type Board = Tables<"boards">;
