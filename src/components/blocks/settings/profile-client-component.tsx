@@ -17,18 +17,19 @@ import { UserProfile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
-type ProfileSettingsProps = {
+type ProfileClientComponentProps = {
 	userProfile: UserProfile;
 	publicUrl: string;
-	toast: (arg0: { title: string; description: string }) => void;
 };
 
-export default function ProfileSettings({
+export default function ProfileClientComponent({
 	userProfile,
 	publicUrl,
-	toast,
-}: ProfileSettingsProps) {
+}: ProfileClientComponentProps) {
+	const { toast } = useToast();
+
 	const [profileState, profileAction, profilePending] = useActionState(
 		updateUserProfile,
 		undefined,

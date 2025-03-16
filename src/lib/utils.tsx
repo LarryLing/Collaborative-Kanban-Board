@@ -9,7 +9,6 @@ import {
 	TwitterXIcon,
 } from "@/components/icons/icon";
 import { LinkIcon } from "lucide-react";
-// import { BoardType } from "./types";
 import { Tables } from "../../database.types";
 
 export function cn(...inputs: ClassValue[]) {

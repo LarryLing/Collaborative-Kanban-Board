@@ -35,7 +35,7 @@ export default function LoginPage() {
 					<Button
 						onClick={loginWithGoogle}
 						disabled={pending}
-						className={`${roboto.className} bg-google text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
+						className={`${roboto.className} bg-google hover:bg-google/70 text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
 					>
 						<GoogleIcon className="size-5" />
 						<span>Sign in with Google</span>

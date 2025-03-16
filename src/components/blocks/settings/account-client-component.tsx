@@ -15,16 +15,17 @@ import { UserProfile } from "@/lib/types";
 import DeleteAccountDialog from "./delete-account-dialog";
 import UpdateEmailDialog from "./update-email-dialog";
 import UpdatePasswordDialog from "./update-password-dialog";
+import { useToast } from "@/hooks/use-toast";
 
-type AccountSettingsProps = {
+type AccountClientComponentProps = {
 	userProfile: UserProfile;
-	toast: (arg0: { title: string; description: string }) => void;
 };
 
-export default function AccountSettings({
+export default function AccountClientComponent({
 	userProfile,
-	toast,
-}: AccountSettingsProps) {
+}: AccountClientComponentProps) {
+	const { toast } = useToast();
+
 	const [isAccountDeleteDialogOpen, setIsAccountDeleteDialogOpen] =
 		useState(false);
 	const [isUpdateEmailDialogOpen, setIsUpdateEmailDialogOpen] =

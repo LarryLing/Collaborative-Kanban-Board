@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
 	Popover,
 	PopoverContent,
@@ -12,7 +12,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signout } from "@/lib/actions";
 import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/server";
 
 type AvatarPopoverProps = {
 	userProfile: UserProfile;
@@ -23,28 +22,6 @@ export default function AvatarPopover({
 	userProfile,
 	publicUrl,
 }: AvatarPopoverProps) {
-	// const supabase = await createClient();
-	// const [avatarUrl, setAvatarUrl] = useState("");
-	// useEffect(() => {
-	// 	async function downloadImage(avatar_path: string) {
-	// 		try {
-	// 			const { data } = await supabase.storage
-	// 				.from("avatars")
-	// 				.getPublicUrl(avatar_path);
-
-	// 			setAvatarUrl(data.publicUrl);
-	// 		} catch (error) {
-	// 			console.log("Error downloading image: ", error);
-	// 		}
-	// 	}
-
-	// 	if (userProfile.avatar_path) downloadImage(userProfile.avatar_path);
-	// }, [userProfile.avatar_path, supabase]);
-
-	// const { data } = await supabase.storage
-	// 	.from("avatars")
-	// 	.getPublicUrl(userProfile.avatar_path || "");
-
 	return (
 		<Popover>
 			<PopoverTrigger>
@@ -127,7 +104,7 @@ export default function AvatarPopover({
 						className="w-full justify-start"
 						asChild
 					>
-						<Link href="/settings">
+						<Link href="/settings/profile">
 							<Settings2 />
 							Settings
 						</Link>

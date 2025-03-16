@@ -10,9 +10,7 @@ export default async function AuthenticationLayout({
 	const supabase = await createClient();
 
 	const { data } = await supabase.auth.getUser();
-	if (data.user) {
-		redirect("/");
-	}
+	if (data.user) redirect("/");
 
 	return (
 		<section className="relative">
