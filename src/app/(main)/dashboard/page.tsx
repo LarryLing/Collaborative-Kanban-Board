@@ -2,10 +2,9 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header";
 import { Separator } from "@/components/ui/separator";
-import ListView from "@/components/blocks/dashboard/list-view";
-import GalleryView from "@/components/blocks/dashboard/gallery-view";
 import { processBoards } from "@/lib/utils";
-import { OwnershipOptions, SortOptions } from "@/lib/types";
+import { OwnershipOptions, SortOptions, ViewOptions } from "@/lib/types";
+import BoardsDisplay from "@/components/blocks/dashboard/boards-display";
 
 export default async function DashboardPage(props: {
 	searchParams?: Promise<{
@@ -51,11 +50,10 @@ export default async function DashboardPage(props: {
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<BoardsDisplayHeader />
 			<Separator className="w-full" />
-			{view === "list" ? (
-				<ListView boards={processedBoards} />
-			) : (
-				<GalleryView boards={processedBoards} />
-			)}
+			<BoardsDisplay
+				view={view as ViewOptions}
+				boards={processedBoards}
+			/>
 		</div>
 	);
 }
