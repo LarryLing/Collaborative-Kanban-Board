@@ -1,3 +1,4 @@
+import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { createClient as createClientClient } from "@/lib/supabase/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -43,5 +44,10 @@ export default async function Page({
 
 	if (boardError) throw boardError;
 
-	return <p>Something about {boardData.title}</p>;
+	return (
+		<>
+			<RefreshComponent />
+			<p>Something about {boardData.title}</p>
+		</>
+	);
 }
