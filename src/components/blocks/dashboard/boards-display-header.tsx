@@ -26,72 +26,105 @@ import {
 	Search,
 } from "lucide-react";
 import React, { useState } from "react";
+import {
+	useSearchParams,
+	usePathname,
+	useRouter,
+	ReadonlyURLSearchParams,
+} from "next/navigation";
+import { createBoard } from "@/lib/actions";
+import { OwnershipOptions, SortOptions, ViewOptions } from "@/lib/types";
+import { useDebouncedCallback } from "use-debounce";
 
-type BoardsDisplayHeaderProps = {
-	ownership: string;
-	setOwnership: (arg0: string) => void;
-	listView: boolean;
-	setListView: (arg0: boolean) => void;
-	bookmarked: boolean;
-	setBookmarked: (arg0: boolean) => void;
-	sortMethod: string;
-	setSortMethod: (arg0: string) => void;
-	query: string;
-	setQuery: (arg0: string) => void;
-};
+export default function BoardsDisplayHeader() {
+	const searchParams = useSearchParams();
+	const pathname = usePathname();
+	const { replace } = useRouter();
 
-export default function BoardsDisplayHeader({
-	ownership,
-	setOwnership,
-	listView,
-	setListView,
-	bookmarked,
-	setBookmarked,
-	sortMethod,
-	setSortMethod,
-	query,
-	setQuery,
-}: BoardsDisplayHeaderProps) {
+	function handleOwnershipChange(ownership: OwnershipOptions) {
+		const params = new URLSearchParams(searchParams);
+
+		ownership
+			? params.set("ownership", ownership)
+			: params.delete("ownership");
+
+		replace(`${pathname}?${params.toString()}`);
+	}
+
+	function handleSortChange(sortMethod: SortOptions) {
+		const params = new URLSearchParams(searchParams);
+
+		sortMethod ? params.set("sort", sortMethod) : params.delete("sort");
+
+		replace(`${pathname}?${params.toString()}`);
+	}
+
+	function handleViewChange(view: ViewOptions) {
+		const params = new URLSearchParams(searchParams);
+
+		view ? params.set("view", view) : params.delete("view");
+
+		replace(`${pathname}?${params.toString()}`);
+	}
+
+	function handleBookmarkedChange(bookmarked: boolean) {
+		const params = new URLSearchParams(searchParams);
+
+		bookmarked
+			? params.set("bookmarked", "bookmarked")
+			: params.delete("bookmarked");
+
+		replace(`${pathname}?${params.toString()}`);
+	}
+
+	const handleSearch = useDebouncedCallback((query) => {
+		const params = new URLSearchParams(searchParams);
+
+		query ? params.set("query", query) : params.delete("query");
+
+		replace(`${pathname}?${params.toString()}`);
+	}, 500);
+
 	return (
 		<div className="flex flex-col gap-4">
 			<h2 className="font-semibold text-3xl">Dashboard</h2>
 			<div className="flex justify-between">
-				<Button>
+				<Button onClick={() => createBoard()}>
 					<Plus className="size-4" />
 					<span>New Board</span>
 				</Button>
 				<div className="flex gap-2 items-center">
 					<div className="md:flex hidden gap-2">
 						<OwnershipDropdown
-							ownership={ownership}
-							setOwnership={setOwnership}
+							searchParams={searchParams}
+							handleOwnershipChange={handleOwnershipChange}
 						/>
 						<SortDropdown
-							sortMethod={sortMethod}
-							setSortMethod={setSortMethod}
+							searchParams={searchParams}
+							handleSortChange={handleSortChange}
 						/>
 						<ViewButton
-							listView={listView}
-							setListView={setListView}
+							searchParams={searchParams}
+							handleViewChange={handleViewChange}
 						/>
 						<BookmarkToggle
-							bookmarked={bookmarked}
-							setBookmarked={setBookmarked}
+							searchParams={searchParams}
+							handleBookmarkedChange={handleBookmarkedChange}
 						/>
 					</div>
 					<div className="block md:hidden">
 						<OptionsDropdown
-							ownership={ownership}
-							setOwnership={setOwnership}
-							listView={listView}
-							setListView={setListView}
-							bookmarked={bookmarked}
-							setBookmarked={setBookmarked}
-							sortMethod={sortMethod}
-							setSortMethod={setSortMethod}
+							searchParams={searchParams}
+							handleOwnershipChange={handleOwnershipChange}
+							handleSortChange={handleSortChange}
+							handleViewChange={handleViewChange}
+							handleBookmarkedChange={handleBookmarkedChange}
 						/>
 					</div>
-					<SearchBar query={query} setQuery={setQuery} />
+					<SearchBar
+						searchParams={searchParams}
+						handleSearch={handleSearch}
+					/>
 				</div>
 			</div>
 		</div>
@@ -99,14 +132,26 @@ export default function BoardsDisplayHeader({
 }
 
 type OwnershipDropdownProps = {
-	ownership: string;
-	setOwnership: (arg0: string) => void;
+	searchParams: ReadonlyURLSearchParams;
+	handleOwnershipChange: (arg0: OwnershipOptions) => void;
 };
 
 function OwnershipDropdown({
-	ownership,
-	setOwnership,
+	searchParams,
+	handleOwnershipChange,
 }: OwnershipDropdownProps) {
+	function getSelectedParam() {
+		const param = searchParams.get("ownership");
+
+		if (!param) {
+			return "Owned by anyone";
+		} else if (param === "me") {
+			return "Owned by me";
+		} else {
+			return "Not owned by me";
+		}
+	}
+
 	return (
 		<DropdownMenu>
 			<TooltipProvider>
@@ -114,7 +159,7 @@ function OwnershipDropdown({
 					<TooltipTrigger asChild>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" className="w-[160px]">
-								{ownership}
+								{getSelectedParam()}
 							</Button>
 						</DropdownMenuTrigger>
 					</TooltipTrigger>
@@ -123,16 +168,18 @@ function OwnershipDropdown({
 			</TooltipProvider>
 			<DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<DropdownMenuRadioGroup
-					value={ownership}
-					onValueChange={setOwnership}
+					value={searchParams.get("ownership") || ""}
+					onValueChange={(value) =>
+						handleOwnershipChange(value as OwnershipOptions)
+					}
 				>
-					<DropdownMenuRadioItem value="Owned by anyone">
+					<DropdownMenuRadioItem value="">
 						Owned by anyone
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Owned by me">
+					<DropdownMenuRadioItem value="me">
 						Owned by me
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Not owned by me">
+					<DropdownMenuRadioItem value="not-me">
 						Not owned by me
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
@@ -142,11 +189,13 @@ function OwnershipDropdown({
 }
 
 type ViewButtonProps = {
-	listView: boolean;
-	setListView: (arg0: boolean) => void;
+	searchParams: ReadonlyURLSearchParams;
+	handleViewChange: (arg0: ViewOptions) => void;
 };
 
-function ViewButton({ listView, setListView }: ViewButtonProps) {
+function ViewButton({ searchParams, handleViewChange }: ViewButtonProps) {
+	const nextViewValue = searchParams.get("view") === null ? "list" : "";
+
 	return (
 		<TooltipProvider>
 			<Tooltip>
@@ -154,10 +203,10 @@ function ViewButton({ listView, setListView }: ViewButtonProps) {
 					<Button
 						aria-label="Toggle view"
 						variant="outline"
-						onClick={() => setListView(!listView)}
+						onClick={() => handleViewChange(nextViewValue)}
 						size="icon"
 					>
-						{listView ? (
+						{nextViewValue === "" ? (
 							<LayoutGrid className="size-4" />
 						) : (
 							<List className="size-4" />
@@ -165,7 +214,7 @@ function ViewButton({ listView, setListView }: ViewButtonProps) {
 					</Button>
 				</TooltipTrigger>
 				<TooltipContent>
-					{listView ? "Gallery view" : "List view"}
+					{nextViewValue === "" ? "Gallery view" : "List view"}
 				</TooltipContent>
 			</Tooltip>
 		</TooltipProvider>
@@ -173,11 +222,16 @@ function ViewButton({ listView, setListView }: ViewButtonProps) {
 }
 
 type BookmarkToggleProps = {
-	bookmarked: boolean;
-	setBookmarked: (arg0: boolean) => void;
+	searchParams: ReadonlyURLSearchParams;
+	handleBookmarkedChange: (arg0: boolean) => void;
 };
 
-function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
+function BookmarkToggle({
+	searchParams,
+	handleBookmarkedChange,
+}: BookmarkToggleProps) {
+	const bookmarked = searchParams.get("bookmarked") ? true : false;
+
 	return (
 		<TooltipProvider>
 			<Tooltip>
@@ -187,7 +241,9 @@ function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
 							aria-label="Toggle view"
 							variant="outline"
 							pressed={bookmarked}
-							onPressedChange={() => setBookmarked(!bookmarked)}
+							onPressedChange={() =>
+								handleBookmarkedChange(!bookmarked)
+							}
 						>
 							<Bookmark className="size-4" />
 						</Toggle>
@@ -200,11 +256,11 @@ function BookmarkToggle({ bookmarked, setBookmarked }: BookmarkToggleProps) {
 }
 
 type SortDropdownProps = {
-	sortMethod: string;
-	setSortMethod: (arg0: string) => void;
+	searchParams: ReadonlyURLSearchParams;
+	handleSortChange: (arg0: SortOptions) => void;
 };
 
-function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
+function SortDropdown({ searchParams, handleSortChange }: SortDropdownProps) {
 	return (
 		<DropdownMenu>
 			<TooltipProvider>
@@ -221,16 +277,18 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 			</TooltipProvider>
 			<DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<DropdownMenuRadioGroup
-					value={sortMethod}
-					onValueChange={setSortMethod}
+					value={searchParams.get("sort") || ""}
+					onValueChange={(value) =>
+						handleSortChange(value as SortOptions)
+					}
 				>
-					<DropdownMenuRadioItem value="Last opened">
+					<DropdownMenuRadioItem value="">
 						Last opened
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort ascending">
+					<DropdownMenuRadioItem value="asc">
 						Sort ascending
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort descending">
+					<DropdownMenuRadioItem value="des">
 						Sort descending
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
@@ -240,11 +298,11 @@ function SortDropdown({ sortMethod, setSortMethod }: SortDropdownProps) {
 }
 
 type SearchBarProps = {
-	query: string;
-	setQuery: (arg0: string) => void;
+	searchParams: ReadonlyURLSearchParams;
+	handleSearch: (arg0: string) => void;
 };
 
-function SearchBar({ query, setQuery }: SearchBarProps) {
+function SearchBar({ searchParams, handleSearch }: SearchBarProps) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 
 	return (
@@ -270,10 +328,12 @@ function SearchBar({ query, setQuery }: SearchBarProps) {
 			{isSearchOpen && (
 				<Input
 					type="search"
-					value={query}
-					onChange={(e) => setQuery(e.target.value)}
+					onChange={(e) => {
+						handleSearch(e.target.value);
+					}}
 					className="w-[100px] md:w-[150px] lg:w-[175px] text-sm"
 					placeholder="Search..."
+					defaultValue={searchParams.get("query")?.toString()}
 				/>
 			)}
 		</div>
@@ -281,18 +341,18 @@ function SearchBar({ query, setQuery }: SearchBarProps) {
 }
 
 function OptionsDropdown({
-	ownership,
-	setOwnership,
-	listView,
-	setListView,
-	bookmarked,
-	setBookmarked,
-	sortMethod,
-	setSortMethod,
+	searchParams,
+	handleOwnershipChange,
+	handleSortChange,
+	handleViewChange,
+	handleBookmarkedChange,
 }: OwnershipDropdownProps &
 	ViewButtonProps &
 	BookmarkToggleProps &
 	SortDropdownProps) {
+	const nextViewValue = searchParams.get("view") === null ? "list" : "";
+	const bookmarked = searchParams.get("bookmarked") ? true : false;
+
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -300,48 +360,51 @@ function OptionsDropdown({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
 				<DropdownMenuRadioGroup
-					value={ownership}
-					onValueChange={setOwnership}
+					value={searchParams.get("ownership") || ""}
+					onValueChange={(value) =>
+						handleOwnershipChange(value as OwnershipOptions)
+					}
 				>
-					<DropdownMenuRadioItem value="Owned by anyone">
+					<DropdownMenuRadioItem value="">
 						Owned by anyone
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Owned by me">
+					<DropdownMenuRadioItem value="me">
 						Owned by me
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Not owned by me">
+					<DropdownMenuRadioItem value="not-me">
 						Not owned by me
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup
-					value={sortMethod}
-					onValueChange={setSortMethod}
+					value={searchParams.get("sort") || ""}
+					onValueChange={(value) =>
+						handleSortChange(value as SortOptions)
+					}
 				>
-					<DropdownMenuRadioItem value="Last opened">
+					<DropdownMenuRadioItem value="">
 						Last opened
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort ascending">
+					<DropdownMenuRadioItem value="asc">
 						Sort ascending
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="Sort descending">
+					<DropdownMenuRadioItem value="des">
 						Sort descending
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup
-					value={listView ? "List view" : "Gallery view"}
+					value={
+						nextViewValue === "list" ? "List view" : "Gallery view"
+					}
+					onValueChange={(value) =>
+						handleViewChange(value as ViewOptions)
+					}
 				>
-					<DropdownMenuRadioItem
-						value="Gallery view"
-						onSelect={() => setListView(false)}
-					>
+					<DropdownMenuRadioItem value="">
 						<span>Gallery view</span>
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem
-						value="List view"
-						onSelect={() => setListView(true)}
-					>
+					<DropdownMenuRadioItem value="list">
 						<span>List view</span>
 					</DropdownMenuRadioItem>
 				</DropdownMenuRadioGroup>
@@ -351,13 +414,13 @@ function OptionsDropdown({
 				>
 					<DropdownMenuRadioItem
 						value="All"
-						onSelect={() => setBookmarked(false)}
+						onSelect={() => handleBookmarkedChange(false)}
 					>
 						<span>All</span>
 					</DropdownMenuRadioItem>
 					<DropdownMenuRadioItem
 						value="Bookmarked"
-						onSelect={() => setBookmarked(true)}
+						onSelect={() => handleBookmarkedChange(true)}
 					>
 						<span>Bookmarked</span>
 					</DropdownMenuRadioItem>

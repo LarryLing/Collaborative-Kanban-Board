@@ -1,36 +1,28 @@
-import DashboardClientComponent from "@/components/blocks/dashboard/dashboard-client-component";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "../../../../database.types";
+import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header";
+import { Separator } from "@/components/ui/separator";
+import ListView from "@/components/blocks/dashboard/list-view";
+import GalleryView from "@/components/blocks/dashboard/gallery-view";
+import { processBoards } from "@/lib/utils";
+import { OwnershipOptions, SortOptions } from "@/lib/types";
 
-async function getUserProfile(
-	supabase: SupabaseClient<Database>,
-	userId: string,
-) {
-	const { data: userProfile, error: profileError } = await supabase
-		.from("profiles")
-		.select("*, socials(url)")
-		.eq("id", userId)
-		.single();
+export default async function DashboardPage(props: {
+	searchParams?: Promise<{
+		ownership?: string;
+		sort?: string;
+		view?: string;
+		bookmarked?: string;
+		query?: string;
+	}>;
+}) {
+	const searchParams = await props.searchParams;
+	const ownership = searchParams?.ownership || "";
+	const sort = searchParams?.sort || "";
+	const view = searchParams?.view || "";
+	const bookmarked = searchParams?.bookmarked || "";
+	const query = searchParams?.query || "";
 
-	if (profileError) throw profileError;
-
-	return userProfile;
-}
-
-async function getBoards(supabase: SupabaseClient<Database>, userId: string) {
-	const { data: boardsData, error: boardsError } = await supabase
-		.from("profiles_boards_bridge")
-		.select("board_id, boards(*)")
-		.eq("profile_id", userId);
-
-	if (boardsError) throw boardsError;
-
-	return boardsData;
-}
-
-export default async function DashboardPage() {
 	const supabase = await createClient();
 
 	const { data: userData, error: userError } = await supabase.auth.getUser();
@@ -39,18 +31,31 @@ export default async function DashboardPage() {
 
 	if (!userData.user) redirect("/login");
 
-	const userProfilePromise = getUserProfile(supabase, userData.user.id);
-	const boardsPromise = getBoards(supabase, userData.user.id);
+	const { data: boardsData, error: boardsError } = await supabase
+		.from("profiles_boards_bridge")
+		.select("board_id, boards(*)")
+		.eq("profile_id", userData.user.id);
 
-	const [userProfile, boards] = await Promise.all([
-		userProfilePromise,
-		boardsPromise,
-	]);
+	if (boardsError) throw boardsError;
+
+	const processedBoards = processBoards(
+		userData.user.id,
+		boardsData.map((item) => item.boards),
+		bookmarked === "bookmarked",
+		ownership as OwnershipOptions,
+		sort as SortOptions,
+		query,
+	);
 
 	return (
-		<DashboardClientComponent
-			boards={boards.map((item) => item.boards)}
-			userProfile={userProfile}
-		/>
+		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
+			<BoardsDisplayHeader />
+			<Separator className="w-full" />
+			{view === "list" ? (
+				<ListView boards={processedBoards} />
+			) : (
+				<GalleryView boards={processedBoards} />
+			)}
+		</div>
 	);
 }

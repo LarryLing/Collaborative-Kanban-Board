@@ -9,7 +9,7 @@ import {
 	TwitterXIcon,
 } from "@/components/icons/icon";
 import { LinkIcon } from "lucide-react";
-import { Tables } from "../../database.types";
+import { Board, OwnershipOptions, SortOptions } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -52,10 +52,10 @@ export function getLastOpened(datetime: string) {
 
 export function processBoards(
 	id: string,
-	fetchedBoards: Tables<"boards">[],
+	fetchedBoards: Board[],
 	bookmarked: boolean,
-	ownership: string,
-	sortMethod: string,
+	ownership: OwnershipOptions,
+	sortMethod: SortOptions,
 	query: string,
 ) {
 	let processedBoards = [...fetchedBoards];
@@ -64,25 +64,25 @@ export function processBoards(
 		processedBoards = processedBoards.filter((board) => board.bookmarked);
 	}
 
-	if (ownership === "Owned by me") {
+	if (ownership === "me") {
 		processedBoards = processedBoards.filter(
 			(board) => board.profile_id === id,
 		);
-	} else if (ownership === "Not owned by me") {
+	} else if (ownership === "not-me") {
 		processedBoards = processedBoards.filter(
 			(board) => board.profile_id !== id,
 		);
 	}
 
-	if (sortMethod === "Last opened") {
+	if (sortMethod === "") {
 		processedBoards.sort(
 			(a, b) =>
 				new Date(b.last_opened).getTime() -
 				new Date(a.last_opened).getTime(),
 		);
-	} else if (sortMethod === "Sort ascending") {
+	} else if (sortMethod === "asc") {
 		processedBoards.sort((a, b) => a.title.localeCompare(b.title));
-	} else if (sortMethod === "Sort descending") {
+	} else if (sortMethod === "des") {
 		processedBoards.sort((a, b) => b.title.localeCompare(a.title));
 	}
 
