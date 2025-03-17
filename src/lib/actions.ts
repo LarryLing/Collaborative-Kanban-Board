@@ -469,7 +469,7 @@ export async function uploadAvatar(formState: UserFormState, formData: FormData)
 
 export async function deleteAccount(formState: UserFormState, formData: FormData) {
     const validatedFields = DeleteAccountFormSchema.safeParse({
-		displayName: formData.get("displayName"),
+		prompt: formData.get("prompt"),
 	});
 
 	if (!validatedFields.success) {
@@ -481,30 +481,18 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
     try {
         const supabase = await createClient();
 
-        const { data: userData, error: userError } = await supabase
-            .from("profiles")
-            .select("id")
-            .eq("display_name", validatedFields.data.displayName)
-            .single();
+        const { data: userData, error: userError } = await supabase.auth.getUser();
 
-        if (userError) {
-            return {
-                errors: {
-                    displayName: ["Incorrect display name."],
-                },
-            };
-        }
-
-        const userId = userData.id as string;
+        if (userError) throw userError;
 
         const { data: folderData, error: folderError } = await supabase.storage
             .from("avatars")
-            .list(`${userId}`);
+            .list(`${userData.user.id}`);
 
         if (folderError) throw folderError;
 
         if (folderData.length > 0) {
-            const files = folderData.map((file) => `${userId}/${file.name}`);
+            const files = folderData.map((file) => `${userData.user.id}/${file.name}`);
             const { error: removeError } = await supabase.storage
                 .from("avatars")
                 .remove(files);
@@ -515,7 +503,7 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
         const { error: socialsDeleteError } = await supabase
             .from("socials")
             .delete()
-            .eq("profile_id", userId);
+            .eq("profile_id", userData.user.id);
 
         if (socialsDeleteError) throw socialsDeleteError;
 

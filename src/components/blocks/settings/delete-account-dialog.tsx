@@ -13,13 +13,11 @@ import { useActionState } from "react";
 type DeleteAccountDialogProps = {
 	isDialogOpen: boolean;
 	setIsDialogOpen: (arg0: boolean) => void;
-	displayname: string;
 };
 
 export default function DeleteAccountDialog({
 	isDialogOpen,
 	setIsDialogOpen,
-	displayname,
 }: DeleteAccountDialogProps) {
 	const [state, action, pending] = useActionState(deleteAccount, undefined);
 
@@ -29,20 +27,20 @@ export default function DeleteAccountDialog({
 				<DialogHeader>
 					<DialogTitle>Delete Account</DialogTitle>
 					<DialogDescription>
-						Please type your username below to confirm this action.
+						Please type your email below to confirm this action.
 					</DialogDescription>
 				</DialogHeader>
 				<form>
 					<Input
-						id="displayName"
-						name="displayName"
+						id="prompt"
+						name="prompt"
 						type="text"
-						placeholder={displayname}
+						placeholder="delete my account"
 						className="max-w-[400px]"
 					/>
-					{state?.errors?.displayName && (
+					{state?.errors?.prompt && (
 						<p className="text-sm text-destructive">
-							{state.errors.displayName}
+							{state.errors.prompt}
 						</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">

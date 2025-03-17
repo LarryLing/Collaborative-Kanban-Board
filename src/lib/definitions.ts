@@ -75,9 +75,14 @@ export const EditProfileFormSchema = z.object({
 	social3: z.string().url().optional().or(z.literal("")),
 });
 
-export const DeleteAccountFormSchema = z.object({
-	displayName: z.string().trim(),
-});
+export const DeleteAccountFormSchema = z
+    .object({
+        prompt: z.string()
+    })
+    .refine((data) => data.prompt === "delete my account", {
+        message: "Typed prompt does not match.",
+        path: ["prompt"],
+    });
 
 export const FileSchema = z.object({
     name: z.string(),
@@ -109,6 +114,7 @@ export type UserFormState =
             social1?: string[];
             social2?: string[];
             social3?: string[];
+            prompt?: string[];
         };
 	  }
 	| undefined;
