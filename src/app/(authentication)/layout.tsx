@@ -16,7 +16,7 @@ export default async function AuthenticationLayout({
 		<section className="relative">
 			<div className="absolute top-0 left-0 w-full h-[80px] px-4 border-b-[1px] border-transparent">
 				<div className="flex justify-between items-center size-full">
-					<Branding />
+					<Branding href="/" />
 				</div>
 			</div>
 			{children}

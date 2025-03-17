@@ -22,7 +22,7 @@ export default function AuthenticatedNavigationBar({
 
 	return (
 		<NavigationMenu className="sticky text-nowrap max-w-none w-full basis-[80px] px-4 flex justify-between items-center border-b-[1px] border-border">
-			<Branding />
+			<Branding href="/dashboard" />
 			<div className="flex justify-center items-center gap-2">
 				<Button
 					variant="ghost"

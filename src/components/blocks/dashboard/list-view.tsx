@@ -8,10 +8,10 @@ import React, { useState } from "react";
 import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
 import BoardOptionsDropdown from "./board-options-dropdown";
-import { Tables } from "../../../../database.types";
 import { createBoard } from "@/lib/actions";
+import { Board } from "@/lib/types";
 
-export default function ListView({ boards }: { boards: Tables<"boards">[] }) {
+export default function ListView({ boards }: { boards: Board[] }) {
 	return (
 		<div className="space-y-2">
 			{boards.map((board) => {
@@ -28,7 +28,7 @@ function BoardItem({
 	bookmarked,
 	collaborators,
 	last_opened,
-}: Tables<"boards">) {
+}: Board) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

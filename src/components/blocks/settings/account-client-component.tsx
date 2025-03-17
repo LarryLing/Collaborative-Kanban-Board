@@ -17,13 +17,11 @@ import UpdateEmailDialog from "./update-email-dialog";
 import UpdatePasswordDialog from "./update-password-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-type AccountClientComponentProps = {
-	userProfile: UserProfile;
-};
-
 export default function AccountClientComponent({
 	userProfile,
-}: AccountClientComponentProps) {
+}: {
+	userProfile: UserProfile;
+}) {
 	const { toast } = useToast();
 
 	const [isAccountDeleteDialogOpen, setIsAccountDeleteDialogOpen] =

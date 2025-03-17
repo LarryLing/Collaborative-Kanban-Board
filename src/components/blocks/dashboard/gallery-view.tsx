@@ -9,14 +9,10 @@ import React, { useState } from "react";
 import BoardOptionsDropdown from "./board-options-dropdown";
 import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
-import { Tables } from "../../../../database.types";
 import { createBoard } from "@/lib/actions";
+import { Board } from "@/lib/types";
 
-export default function GalleryView({
-	boards,
-}: {
-	boards: Tables<"boards">[];
-}) {
+export default function GalleryView({ boards }: { boards: Board[] }) {
 	return (
 		<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 			{boards.map((board) => {
@@ -34,7 +30,7 @@ function BoardItem({
 	bookmarked,
 	collaborators,
 	last_opened,
-}: Tables<"boards">) {
+}: Board) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 

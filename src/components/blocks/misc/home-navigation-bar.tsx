@@ -9,11 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
 
-type HomeNavigationBarProps = {
-	user: User | null;
-};
-
-export default function NavigationBar({ user }: HomeNavigationBarProps) {
+export default function NavigationBar({ user }: { user: User | null }) {
 	const { theme, setTheme } = useTheme();
 
 	return (

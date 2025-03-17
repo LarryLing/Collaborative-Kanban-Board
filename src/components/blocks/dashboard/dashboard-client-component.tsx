@@ -6,11 +6,10 @@ import ListView from "@/components/blocks/dashboard/list-view";
 import { Separator } from "@/components/ui/separator";
 import { processBoards } from "@/lib/utils";
 import React, { useMemo, useState } from "react";
-import { Tables } from "../../../../database.types";
-import { UserProfile } from "@/lib/types";
+import { Board, UserProfile } from "@/lib/types";
 
 type DashboardClientProps = {
-	boards: Tables<"boards">[];
+	boards: Board[];
 	userProfile: UserProfile;
 };
 
