@@ -19,15 +19,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
-type ProfileClientComponentProps = {
+type ProfileSettingsProps = {
 	userProfile: UserProfile;
 	publicUrl: string;
 };
 
-export default function ProfileClientComponent({
+export default function ProfileSettings({
 	userProfile,
 	publicUrl,
-}: ProfileClientComponentProps) {
+}: ProfileSettingsProps) {
 	const { toast } = useToast();
 
 	const [profileState, profileAction, profilePending] = useActionState(

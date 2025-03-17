@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
 	Popover,
 	PopoverContent,
@@ -22,8 +24,10 @@ export default function AvatarPopover({
 	userProfile,
 	publicUrl,
 }: AvatarPopoverProps) {
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
 	return (
-		<Popover>
+		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<PopoverTrigger>
 				<Avatar>
 					<AvatarImage src={publicUrl} />
@@ -72,11 +76,14 @@ export default function AvatarPopover({
 										variant="link"
 										className="flex"
 										key={`social_${index}`}
+										onClick={() => setIsPopoverOpen(false)}
 									>
 										{getSocialIcon(social.url)}
 										<Link
 											href={social.url}
 											className="underline-offset-4 hover:underline"
+											target="_blank"
+											rel="noopener noreferrer"
 										>
 											{new URL(
 												social.url,
@@ -93,6 +100,7 @@ export default function AvatarPopover({
 						variant="ghost"
 						className="w-full justify-start"
 						asChild
+						onClick={() => setIsPopoverOpen(false)}
 					>
 						<Link href="/dashboard">
 							<LayoutGrid />
@@ -103,8 +111,9 @@ export default function AvatarPopover({
 						variant="ghost"
 						className="w-full justify-start"
 						asChild
+						onClick={() => setIsPopoverOpen(false)}
 					>
-						<Link href="/settings/profile">
+						<Link href="/settings">
 							<Settings2 />
 							Settings
 						</Link>

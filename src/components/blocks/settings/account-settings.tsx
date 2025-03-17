@@ -17,7 +17,7 @@ import UpdateEmailDialog from "./update-email-dialog";
 import UpdatePasswordDialog from "./update-password-dialog";
 import { useToast } from "@/hooks/use-toast";
 
-export default function AccountClientComponent({
+export default function AccountSettings({
 	userProfile,
 }: {
 	userProfile: UserProfile;
