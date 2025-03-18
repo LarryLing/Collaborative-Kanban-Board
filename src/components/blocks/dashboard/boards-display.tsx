@@ -1,37 +1,71 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { getLastOpened } from "@/lib/utils";
 import { Bookmark, Plus, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useMemo, useState, useSyncExternalStore } from "react";
 import BoardOptionsDropdown from "./board-options-dropdown";
 import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
 import { createBoard } from "@/lib/actions";
 import { Board, ViewOptions } from "@/lib/types";
+import { processBoards, getLastOpened } from "@/lib/utils";
+import { ownership, sort, bookmarked, view } from "../../../lib/storage-utils";
 
 type BoardsDisplayProps = {
-	view: ViewOptions;
+	id: string;
 	boards: Board[];
+	query: string;
 };
 
-export default function BoardsDisplay({ view, boards }: BoardsDisplayProps) {
+export default function BoardsDisplay({
+	id,
+	boards,
+	query,
+}: BoardsDisplayProps) {
+	const ownershipState = useSyncExternalStore(
+		ownership.subscribe,
+		ownership.getSnapshot,
+	);
+	const sortState = useSyncExternalStore(sort.subscribe, sort.getSnapshot);
+	const bookmarkedState = useSyncExternalStore(
+		bookmarked.subscribe,
+		bookmarked.getSnapshot,
+	);
+	const viewState = useSyncExternalStore(view.subscribe, view.getSnapshot);
+
+	const processedBoards = useMemo(
+		() =>
+			processBoards(
+				id,
+				boards,
+				bookmarkedState,
+				ownershipState,
+				sortState,
+				query,
+			),
+		[id, boards, bookmarkedState, ownershipState, sortState, query],
+	);
+
 	return (
 		<div
 			className={
-				view === ""
+				viewState === "gallery"
 					? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
 					: "space-y-2"
 			}
 		>
-			{boards.map((board) => {
+			{processedBoards.map((board) => {
 				return (
-					<BoardItem key={board.board_id} board={board} view={view} />
+					<BoardItem
+						key={board.board_id}
+						board={board}
+						view={viewState}
+					/>
 				);
 			})}
-			<NewBoardItem view={view} />
+			<NewBoardItem view={viewState} />
 		</div>
 	);
 }
@@ -56,10 +90,10 @@ function BoardItem({ view, board }: BoardItemProps) {
 
 	return (
 		<div
-			className={`${view === "" ? "h-[280px] max-w-[450px] md:max-h-none group" : "h-auto hover:bg-accent/60 hover:text-accent-foreground transition-colors"} w-full border border-border rounded-md overflow-hidden relative`}
+			className={`${view === "gallery" ? "h-[280px] max-w-[450px] md:max-h-none group" : "h-auto hover:bg-accent/60 hover:text-accent-foreground transition-colors"} w-full border border-border rounded-md overflow-hidden relative`}
 		>
 			<Link href={`/board/${board_id}`}>
-				{view === "" ? (
+				{view === "gallery" ? (
 					<>
 						<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
 							{cover_path && (
@@ -108,10 +142,10 @@ function BoardItem({ view, board }: BoardItemProps) {
 				)}
 			</Link>
 			<div
-				className={`absolute ${view === "" ? "bottom-4 right-4" : "bottom-2.5 right-2"}`}
+				className={`absolute ${view === "gallery" ? "bottom-4 right-4" : "bottom-2.5 right-2"}`}
 			>
 				<BoardOptionsDropdown
-					side={view === "" ? "top" : "left"}
+					side={view === "gallery" ? "top" : "left"}
 					boardId={board_id}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
@@ -141,7 +175,7 @@ function NewBoardItem({ view }: NewBoardItemProps) {
 	return (
 		<Button
 			variant="outline"
-			className={`${view === "" ? "h-[280px]" : "h-[56px] overflow-hidden pl-4 pr-2"} w-full flex items-center justify-center gap-2`}
+			className={`${view === "gallery" ? "h-[280px]" : "h-[56px] overflow-hidden pl-4 pr-2"} w-full flex items-center justify-center gap-2`}
 			onClick={() => createBoard()}
 		>
 			<Plus className="size-4" />

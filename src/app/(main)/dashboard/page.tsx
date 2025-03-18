@@ -1,10 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header";
 import { Separator } from "@/components/ui/separator";
-import { processBoards } from "@/lib/utils";
-import { OwnershipOptions, SortOptions, ViewOptions } from "@/lib/types";
 import BoardsDisplay from "@/components/blocks/dashboard/boards-display";
+import BoardsDisplayHeader from "@/components/blocks/dashboard/boards-display-header";
 
 export default async function DashboardPage(props: {
 	searchParams?: Promise<{
@@ -16,10 +14,7 @@ export default async function DashboardPage(props: {
 	}>;
 }) {
 	const searchParams = await props.searchParams;
-	const ownership = searchParams?.ownership || "";
-	const sort = searchParams?.sort || "";
-	const view = searchParams?.view || "";
-	const bookmarked = searchParams?.bookmarked || "";
+
 	const query = searchParams?.query || "";
 
 	const supabase = await createClient();
@@ -37,22 +32,14 @@ export default async function DashboardPage(props: {
 
 	if (boardsError) throw boardsError;
 
-	const processedBoards = processBoards(
-		userData.user.id,
-		boardsData.map((item) => item.boards),
-		bookmarked === "bookmarked",
-		ownership as OwnershipOptions,
-		sort as SortOptions,
-		query,
-	);
-
 	return (
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<BoardsDisplayHeader />
 			<Separator className="w-full" />
 			<BoardsDisplay
-				view={view as ViewOptions}
-				boards={processedBoards}
+				id={userData.user.id}
+				boards={boardsData.map((item) => item.boards)}
+				query={query}
 			/>
 		</div>
 	);

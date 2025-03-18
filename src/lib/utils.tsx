@@ -9,7 +9,13 @@ import {
 	TwitterXIcon,
 } from "@/components/icons/icon";
 import { LinkIcon } from "lucide-react";
-import { Board, OwnershipOptions, SortOptions } from "./types";
+import {
+	Board,
+	BookmarkedOptions,
+	OwnershipOptions,
+	SortOptions,
+    ViewOptions,
+} from "./types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -53,14 +59,14 @@ export function getLastOpened(datetime: string) {
 export function processBoards(
 	id: string,
 	fetchedBoards: Board[],
-	bookmarked: boolean,
+	bookmarked: BookmarkedOptions,
 	ownership: OwnershipOptions,
 	sortMethod: SortOptions,
 	query: string,
 ) {
 	let processedBoards = [...fetchedBoards];
 
-	if (bookmarked) {
+	if (bookmarked === "true") {
 		processedBoards = processedBoards.filter((board) => board.bookmarked);
 	}
 
@@ -74,7 +80,7 @@ export function processBoards(
 		);
 	}
 
-	if (sortMethod === "") {
+	if (sortMethod === "last-opened") {
 		processedBoards.sort(
 			(a, b) =>
 				new Date(b.last_opened).getTime() -
