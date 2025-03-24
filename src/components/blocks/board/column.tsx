@@ -27,7 +27,12 @@ export default function Column({ column, cards }: ColumnProps) {
 					<Button variant="ghost" size="icon">
 						<Ellipsis />
 					</Button>
-					<NewCard size="icon" />
+					<NewCard
+						size="icon"
+						boardId={column.board_id}
+						columnId={column.id}
+                        position={filteredCards.length}
+					/>
 				</div>
 			</div>
 			<div>
@@ -35,7 +40,12 @@ export default function Column({ column, cards }: ColumnProps) {
 					<Card key={filteredCard.id} card={filteredCard} />
 				))}
 				<DropIndicator columnId={column.id} />
-				<NewCard size="default" />
+				<NewCard
+					size="default"
+					boardId={column.board_id}
+					columnId={column.id}
+                    position={filteredCards.length}
+				/>
 			</div>
 		</div>
 	);
