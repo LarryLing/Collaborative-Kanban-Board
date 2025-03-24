@@ -10,14 +10,21 @@ import {
 	Card as CardType,
 	Column as ColumnType,
 } from "../../../../database.types";
+import ColumnOptionsDropdown from "./column-options-dropdown";
 
 type ColumnProps = {
 	boardId: string;
 	column: ColumnType;
+	columns: ColumnType[];
 	cards: CardType[];
 };
 
-export default function Column({ boardId, column, cards }: ColumnProps) {
+export default function Column({
+	boardId,
+	column,
+	columns,
+	cards,
+}: ColumnProps) {
 	const filteredCards = cards.filter((card) => card.column_id === column.id);
 
 	return (
@@ -28,9 +35,12 @@ export default function Column({ boardId, column, cards }: ColumnProps) {
 					<span className="text-sm">{filteredCards.length}</span>
 				</div>
 				<div className="space-x-2">
-					<Button variant="ghost" size="icon">
-						<Ellipsis />
-					</Button>
+					<ColumnOptionsDropdown
+						boardId={boardId}
+						columnId={column.id}
+						columns={columns}
+						cards={cards}
+					/>
 					<NewCard
 						size="icon"
 						boardId={boardId}

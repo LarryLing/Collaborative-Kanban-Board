@@ -98,6 +98,7 @@ export default function BoardClientComponent({
 					key={column.id}
 					boardId={boardId}
 					column={column}
+					columns={columns}
 					cards={cards}
 				/>
 			))}
