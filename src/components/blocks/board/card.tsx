@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card as CardType } from "@/lib/types";
+import { Card as CardType } from "../../../../database.types";
 import React, { useState } from "react";
 import DropIndicator from "./drop-indicator";
 import {
@@ -33,7 +33,7 @@ export default function Card({ card }: CardProps) {
 						variant="outline"
 						className="justify-start w-full active:cursor-grabbing h-[50px]"
 					>
-						<span>{card.name}</span>
+						<span>{card.title}</span>
 					</Button>
 				</DialogTrigger>
 				<DialogContent className="flex flex-col size-[500px] px-8">
@@ -42,7 +42,7 @@ export default function Card({ card }: CardProps) {
 							<Input
 								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg"
 								placeholder="New Card"
-								defaultValue={card.name}
+								defaultValue={card.title}
 							/>
 						</DialogTitle>
 					</DialogHeader>

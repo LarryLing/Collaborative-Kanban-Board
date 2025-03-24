@@ -24,7 +24,7 @@ export default async function Page({
 }: {
 	params: Promise<{ board: string }>;
 }) {
-	const { board } = await params;
+	const { board: boardId } = await params;
 
 	const supabase = await createServerClient();
 
@@ -33,40 +33,45 @@ export default async function Page({
 		.update({
 			last_opened: new Date().toISOString().toLocaleString(),
 		})
-		.eq("board_id", board);
+		.eq("board_id", boardId);
 
 	if (updateOpenedError) throw updateOpenedError;
 
 	const { data: boardData, error: boardError } = await supabase
 		.from("boards")
 		.select("*")
-		.eq("board_id", board)
+		.eq("board_id", boardId)
 		.single();
 
 	if (boardError) throw boardError;
 
 	const { data: columnsData, error: columnsError } = await supabase
-		.from("columns")
-		.select("*")
-		.eq("board_id", board)
-		.order("position");
+		.from("columns_json")
+		.select("columns")
+		.eq("board_id", boardId)
+		.single();
 
 	if (columnsError) throw columnsError;
 
+	const fetchedColumns = columnsData.columns.columns;
+
 	const { data: cardsData, error: cardsError } = await supabase
-		.from("cards")
-		.select("*")
-		.eq("board_id", board)
-		.order("position");
+		.from("cards_json")
+		.select("cards")
+		.eq("board_id", boardId)
+		.single();
 
 	if (cardsError) throw cardsError;
+
+	const fetchedCards = cardsData.cards.cards;
 
 	return (
 		<>
 			<RefreshComponent />
 			<BoardClientComponent
-				fetchedCards={cardsData || []}
-				fetchedColumns={columnsData || []}
+				boardId={boardId}
+				fetchedColumns={fetchedColumns}
+				fetchedCards={fetchedCards}
 			/>
 		</>
 	);

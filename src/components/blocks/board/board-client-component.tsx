@@ -1,16 +1,25 @@
 "use client";
 
-import { Card as CardType, Column as ColumnType } from "@/lib/types";
+import {
+	Card as CardType,
+	CardsJson,
+	Column as ColumnType,
+	ColumnsJson,
+} from "../../../../database.types";
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Column from "./column";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 type BoardClientComponentProps = {
+	boardId: string;
 	fetchedCards: CardType[];
 	fetchedColumns: ColumnType[];
 };
 
 export default function BoardClientComponent({
+	boardId,
 	fetchedCards,
 	fetchedColumns,
 }: BoardClientComponentProps) {
@@ -25,34 +34,12 @@ export default function BoardClientComponent({
 			.on(
 				"postgres_changes",
 				{
-					event: "*",
+					event: "UPDATE",
 					schema: "public",
-					table: "columns",
+					table: "columns_json",
 				},
 				(payload) => {
-					if (payload.eventType === "DELETE") {
-						setColumns(
-							columns.filter(
-								(column) => column.id !== payload.old.id,
-							),
-						);
-					} else if (payload.eventType === "UPDATE") {
-						let updatedColumns = [...columns];
-						let index = 0;
-
-						for (let i = 0; i < updatedColumns.length; i++) {
-							if (updatedColumns[i].id === payload.old.id) {
-								index = i;
-								break;
-							}
-						}
-
-						updatedColumns[index] = payload.new as ColumnType;
-
-						setColumns(updatedColumns);
-					} else if (payload.eventType === "INSERT") {
-						setColumns([...columns, payload.new as ColumnType]);
-					}
+					setColumns((payload.new.columns as ColumnsJson).columns);
 				},
 			)
 			.subscribe();
@@ -68,32 +55,12 @@ export default function BoardClientComponent({
 			.on(
 				"postgres_changes",
 				{
-					event: "*",
+					event: "UPDATE",
 					schema: "public",
-					table: "cards",
+					table: "cards_json",
 				},
 				(payload) => {
-					if (payload.eventType === "DELETE") {
-						setCards(
-							cards.filter((card) => card.id !== payload.old.id),
-						);
-					} else if (payload.eventType === "UPDATE") {
-						let updatedCards = [...cards];
-						let index = 0;
-
-						for (let i = 0; i < updatedCards.length; i++) {
-							if (updatedCards[i].id === payload.old.id) {
-								index = i;
-								break;
-							}
-						}
-
-						updatedCards[index] = payload.new as CardType;
-
-						setCards(updatedCards);
-					} else if (payload.eventType === "INSERT") {
-						setCards([...cards, payload.new as CardType]);
-					}
+					setCards((payload.new.cards as CardsJson).cards);
 				},
 			)
 			.subscribe();
@@ -103,11 +70,43 @@ export default function BoardClientComponent({
 		};
 	}, [supabase, cards, setCards]);
 
+	async function createNewBoard() {
+		const updatedColumnsJson = {
+			columns: [
+				...columns,
+				{
+					id: crypto.randomUUID(),
+					title: "New Column",
+				},
+			] as ColumnType[],
+		} as ColumnsJson;
+
+		const { error: newColumnError } = await supabase
+			.from("columns_json")
+			.update({
+				columns: updatedColumnsJson,
+			})
+			.eq("board_id", boardId);
+
+		if (newColumnError) throw newColumnError;
+	}
+
 	return (
 		<div className="flex gap-4">
 			{columns.map((column) => (
-				<Column key={column.id} column={column} cards={cards} />
+				<Column
+					key={column.id}
+					boardId={boardId}
+					column={column}
+					cards={cards}
+				/>
 			))}
+			<div className="px-1 py-2">
+				<Button variant="ghost" onClick={() => createNewBoard()}>
+					<Plus />
+					<span>New Column</span>
+				</Button>
+			</div>
 		</div>
 	);
 }

@@ -14,22 +14,22 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
+import { Card, CardsJson } from "../../../../database.types";
 
 type NewCardProps = {
 	size: "default" | "icon";
 	boardId: string;
 	columnId: string;
-	position: number;
+	cards: Card[];
 };
 
 export default function NewCard({
 	size,
 	boardId,
 	columnId,
-	position,
+	cards,
 }: NewCardProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const [nextPosition, setNextPosition] = useState(position);
 	const [pending, setPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);
@@ -45,18 +45,29 @@ export default function NewCard({
 
 		const supabase = createClient();
 
-		const { error: newCardError } = await supabase.from("cards").insert({
-			board_id: boardId,
-			column_id: columnId,
-			position: nextPosition,
-			name: title,
-			description: description,
-		});
+		const updatedCardsJson = {
+			cards: [
+				...cards,
+				{
+					id: crypto.randomUUID(),
+					column_id: columnId,
+					title: title,
+					description: description,
+					created_at: new Date().toISOString().toLocaleString(),
+				},
+			] as Card[],
+		} as CardsJson;
+
+		const { error: newCardError } = await supabase
+			.from("cards_json")
+			.update({
+				cards: updatedCardsJson,
+			})
+			.eq("board_id", boardId);
 
 		if (newCardError) throw newCardError;
 
 		setIsDialogOpen(false);
-		setNextPosition((nextPosition) => nextPosition + 1);
 		setPending(false);
 	}
 
