@@ -14,14 +14,13 @@ import {
 	BookmarkedOptions,
 	OwnershipOptions,
 	SortOptions,
-    ViewOptions,
 } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function getLastOpened(datetime: string) {
+export function getDateString(datetime: string) {
 	const months = [
 		"Jan",
 		"Feb",

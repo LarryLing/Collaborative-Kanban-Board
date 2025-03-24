@@ -29,7 +29,11 @@ export default function OwnershipDropdown() {
 					<TooltipTrigger asChild>
 						<DropdownMenuTrigger asChild>
 							<Button variant="outline" className="w-[160px]">
-								{ownershipState}
+								{ownershipState === "anyone" &&
+									"Owned by anyone"}
+								{ownershipState === "me" && "Owned by me"}
+								{ownershipState === "not-me" &&
+									"Not owned by me"}
 							</Button>
 						</DropdownMenuTrigger>
 					</TooltipTrigger>

@@ -5,7 +5,6 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ViewOptions } from "@/lib/types";
 import { LayoutGrid, List } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import { handleViewChange, view } from "../../../lib/storage-utils";

@@ -1,3 +1,4 @@
+import BoardClientComponent from "@/components/blocks/board/board-client-component";
 import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { createClient as createClientClient } from "@/lib/supabase/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
@@ -44,10 +45,29 @@ export default async function Page({
 
 	if (boardError) throw boardError;
 
+	const { data: columnsData, error: columnsError } = await supabase
+		.from("columns")
+		.select("*")
+		.eq("board_id", board)
+		.order("position");
+
+	if (columnsError) throw columnsError;
+
+	const { data: cardsData, error: cardsError } = await supabase
+		.from("cards")
+		.select("*")
+		.eq("board_id", board)
+		.order("position");
+
+	if (cardsError) throw cardsError;
+
 	return (
 		<>
 			<RefreshComponent />
-			<p>Something about {boardData.title}</p>
+			<BoardClientComponent
+				fetchedCards={cardsData || []}
+				fetchedColumns={columnsData || []}
+			/>
 		</>
 	);
 }

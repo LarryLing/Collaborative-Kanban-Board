@@ -10,7 +10,7 @@ import RenameDialog from "./rename-dialog";
 import DeleteDialog from "./delete-dialog";
 import { createBoard } from "@/lib/actions";
 import { Board, ViewOptions } from "@/lib/types";
-import { processBoards, getLastOpened } from "@/lib/utils";
+import { processBoards, getDateString } from "@/lib/utils";
 import { ownership, sort, bookmarked, view } from "../../../lib/storage-utils";
 
 type BoardsDisplayProps = {
@@ -117,7 +117,7 @@ function BoardItem({ view, board }: BoardItemProps) {
 									<Bookmark className="size-4 inline-block" />
 								)}
 								<span className="font-normal text-sm">
-									Opened {getLastOpened(last_opened)}
+									Opened {getDateString(last_opened)}
 								</span>
 							</div>
 						</div>
@@ -127,7 +127,7 @@ function BoardItem({ view, board }: BoardItemProps) {
 						<span className="font-semibold text-md">{title}</span>
 						<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
 							<span className="w-[150px]">
-								Opened {getLastOpened(last_opened)}
+								Opened {getDateString(last_opened)}
 							</span>
 							<div className="space-x-2">
 								{collaborators > 1 && (
