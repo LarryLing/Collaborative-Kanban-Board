@@ -14,7 +14,7 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { Card, CardsJson } from "../../../../database.types";
+import { Card } from "../../../../database.types";
 
 type NewCardProps = {
 	size: "default" | "icon";
@@ -45,30 +45,28 @@ export default function NewCard({
 
 		const supabase = createClient();
 
-		const updatedCardsJson = {
-			cards: [
-				...cards,
-				{
-					id: crypto.randomUUID(),
-					column_id: columnId,
-					title: title,
-					description: description,
-					created_at: new Date().toISOString().toLocaleString(),
-				},
-			] as Card[],
-		} as CardsJson;
+		const updatedCardsJson = [
+			...cards,
+			{
+				id: crypto.randomUUID(),
+				column_id: columnId,
+				title: title,
+				description: description,
+				created_at: new Date().toISOString().toLocaleString(),
+			},
+		] as Card[];
 
 		const { error: newCardError } = await supabase
-			.from("cards_json")
+			.from("cards")
 			.update({
 				cards: updatedCardsJson,
 			})
 			.eq("board_id", boardId);
 
-		if (newCardError) throw newCardError;
-
 		setIsDialogOpen(false);
 		setPending(false);
+
+		if (newCardError) throw newCardError;
 	}
 
 	return (
@@ -77,7 +75,7 @@ export default function NewCard({
 				{size === "default" ? (
 					<Button
 						draggable="true"
-						variant="outline"
+						variant="ghost"
 						className="w-full active:cursor-grabbing h-[50px]"
 						onClick={() => setIsDialogOpen(true)}
 					>

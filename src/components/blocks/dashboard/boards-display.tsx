@@ -58,11 +58,7 @@ export default function BoardsDisplay({
 		>
 			{processedBoards.map((board) => {
 				return (
-					<BoardItem
-						key={board.board_id}
-						board={board}
-						view={viewState}
-					/>
+					<BoardItem key={board.id} board={board} view={viewState} />
 				);
 			})}
 			<NewBoardItem view={viewState} />
@@ -79,20 +75,14 @@ function BoardItem({ view, board }: BoardItemProps) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-	const {
-		board_id,
-		title,
-		cover_path,
-		bookmarked,
-		collaborators,
-		last_opened,
-	} = board;
+	const { id, title, cover_path, bookmarked, collaborators, last_opened } =
+		board;
 
 	return (
 		<div
 			className={`${view === "gallery" ? "h-[280px] max-w-[450px] md:max-h-none group" : "h-auto hover:bg-accent/60 hover:text-accent-foreground transition-colors"} w-full border border-border rounded-md overflow-hidden relative`}
 		>
-			<Link href={`/board/${board_id}`}>
+			<Link href={`/board/${id}`}>
 				{view === "gallery" ? (
 					<>
 						<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
@@ -146,20 +136,20 @@ function BoardItem({ view, board }: BoardItemProps) {
 			>
 				<BoardOptionsDropdown
 					side={view === "gallery" ? "top" : "left"}
-					boardId={board_id}
+					boardId={id}
 					bookmarked={bookmarked}
 					setIsRenameDialogOpen={setIsRenameDialogOpen}
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
 			<RenameDialog
-				boardId={board_id}
+				boardId={id}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
 			<DeleteDialog
-				boardId={board_id}
+				boardId={id}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>
@@ -174,7 +164,7 @@ type NewBoardItemProps = {
 function NewBoardItem({ view }: NewBoardItemProps) {
 	return (
 		<Button
-			variant="outline"
+			variant="ghost"
 			className={`${view === "gallery" ? "h-[280px]" : "h-[56px] overflow-hidden pl-4 pr-2"} w-full flex items-center justify-center gap-2`}
 			onClick={() => createBoard()}
 		>

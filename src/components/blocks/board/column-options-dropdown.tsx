@@ -11,71 +11,71 @@ import {
 import { Ellipsis, PenLine, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import {
-	Card,
-	CardsJson,
-	Column,
-	ColumnsJson,
-} from "../../../../database.types";
+import { Card, Column } from "../../../../database.types";
 import { createClient } from "@/lib/supabase/client";
 
 type ColumnOptionsDropdownProps = {
 	boardId: string;
-	columnId: string;
+	column: Column;
 	columns: Column[];
 	cards: Card[];
+	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
 
 export default function ColumnOptionsDropdown({
 	boardId,
-	columnId,
+	column,
 	columns,
 	cards,
+	setIsRenameColumnDialogOpen,
 }: ColumnOptionsDropdownProps) {
 	const { theme } = useTheme();
 
 	async function deleteCard() {
 		const supabase = createClient();
 
-		const updatedCardsJson = {
-			cards: cards.filter((cards) => cards.column_id !== columnId),
-		} as CardsJson;
-
-		const { error: updateCardsError } = await supabase
-			.from("cards_json")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (updateCardsError) throw updateCardsError;
-
-		const updatedColumnsJson = {
-			columns: columns.filter((column) => column.id !== columnId),
-		} as ColumnsJson;
+		const updatedColumnsJson = columns.filter(
+			(filteredColumn) => filteredColumn.id !== column.id,
+		);
 
 		const { error: updateColumnsError } = await supabase
-			.from("columns_json")
+			.from("columns")
 			.update({
 				columns: updatedColumnsJson,
 			})
 			.eq("board_id", boardId);
 
 		if (updateColumnsError) throw updateColumnsError;
+
+		const updatedCardsJson = cards.filter(
+			(filteredCard) => filteredCard.column_id !== column.id,
+		);
+
+		const { error: updateCardsError } = await supabase
+			.from("cards")
+			.update({
+				cards: updatedCardsJson,
+			})
+			.eq("board_id", boardId);
+
+		if (updateCardsError) throw updateCardsError;
 	}
 
 	return (
-		<DropdownMenu>
+		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
 				<Button variant="ghost" size="icon">
 					<Ellipsis />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
-				<DropdownMenuItem>
+				<DropdownMenuItem
+					onClick={() => setIsRenameColumnDialogOpen(true)}
+				>
 					<PenLine className="size-4" />
 					<span>Rename</span>
 				</DropdownMenuItem>
+
 				<DropdownMenuItem onClick={() => deleteCard()}>
 					<Trash2 className="size-4" />
 					<span>Delete</span>

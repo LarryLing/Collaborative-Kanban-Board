@@ -28,42 +28,36 @@ export default async function Page({
 
 	const supabase = await createServerClient();
 
-	const { error: updateOpenedError } = await supabase
+	const { data: boardData, error: updateOpenedError } = await supabase
 		.from("boards")
 		.update({
 			last_opened: new Date().toISOString().toLocaleString(),
 		})
-		.eq("board_id", boardId);
+		.eq("id", boardId)
+		.select()
+		.single();
 
 	if (updateOpenedError) throw updateOpenedError;
 
-	const { data: boardData, error: boardError } = await supabase
-		.from("boards")
-		.select("*")
-		.eq("board_id", boardId)
-		.single();
-
-	if (boardError) throw boardError;
-
 	const { data: columnsData, error: columnsError } = await supabase
-		.from("columns_json")
+		.from("columns")
 		.select("columns")
 		.eq("board_id", boardId)
 		.single();
 
 	if (columnsError) throw columnsError;
 
-	const fetchedColumns = columnsData.columns.columns;
+	const fetchedColumns = columnsData.columns;
 
 	const { data: cardsData, error: cardsError } = await supabase
-		.from("cards_json")
+		.from("cards")
 		.select("cards")
 		.eq("board_id", boardId)
 		.single();
 
 	if (cardsError) throw cardsError;
 
-	const fetchedCards = cardsData.cards.cards;
+	const fetchedCards = cardsData.cards;
 
 	return (
 		<>

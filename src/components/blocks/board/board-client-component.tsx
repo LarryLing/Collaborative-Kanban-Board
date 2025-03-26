@@ -2,9 +2,7 @@
 
 import {
 	Card as CardType,
-	CardsJson,
 	Column as ColumnType,
-	ColumnsJson,
 } from "../../../../database.types";
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -36,10 +34,10 @@ export default function BoardClientComponent({
 				{
 					event: "UPDATE",
 					schema: "public",
-					table: "columns_json",
+					table: "columns",
 				},
 				(payload) => {
-					setColumns((payload.new.columns as ColumnsJson).columns);
+					setColumns(payload.new.columns as ColumnType[]);
 				},
 			)
 			.subscribe();
@@ -57,10 +55,10 @@ export default function BoardClientComponent({
 				{
 					event: "UPDATE",
 					schema: "public",
-					table: "cards_json",
+					table: "cards",
 				},
 				(payload) => {
-					setCards((payload.new.cards as CardsJson).cards);
+					setCards(payload.new.cards as CardType[]);
 				},
 			)
 			.subscribe();
@@ -71,18 +69,16 @@ export default function BoardClientComponent({
 	}, [supabase, cards, setCards]);
 
 	async function createNewBoard() {
-		const updatedColumnsJson = {
-			columns: [
-				...columns,
-				{
-					id: crypto.randomUUID(),
-					title: "New Column",
-				},
-			] as ColumnType[],
-		} as ColumnsJson;
+		const updatedColumnsJson = [
+			...columns,
+			{
+				id: crypto.randomUUID(),
+				title: "New Column",
+			},
+		] as ColumnType[];
 
 		const { error: newColumnError } = await supabase
-			.from("columns_json")
+			.from("columns")
 			.update({
 				columns: updatedColumnsJson,
 			})

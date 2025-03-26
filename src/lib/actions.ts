@@ -21,8 +21,8 @@ export async function signup(formState: UserFormState, formData: FormData) {
     const validatedFields = SignupFormSchema.safeParse({
 		displayName: formData.get("displayName"),
 		email: formData.get("email"),
-		password: formData.get("password"),
-		confirm: formData.get("confirm"),
+		newPassword: formData.get("newPassword"),
+		confirmPassword: formData.get("confirmPassword"),
 	});
 
 	if (!validatedFields.success) {
@@ -248,7 +248,10 @@ export async function updatePassword(formState: UserFormState, formData: FormDat
             },
         );
 
-        if (passwordError) throw passwordError;
+        if (passwordError) {
+            console.log(passwordError);
+            throw passwordError;
+        }
 
         revalidatePath("/");
 
@@ -287,7 +290,10 @@ export async function updateEmail(formState: UserFormState, formData: FormData) 
             .select("email")
             .eq("email", validatedFields.data.email);
 
-        if (emailExistsError) throw emailExistsError;
+        if (emailExistsError) {
+            console.log(emailExistsError)
+            throw emailExistsError;
+        }
 
         if (emailExistsData.length > 0) {
             return {
@@ -304,7 +310,7 @@ export async function updateEmail(formState: UserFormState, formData: FormData) 
             },
         });
 
-        if (updateError) throw updateError
+        if (updateError) throw updateError;
 
         revalidatePath("/");
 
@@ -500,14 +506,9 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
             if (removeError) throw removeError;
         }
 
-        const { error: socialsDeleteError } = await supabase
-            .from("socials")
-            .delete()
-            .eq("profile_id", userData.user.id);
-
-        if (socialsDeleteError) throw socialsDeleteError;
-
-        const { error: deleteError } = await supabase.rpc("handle_delete_user");
+        const { error: deleteError } = await supabase.rpc(
+            "handle_delete_user"
+        );
 
         if (deleteError) throw deleteError;
 
@@ -535,7 +536,7 @@ export async function createBoard() {
     const board_id = crypto.randomUUID();
 
     const { error: boardError } = await supabase.from("boards").insert({
-        board_id: board_id,
+        id: board_id,
         profile_id: userData.user.id,
         title: "Untitled Board",
     });
@@ -551,7 +552,7 @@ export async function deleteBoard(boardId: string) {
     const { error: deleteError } = await supabase
         .from("boards")
         .delete()
-        .eq("board_id", boardId);
+        .eq("id", boardId);
 
     if (deleteError) throw deleteError;
 
@@ -564,7 +565,7 @@ export async function bookmarkBoard(boardId: string, currentlyBookmarked: boolea
     const { error: bookmarkError } = await supabase
         .from("boards")
         .update({bookmarked: !currentlyBookmarked})
-        .eq("board_id", boardId);
+        .eq("id", boardId);
 
     if (bookmarkError) throw bookmarkError;
 
@@ -588,7 +589,7 @@ export async function renameBoard(formState: BoardFormState, formData: FormData)
         const { error: renameError } = await supabase
             .from("boards")
             .update({title: validatedFields.data.title})
-            .eq("board_id", formState?.boardId!);
+            .eq("id", formState?.boardId!);
 
         if (renameError) throw renameError;
 
