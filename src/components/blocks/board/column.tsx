@@ -12,6 +12,7 @@ import ColumnOptionsDropdown from "./column-options-dropdown";
 import RenameColumnDialog from "./rename-column-dialog";
 
 type ColumnProps = {
+	index: number;
 	boardId: string;
 	column: ColumnType;
 	columns: ColumnType[];
@@ -19,6 +20,7 @@ type ColumnProps = {
 };
 
 export default function Column({
+	index,
 	boardId,
 	column,
 	columns,
@@ -29,18 +31,19 @@ export default function Column({
 
 	const filteredCards = cards.filter((card) => card.column_id === column.id);
 
-	const { id, title } = column;
+	const { id, title, color } = column;
 
 	return (
 		<>
 			<div className="w-72 shrink-0">
 				<div className="px-1 py-2 flex items-center justify-between">
 					<div className="rounded-md font-semibold">
-						<span className="mr-3">{column.title}</span>
+						<span className={`mr-3 ${color}`}>{column.title}</span>
 						<span className="text-sm">{filteredCards.length}</span>
 					</div>
 					<div className="space-x-2">
 						<ColumnOptionsDropdown
+							index={index}
 							boardId={boardId}
 							column={column}
 							columns={columns}
@@ -71,9 +74,9 @@ export default function Column({
 				</div>
 			</div>
 			<RenameColumnDialog
+				index={index}
 				boardId={boardId}
-				columnId={id}
-				columnTitle={title}
+				column={column}
 				columns={columns}
 				isRenameColumnDialogOpen={isRenameColumnDialogOpen}
 				setIsRenameColumnDialogOpen={setIsRenameColumnDialogOpen}

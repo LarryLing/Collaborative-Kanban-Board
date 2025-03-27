@@ -99,7 +99,7 @@ export default function NewCard({
 								ref={titleRef}
 								id="title"
 								name="title"
-								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg"
+								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
 								placeholder="New Card"
 								defaultValue="New Card"
 							/>
@@ -109,7 +109,7 @@ export default function NewCard({
 						ref={descriptionRef}
 						id="description"
 						name="description"
-						className="h-full resize-none border-none focus-visible:ring-0 p-0"
+						className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
 						placeholder="Enter some description text..."
 					/>
 					<DialogFooter>
@@ -119,7 +119,7 @@ export default function NewCard({
 							disabled={pending}
 							onClick={() => setIsDialogOpen(false)}
 						>
-							Go Back
+							Discard
 						</Button>
 						<Button type="submit" disabled={pending}>
 							{pending ? "Creating Card..." : "Create Card"}

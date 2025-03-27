@@ -40,14 +40,14 @@ export default function Card({ card }: CardProps) {
 					<DialogHeader className="hover:cursor-text">
 						<DialogTitle>
 							<Input
-								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg"
+								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
 								placeholder="New Card"
 								defaultValue={card.title}
 							/>
 						</DialogTitle>
 					</DialogHeader>
 					<Textarea
-						className="h-full resize-none border-none focus-visible:ring-0 p-0"
+						className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
 						placeholder="Enter some description text..."
 						defaultValue={card.description}
 					/>

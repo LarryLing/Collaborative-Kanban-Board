@@ -68,12 +68,13 @@ export default function BoardClientComponent({
 		};
 	}, [supabase, cards, setCards]);
 
-	async function createNewBoard() {
+	async function createColumn() {
 		const updatedColumnsJson = [
 			...columns,
 			{
 				id: crypto.randomUUID(),
 				title: "New Column",
+				color: "text-primary",
 			},
 		] as ColumnType[];
 
@@ -89,9 +90,10 @@ export default function BoardClientComponent({
 
 	return (
 		<div className="flex gap-4">
-			{columns.map((column) => (
+			{columns.map((column, index) => (
 				<Column
 					key={column.id}
+					index={index}
 					boardId={boardId}
 					column={column}
 					columns={columns}
@@ -99,7 +101,7 @@ export default function BoardClientComponent({
 				/>
 			))}
 			<div className="px-1 py-2">
-				<Button variant="ghost" onClick={() => createNewBoard()}>
+				<Button variant="ghost" onClick={() => createColumn()}>
 					<Plus />
 					<span>New Column</span>
 				</Button>
