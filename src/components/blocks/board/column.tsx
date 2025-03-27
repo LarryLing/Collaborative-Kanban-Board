@@ -10,6 +10,7 @@ import {
 } from "../../../../database.types";
 import ColumnOptionsDropdown from "./column-options-dropdown";
 import RenameColumnDialog from "./rename-column-dialog";
+import CardOptionsDropdown from "./card-options-dropdown";
 
 type ColumnProps = {
 	index: number;
@@ -38,7 +39,7 @@ export default function Column({
 			<div className="w-72 shrink-0">
 				<div className="px-1 py-2 flex items-center justify-between">
 					<div className="rounded-md font-semibold">
-						<span className={`mr-3 ${color}`}>{column.title}</span>
+						<span className={`mr-3 ${color}`}>{title}</span>
 						<span className="text-sm">{filteredCards.length}</span>
 					</div>
 					<div className="space-x-2">
@@ -61,8 +62,19 @@ export default function Column({
 					</div>
 				</div>
 				<div>
-					{filteredCards.map((filteredCard) => (
-						<Card key={filteredCard.id} card={filteredCard} />
+					{filteredCards.map((filteredCard, index) => (
+						<div
+							key={filteredCard.id}
+							className="w-full h-[50px] border border-border rounded-md overflow-hidden relative text-sm font-semibold"
+						>
+							<Card key={filteredCard.id} card={filteredCard} />
+							<CardOptionsDropdown
+								index={index}
+								boardId={boardId}
+								card={filteredCard}
+								cards={cards}
+							/>
+						</div>
 					))}
 					<DropIndicator columnId={column.id} />
 					<NewCard

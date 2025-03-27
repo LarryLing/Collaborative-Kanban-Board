@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card as CardType } from "../../../../database.types";
 import React, { useState } from "react";
 import DropIndicator from "./drop-indicator";
@@ -15,6 +14,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { getDateString } from "@/lib/utils";
+import CardOptionsDropdown from "./card-options-dropdown";
 
 type CardProps = {
 	card: CardType;
@@ -25,16 +25,14 @@ export default function Card({ card }: CardProps) {
 
 	return (
 		<>
-			<DropIndicator beforeId={card.id} columnId={card.column_id} />
 			<Dialog>
 				<DialogTrigger asChild>
-					<Button
-						draggable="true"
-						variant="outline"
-						className="justify-start w-full active:cursor-grabbing h-[50px]"
+					<div
+						draggable
+						className="w-full h-full flex justify-start items-center px-4 py-2 hover:cursor-pointer hover:bg-accent/60 hover:text-accent-foreground transition-colors active:cursor-grabbing"
 					>
 						<span>{card.title}</span>
-					</Button>
+					</div>
 				</DialogTrigger>
 				<DialogContent className="flex flex-col size-[500px] px-8">
 					<DialogHeader className="hover:cursor-text">
