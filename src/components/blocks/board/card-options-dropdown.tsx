@@ -67,7 +67,7 @@ export default function CardOptionsDropdown({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="absolute right-2 top-[6px]"
+					className="absolute right-2 top-[13px]"
 				>
 					<Ellipsis />
 				</Button>

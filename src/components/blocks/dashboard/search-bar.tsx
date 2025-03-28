@@ -1,4 +1,4 @@
-import { ReadonlyURLSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
 	Tooltip,
 	TooltipContent,
@@ -9,17 +9,22 @@ import { useState } from "react";
 import { Toggle } from "@/components/ui/toggle";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { useDebouncedCallback } from "use-debounce";
 
-type SearchBarProps = {
-	searchParams: ReadonlyURLSearchParams;
-	handleSearch: (arg0: string) => void;
-};
-
-export default function SearchBar({
-	searchParams,
-	handleSearch,
-}: SearchBarProps) {
+export default function SearchBar() {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+	const searchParams = useSearchParams();
+	const pathname = usePathname();
+	const { replace } = useRouter();
+
+	const handleSearch = useDebouncedCallback((query) => {
+		const params = new URLSearchParams(searchParams);
+
+		query ? params.set("query", query) : params.delete("query");
+
+		replace(`${pathname}?${params.toString()}`);
+	}, 500);
 
 	return (
 		<div className="hidden md:flex space-x-2">

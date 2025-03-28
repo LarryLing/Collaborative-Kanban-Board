@@ -62,20 +62,28 @@ export default function Column({
 					</div>
 				</div>
 				<div>
-					{filteredCards.map((filteredCard, index) => (
-						<div
-							key={filteredCard.id}
-							className="w-full h-[50px] border border-border rounded-md overflow-hidden relative text-sm font-semibold"
-						>
-							<Card key={filteredCard.id} card={filteredCard} />
-							<CardOptionsDropdown
-								index={index}
-								boardId={boardId}
-								card={filteredCard}
-								cards={cards}
-							/>
-						</div>
-					))}
+					{cards.map(
+						(card, index) =>
+							card.column_id === column.id && (
+								<div key={card.id} className="relative">
+									<DropIndicator
+										columnId={card.column_id}
+									></DropIndicator>
+									<Card
+										index={index}
+										boardId={boardId}
+										card={card}
+										cards={cards}
+									/>
+									<CardOptionsDropdown
+										index={index}
+										boardId={boardId}
+										card={card}
+										cards={cards}
+									/>
+								</div>
+							),
+					)}
 					<DropIndicator columnId={column.id} />
 					<NewCard
 						size="default"

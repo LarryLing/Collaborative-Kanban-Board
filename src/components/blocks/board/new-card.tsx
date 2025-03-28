@@ -93,7 +93,10 @@ export default function NewCard({
 					onSubmit={(e) => handleSubmit(e)}
 					className="flex flex-col gap-4"
 				>
-					<DialogHeader className="hover:cursor-text">
+					<DialogHeader
+						className="hover:cursor-text"
+						aria-description="New Card"
+					>
 						<DialogTitle>
 							<Input
 								ref={titleRef}
