@@ -10,7 +10,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
+import React, {
+	ChangeEvent,
+	useActionState,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { updateUserProfile, uploadAvatar } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
@@ -30,14 +36,13 @@ export default function ProfileSettings({
 }: ProfileSettingsProps) {
 	const { toast } = useToast();
 
+	const avatarInputRef = useRef<HTMLInputElement | null>(null);
+
 	const [profileState, profileAction, profilePending] = useActionState(
 		updateUserProfile,
 		undefined,
 	);
-	const [avatarState, avatarAction, avatarPending] = useActionState(
-		uploadAvatar,
-		undefined,
-	);
+
 	const [avatarPreview, setAvatarPreview] = useState(publicUrl);
 	const [uploading, setUploading] = useState(false);
 	const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -56,7 +61,23 @@ export default function ProfileSettings({
 		}
 
 		const file = e.target.files[0];
-		setAvatarPreview(URL.createObjectURL(file));
+
+		const { publicUrl, errorMessage } = await uploadAvatar(file);
+
+		if (publicUrl) {
+			setAvatarPreview(publicUrl);
+
+			toast({
+				title: "Success!",
+				description: "Your avatar has been successfully updated.",
+			});
+		} else if (errorMessage) {
+			toast({
+				title: "Something went wrong...!",
+				description: errorMessage,
+			});
+		}
+
 		setUploading(false);
 	}
 
@@ -68,33 +89,19 @@ export default function ProfileSettings({
 			});
 		}
 
-		if (avatarState?.publicUrl !== undefined) {
-			setAvatarPreview(avatarState.publicUrl);
-			toast({
-				title: "Success!",
-				description: "Your avatar has been successfully updated.",
-			});
-		}
-
 		if (profileState?.errorMessage !== undefined) {
 			toast({
 				title: "Something went wrong...",
 				description: profileState.errorMessage,
 			});
 		}
+	}, [profileState?.updatedProfile, profileState?.errorMessage]);
 
-		if (avatarState?.errorMessage !== undefined) {
-			toast({
-				title: "Something went wrong...",
-				description: avatarState.errorMessage,
-			});
+	function handleClick() {
+		if (avatarInputRef.current) {
+			avatarInputRef.current.click();
 		}
-	}, [
-		profileState?.updatedProfile,
-		avatarState?.publicUrl,
-		profileState?.errorMessage,
-		avatarState?.errorMessage,
-	]);
+	}
 
 	return (
 		<Card className="border-none shadow-none flex-auto">
@@ -107,7 +114,7 @@ export default function ProfileSettings({
 			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="flex flex-col lg:flex-row-reverse gap-6">
-					<form className="space-y-2" action={avatarAction}>
+					<form className="space-y-2">
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
 							<AvatarImage src={avatarPreview} />
@@ -117,23 +124,33 @@ export default function ProfileSettings({
 									.toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
-						<Input
-							id="avatar"
-							name="avatar"
-							type="file"
-							accept="image/*"
-							onChange={(e) => handleChange(e)}
-							disabled={uploading}
-							className="justify-center items-center"
-						/>
-						{avatarState?.errors?.avatar && (
+						<div className="relative">
+							<Input
+								ref={avatarInputRef}
+								id="avatar"
+								name="avatar"
+								type="file"
+								accept="image/*"
+								onChange={(e) => handleChange(e)}
+								disabled={uploading}
+								className="hidden"
+							/>
+							<Button
+								type="button"
+								onClick={() => handleClick()}
+								className="absolute inset-0 z-5"
+								disabled={uploading}
+							>
+								{uploading ? "Uploading..." : "Upload Avatar"}
+							</Button>
+						</div>
+						{/* {avatarState?.errors?.avatar && (
 							<p className="text-sm text-destructive">
 								{avatarState?.errors?.avatar}
 							</p>
 						)}
 						<Button type="submit" disabled={avatarPending}>
-							{avatarPending ? "Uploading..." : "Upload Avatar"}
-						</Button>
+						</Button> */}
 					</form>
 					<form
 						action={profileAction}

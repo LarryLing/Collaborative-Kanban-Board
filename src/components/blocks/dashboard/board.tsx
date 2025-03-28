@@ -1,77 +1,22 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Bookmark, Plus, Users } from "lucide-react";
+import { Board as BoardType, ViewOptions } from "@/lib/types";
+import { getDateString } from "@/lib/utils";
+import { Users, Bookmark } from "lucide-react";
+import { useEffect, useState } from "react";
+import BoardOptionsDropdown from "./board-options-dropdown";
+import DeleteDialog from "./delete-dialog";
+import RenameDialog from "./rename-dialog";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useMemo, useState, useSyncExternalStore } from "react";
-import BoardOptionsDropdown from "./board-options-dropdown";
-import RenameDialog from "./rename-dialog";
-import DeleteDialog from "./delete-dialog";
-import { createBoard } from "@/lib/actions";
-import { Board, ViewOptions } from "@/lib/types";
-import { processBoards, getDateString } from "@/lib/utils";
-import { ownership, sort, bookmarked, view } from "../../../lib/storage-utils";
+import { createClient } from "@/lib/supabase/client";
 
-type BoardsDisplayProps = {
-	id: string;
-	boards: Board[];
-	query: string;
-};
-
-export default function BoardsDisplay({
-	id,
-	boards,
-	query,
-}: BoardsDisplayProps) {
-	const ownershipState = useSyncExternalStore(
-		ownership.subscribe,
-		ownership.getSnapshot,
-	);
-	const sortState = useSyncExternalStore(sort.subscribe, sort.getSnapshot);
-	const bookmarkedState = useSyncExternalStore(
-		bookmarked.subscribe,
-		bookmarked.getSnapshot,
-	);
-	const viewState = useSyncExternalStore(view.subscribe, view.getSnapshot);
-
-	const processedBoards = useMemo(
-		() =>
-			processBoards(
-				id,
-				boards,
-				bookmarkedState,
-				ownershipState,
-				sortState,
-				query,
-			),
-		[id, boards, bookmarkedState, ownershipState, sortState, query],
-	);
-
-	return (
-		<div
-			className={
-				viewState === "gallery"
-					? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-					: "space-y-2"
-			}
-		>
-			{processedBoards.map((board) => {
-				return (
-					<BoardItem key={board.id} board={board} view={viewState} />
-				);
-			})}
-			<NewBoardItem view={viewState} />
-		</div>
-	);
-}
-
-type BoardItemProps = {
+type BoardProps = {
 	view: ViewOptions;
-	board: Board;
+	board: BoardType;
 };
 
-function BoardItem({ view, board }: BoardItemProps) {
+export default function Board({ view, board }: BoardProps) {
 	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
 	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -154,22 +99,5 @@ function BoardItem({ view, board }: BoardItemProps) {
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 			/>
 		</div>
-	);
-}
-
-type NewBoardItemProps = {
-	view: ViewOptions;
-};
-
-function NewBoardItem({ view }: NewBoardItemProps) {
-	return (
-		<Button
-			variant="ghost"
-			className={`${view === "gallery" ? "h-[280px]" : "h-[56px] overflow-hidden pl-4 pr-2"} w-full flex items-center justify-center gap-2`}
-			onClick={() => createBoard()}
-		>
-			<Plus className="size-4" />
-			<span className="font-semibold text-md">New Board</span>
-		</Button>
 	);
 }

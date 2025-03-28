@@ -36,10 +36,14 @@ export default function Column({
 
 	return (
 		<>
-			<div className="w-72 shrink-0">
-				<div className="px-1 py-2 flex items-center justify-between">
+			<div className="w-64 shrink-0">
+				<div className="flex items-center justify-between">
 					<div className="rounded-md font-semibold">
-						<span className={`mr-3 ${color}`}>{title}</span>
+						<span
+							className={`mr-3 ${color} w-[125px] text-ellipsis text-nowrap`}
+						>
+							{title}
+						</span>
 						<span className="text-sm">{filteredCards.length}</span>
 					</div>
 					<div className="space-x-2">

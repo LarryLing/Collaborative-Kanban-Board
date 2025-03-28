@@ -89,7 +89,7 @@ export default function BoardClientComponent({
 	}
 
 	return (
-		<div className="flex gap-4">
+		<div className="flex gap-4 w-full overflow-auto pb-4">
 			{columns.map((column, index) => (
 				<Column
 					key={column.id}
@@ -100,12 +100,10 @@ export default function BoardClientComponent({
 					cards={cards}
 				/>
 			))}
-			<div className="px-1 py-2">
-				<Button variant="ghost" onClick={() => createColumn()}>
-					<Plus />
-					<span>New Column</span>
-				</Button>
-			</div>
+			<Button variant="ghost" onClick={() => createColumn()}>
+				<Plus />
+				<span>New Column</span>
+			</Button>
 		</div>
 	);
 }

@@ -419,17 +419,7 @@ export async function updateUserProfile(
     }
 }
 
-export async function uploadAvatar(formState: UserFormState, formData: FormData) {
-    const validatedFields = UploadSchema.safeParse({
-        avatar: formData.get("avatar"),
-    })
-
-    if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-        }
-    }
-
+export async function uploadAvatar(file: File) {
     try {
         const supabase = await createClient();
 
@@ -437,7 +427,6 @@ export async function uploadAvatar(formState: UserFormState, formData: FormData)
 
         if (userError) throw userError;
 
-        const file = validatedFields.data.avatar;
         const fileExt = file.name.split(".").pop();
         const filePath = `${userData.user.id}/avatar_${Date.now()}.${fileExt}`;
 
@@ -460,7 +449,7 @@ export async function uploadAvatar(formState: UserFormState, formData: FormData)
             .from("avatars")
             .getPublicUrl(filePath);
 
-        revalidatePath("/");
+        revalidatePath("/settings");
 
         return {
             publicUrl: publicUrl.publicUrl,
@@ -533,17 +522,14 @@ export async function createBoard() {
 
     if (userError) throw userError;
 
-    const board_id = crypto.randomUUID();
-
-    const { error: boardError } = await supabase.from("boards").insert({
-        id: board_id,
+    const { data: boardData, error: boardError } = await supabase.from("boards").insert({
         profile_id: userData.user.id,
-        title: "Untitled Board",
-    });
+    }).select().single();
 
     if (boardError) throw boardError;
 
-    redirect("/board/" + board_id);
+    revalidatePath("/")
+    redirect("/board/" + boardData.id);
 }
 
 export async function deleteBoard(boardId: string) {

@@ -1,5 +1,7 @@
 import BoardClientComponent from "@/components/blocks/board/board-client-component";
+import BoardHeader from "@/components/blocks/board/board-header";
 import RefreshComponent from "@/components/blocks/board/refresh-component";
+import { Separator } from "@/components/ui/separator";
 import { createClient as createClientClient } from "@/lib/supabase/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
 
@@ -19,7 +21,7 @@ export async function generateStaticParams() {
 	}));
 }
 
-export default async function Page({
+export default async function BoardPage({
 	params,
 }: {
 	params: Promise<{ board: string }>;
@@ -60,13 +62,21 @@ export default async function Page({
 	const fetchedCards = cardsData.cards;
 
 	return (
-		<>
+		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
-			<BoardClientComponent
-				boardId={boardId}
-				fetchedColumns={fetchedColumns}
-				fetchedCards={fetchedCards}
+			<BoardHeader
+                boardId={boardData.id}
+				boardTitle={boardData.title}
+				boardCover={boardData.cover_path}
 			/>
-		</>
+			<Separator className="w-full" />
+			<div className="flex justify-center">
+				<BoardClientComponent
+					boardId={boardId}
+					fetchedColumns={fetchedColumns}
+					fetchedCards={fetchedCards}
+				/>
+			</div>
+		</div>
 	);
 }

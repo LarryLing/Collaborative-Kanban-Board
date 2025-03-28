@@ -11,7 +11,7 @@ import BookmarkToggle from "./bookmark-toggle";
 import SearchBar from "./search-bar";
 import MobileDisplayOptions from "./mobile-display-options";
 
-export default function BoardsDisplayHeader() {
+export default function DashboardHeader() {
 	return (
 		<div className="flex flex-col gap-4">
 			<h2 className="font-semibold text-3xl">Dashboard</h2>
