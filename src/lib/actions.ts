@@ -419,16 +419,12 @@ export async function updateUserProfile(
     }
 }
 
-export async function uploadAvatar(file: File) {
+export async function uploadAvatar(userId: string, file: File) {
     try {
         const supabase = await createClient();
 
-        const { data: userData, error: userError } = await supabase.auth.getUser();
-
-        if (userError) throw userError;
-
         const fileExt = file.name.split(".").pop();
-        const filePath = `${userData.user.id}/avatar_${Date.now()}.${fileExt}`;
+        const filePath = `${userId}/avatar_${Date.now()}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
             .from("avatars")
@@ -441,7 +437,7 @@ export async function uploadAvatar(file: File) {
             .update({
                 avatar_path: filePath,
             })
-            .eq("id", userData.user.id);
+            .eq("id", userId);
 
         if (profileError) throw profileError;
 
@@ -458,6 +454,51 @@ export async function uploadAvatar(file: File) {
     } catch {
         return {
             errorMessage: "We could not update your avatar. Please try again.",
+        };
+    }
+}
+
+export async function uploadCover(boardId: string, file: File) {
+    try {
+        const supabase = await createClient();
+
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${boardId}/cover_${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+            .from("covers")
+            .upload(filePath, file);
+
+        if (uploadError) {
+            console.log(uploadError.message)
+            throw uploadError;
+        }
+
+        const { error: boardError } = await supabase
+            .from("boards")
+            .update({
+                cover_path: filePath,
+            })
+            .eq("id", boardId);
+
+        if (boardError) {
+            console.log(boardError.message)
+            throw boardError;
+        }
+
+        const { data: publicUrl } = await supabase.storage
+            .from("covers")
+            .getPublicUrl(filePath);
+
+        revalidatePath("/");
+
+        return {
+            publicUrl: publicUrl.publicUrl,
+        }
+
+    } catch {
+        return {
+            errorMessage: "We could not update this board's cover. Please try again.",
         };
     }
 }
@@ -534,6 +575,21 @@ export async function createBoard() {
 
 export async function deleteBoard(boardId: string) {
     const supabase = await createClient();
+
+    const { data: folderData, error: folderError } = await supabase.storage
+        .from("covers")
+        .list(boardId);
+
+    if (folderError) throw folderError;
+
+    if (folderData.length > 0) {
+        const files = folderData.map((file) => `${boardId}/${file.name}`);
+        const { error: removeError } = await supabase.storage
+            .from("covers")
+            .remove(files);
+
+        if (removeError) throw removeError;
+    }
 
     const { error: deleteError } = await supabase
         .from("boards")

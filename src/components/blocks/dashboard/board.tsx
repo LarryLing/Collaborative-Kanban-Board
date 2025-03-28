@@ -17,11 +17,28 @@ type BoardProps = {
 };
 
 export default function Board({ view, board }: BoardProps) {
-	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
-	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
 	const { id, title, cover_path, bookmarked, collaborators, last_opened } =
 		board;
+
+	const supabase = createClient();
+
+	const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+	const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+	const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+	useEffect(() => {
+		async function fetchCoverUrl() {
+			if (!cover_path) return;
+
+			const { data: publicUrl } = await supabase.storage
+				.from("covers")
+				.getPublicUrl(cover_path);
+
+			setCoverPreview(publicUrl.publicUrl);
+		}
+
+		fetchCoverUrl();
+	}, [supabase]);
 
 	return (
 		<div
@@ -31,9 +48,9 @@ export default function Board({ view, board }: BoardProps) {
 				{view === "gallery" ? (
 					<>
 						<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
-							{cover_path && (
+							{coverPreview && (
 								<Image
-									src={cover_path}
+									src={coverPreview}
 									alt=""
 									objectFit="cover"
 									layout="fill"

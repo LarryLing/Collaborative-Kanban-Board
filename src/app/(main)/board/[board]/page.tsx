@@ -61,13 +61,23 @@ export default async function BoardPage({
 
 	const fetchedCards = cardsData.cards;
 
+	let boardCover = null;
+
+	if (boardData.cover_path) {
+		const { data: publicUrl } = await supabase.storage
+			.from("covers")
+			.getPublicUrl(boardData.cover_path);
+
+		boardCover = publicUrl.publicUrl;
+	}
+
 	return (
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-                boardId={boardData.id}
+				boardId={boardData.id}
 				boardTitle={boardData.title}
-				boardCover={boardData.cover_path}
+				boardCover={boardCover}
 			/>
 			<Separator className="w-full" />
 			<div className="flex justify-center">

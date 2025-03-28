@@ -62,7 +62,10 @@ export default function ProfileSettings({
 
 		const file = e.target.files[0];
 
-		const { publicUrl, errorMessage } = await uploadAvatar(file);
+		const { publicUrl, errorMessage } = await uploadAvatar(
+			userProfile.id,
+			file,
+		);
 
 		if (publicUrl) {
 			setAvatarPreview(publicUrl);
@@ -133,7 +136,7 @@ export default function ProfileSettings({
 								accept="image/*"
 								onChange={(e) => handleChange(e)}
 								disabled={uploading}
-								className="hidden"
+								className="opacity-0"
 							/>
 							<Button
 								type="button"

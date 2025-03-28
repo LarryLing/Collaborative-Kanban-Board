@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { uploadCover } from "@/lib/actions";
 import { createClient } from "@/lib/supabase/client";
 import { Pencil } from "lucide-react";
 import Image from "next/image";
@@ -20,6 +22,11 @@ export default function BoardHeader({
 	boardCover,
 }: BoardHeaderProps) {
 	const supabase = createClient();
+
+	const { toast } = useToast();
+
+	const [coverPreview, setCoverPreview] = useState(boardCover);
+	const [uploading, setUploading] = useState(false);
 
 	const boardTitleRef = useRef<HTMLInputElement | null>(null);
 	const coverPathRef = useRef<HTMLInputElement | null>(null);
@@ -41,12 +48,41 @@ export default function BoardHeader({
 		if (updateTitleError) throw updateTitleError;
 	}, 1000);
 
+	async function handleChange(e: ChangeEvent<HTMLInputElement>) {
+		setUploading(true);
+
+		if (!e.target.files || e.target.files?.length === 0) {
+			setUploading(false);
+			return;
+		}
+
+		const file = e.target.files[0];
+
+		const { publicUrl, errorMessage } = await uploadCover(boardId, file);
+
+		if (publicUrl) {
+			setCoverPreview(publicUrl);
+
+			toast({
+				title: "Success!",
+				description: "The cover has been successfully updated.",
+			});
+		} else if (errorMessage) {
+			toast({
+				title: "Something went wrong...",
+				description: errorMessage,
+			});
+		}
+
+		setUploading(false);
+	}
+
 	return (
 		<>
-			<div className="w-full h-[175px] bg-accent/30 group-hover:bg-accent/50 rounded-md relative">
-				{boardCover && (
+			<div className="w-full h-[225px] bg-accent/30 group-hover:bg-accent/50 rounded-md relative overflow-hidden">
+				{coverPreview && (
 					<Image
-						src={boardCover}
+						src={coverPreview}
 						alt=""
 						objectFit="cover"
 						layout="fill"
@@ -59,7 +95,10 @@ export default function BoardHeader({
 							id="coverPath"
 							name="coverPath"
 							type="file"
-							className="size-9"
+							accept="image/*"
+							onChange={(e) => handleChange(e)}
+							disabled={uploading}
+							className="size-9 opacity-0"
 						/>
 						<Button
 							size="icon"
