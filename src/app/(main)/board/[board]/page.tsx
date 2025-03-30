@@ -4,6 +4,7 @@ import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { Separator } from "@/components/ui/separator";
 import { createClient as createClientClient } from "@/lib/supabase/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
+import { Column } from "@/lib/types";
 
 export const dynamicParams = true;
 
@@ -49,17 +50,7 @@ export default async function BoardPage({
 
 	if (columnsError) throw columnsError;
 
-	const fetchedColumns = columnsData.columns;
-
-	const { data: cardsData, error: cardsError } = await supabase
-		.from("cards")
-		.select("cards")
-		.eq("board_id", boardId)
-		.single();
-
-	if (cardsError) throw cardsError;
-
-	const fetchedCards = cardsData.cards;
+	const fetchedColumns = columnsData.columns as Column[];
 
 	let boardCover = null;
 
@@ -84,7 +75,6 @@ export default async function BoardPage({
 				<BoardClientComponent
 					boardId={boardId}
 					fetchedColumns={fetchedColumns}
-					fetchedCards={fetchedCards}
 				/>
 			</div>
 		</div>

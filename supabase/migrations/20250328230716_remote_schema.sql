@@ -1,3 +1,8 @@
+CREATE TRIGGER on_auth_user_created AFTER INSERT ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_new_user();
+
+CREATE TRIGGER on_auth_user_updated AFTER UPDATE ON auth.users FOR EACH ROW EXECUTE FUNCTION handle_update_user();
+
+
 drop trigger if exists "objects_delete_delete_prefix" on "storage"."objects";
 
 drop trigger if exists "objects_insert_create_prefix" on "storage"."objects";
@@ -57,8 +62,6 @@ drop function if exists "storage"."add_prefixes"(_bucket_id text, _name text);
 drop function if exists "storage"."delete_prefix"(_bucket_id text, _name text);
 
 drop function if exists "storage"."delete_prefix_hierarchy_trigger"();
-
-drop function if exists "storage"."get_level"(name text);
 
 drop function if exists "storage"."get_prefix"(name text);
 
@@ -187,36 +190,68 @@ grant truncate on table "storage"."s3_multipart_uploads_parts" to "postgres";
 
 grant update on table "storage"."s3_multipart_uploads_parts" to "postgres";
 
-create policy "User can delete their own objects (in any bucket)"
+create policy "Enable avatar delete by user_id"
 on "storage"."objects"
 as permissive
 for delete
-to authenticated
-using ((owner = auth.uid()));
+to public
+using (((bucket_id = 'avatars'::text) AND (( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1])));
 
 
-create policy "User can select objects"
+create policy "Enable avatar insert by user_id"
+on "storage"."objects"
+as permissive
+for insert
+to public
+with check (((bucket_id = 'avatars'::text) AND (( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1])));
+
+
+create policy "Enable avatar select for authenticated users only"
 on "storage"."objects"
 as permissive
 for select
 to public
-using ((auth.role() = 'authenticated'::text));
+using (((bucket_id = 'avatars'::text) AND (auth.role() = 'authenticated'::text)));
 
 
-create policy "User can update in their own folders (in any bucket)"
+create policy "Enable avatar update by user_id"
 on "storage"."objects"
 as permissive
 for update
-to authenticated
-with check (((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)));
+to public
+using (((bucket_id = 'avatars'::text) AND (( SELECT (auth.uid())::text AS uid) = (storage.foldername(name))[1])));
 
 
-create policy "User can upload in their own folders (in any bucket)"
+create policy "Enable cover delete for authenticated users only"
+on "storage"."objects"
+as permissive
+for delete
+to public
+using (((bucket_id = 'covers'::text) AND (auth.role() = 'authenticated'::text)));
+
+
+create policy "Enable cover insert for authenticated users only"
 on "storage"."objects"
 as permissive
 for insert
-to authenticated
-with check (((storage.foldername(name))[1] = ( SELECT (auth.uid())::text AS uid)));
+to public
+with check (((bucket_id = 'covers'::text) AND (auth.role() = 'authenticated'::text)));
+
+
+create policy "Enable cover select for authenticated users only"
+on "storage"."objects"
+as permissive
+for select
+to public
+using (((bucket_id = 'covers'::text) AND (auth.role() = 'authenticated'::text)));
+
+
+create policy "Enable cover update for authenticated users only"
+on "storage"."objects"
+as permissive
+for update
+to public
+using (((bucket_id = 'covers'::text) AND (auth.role() = 'authenticated'::text)));
 
 
 

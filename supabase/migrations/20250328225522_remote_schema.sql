@@ -81,13 +81,18 @@ ALTER FUNCTION "public"."handle_delete_user"() OWNER TO "postgres";
 CREATE OR REPLACE FUNCTION "public"."handle_new_board"() RETURNS "trigger"
     LANGUAGE "plpgsql" SECURITY DEFINER
     SET "search_path" TO 'public'
-    AS $$
-BEGIN
+    AS $$BEGIN
   INSERT INTO public.profiles_boards_bridge (profile_id, board_id)
-  VALUES (NEW.profile_id, NEW.board_id);
+  VALUES (NEW.profile_id, NEW.id);
+
+  INSERT INTO public.columns (board_id)
+  VALUES (NEW.id);
+
+  INSERT INTO public.cards (board_id)
+  VALUES (NEW.id);
+
   RETURN NEW;
-END;
-$$;
+END;$$;
 
 
 ALTER FUNCTION "public"."handle_new_board"() OWNER TO "postgres";
@@ -135,25 +140,12 @@ CREATE OR REPLACE FUNCTION "public"."handle_password_change"("newpassword" "text
     SET "search_path" TO 'public'
     AS $$BEGIN
   UPDATE auth.users 
-  SET encrypted_password = crypt(newpassword, gen_salt('bf')) 
+  SET encrypted_password = extensions.crypt(newpassword, extensions.gen_salt('bf')) 
   WHERE id = userid;
 END;$$;
 
 
 ALTER FUNCTION "public"."handle_password_change"("newpassword" "text", "userid" "uuid") OWNER TO "postgres";
-
-
-CREATE OR REPLACE FUNCTION "public"."handle_password_change"("current" "text", "new" "text", "userid" "uuid") RETURNS boolean
-    LANGUAGE "plpgsql" SECURITY DEFINER
-    SET "search_path" TO ''
-    AS $$
-BEGIN
-    UPDATE auth.users SET encrypted_password = crypt(new, gen_salt('bf')) WHERE id = userid;
-END;
-$$;
-
-
-ALTER FUNCTION "public"."handle_password_change"("current" "text", "new" "text", "userid" "uuid") OWNER TO "postgres";
 
 
 CREATE OR REPLACE FUNCTION "public"."handle_update_user"() RETURNS "trigger"
@@ -179,7 +171,7 @@ SET default_table_access_method = "heap";
 CREATE TABLE IF NOT EXISTS "public"."boards" (
     "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
     "profile_id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
-    "title" "text" DEFAULT ''::"text" NOT NULL,
+    "title" "text" DEFAULT 'Untitled Board'::"text" NOT NULL,
     "cover_path" "text",
     "last_opened" timestamp with time zone DEFAULT "now"() NOT NULL,
     "bookmarked" boolean DEFAULT false NOT NULL,
@@ -299,7 +291,7 @@ CREATE INDEX "socials_profile_id_idx" ON "public"."socials" USING "btree" ("prof
 
 
 
-CREATE OR REPLACE TRIGGER "on_board_created" AFTER UPDATE ON "public"."boards" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_board"();
+CREATE OR REPLACE TRIGGER "on_board_created" AFTER INSERT ON "public"."boards" FOR EACH ROW EXECUTE FUNCTION "public"."handle_new_board"();
 
 
 
@@ -411,6 +403,10 @@ ALTER TABLE "public"."socials" ENABLE ROW LEVEL SECURITY;
 
 
 ALTER PUBLICATION "supabase_realtime" OWNER TO "postgres";
+
+
+
+
 
 
 ALTER PUBLICATION "supabase_realtime" ADD TABLE ONLY "public"."cards";
@@ -626,12 +622,6 @@ GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
 GRANT ALL ON FUNCTION "public"."handle_password_change"("newpassword" "text", "userid" "uuid") TO "anon";
 GRANT ALL ON FUNCTION "public"."handle_password_change"("newpassword" "text", "userid" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."handle_password_change"("newpassword" "text", "userid" "uuid") TO "service_role";
-
-
-
-GRANT ALL ON FUNCTION "public"."handle_password_change"("current" "text", "new" "text", "userid" "uuid") TO "anon";
-GRANT ALL ON FUNCTION "public"."handle_password_change"("current" "text", "new" "text", "userid" "uuid") TO "authenticated";
-GRANT ALL ON FUNCTION "public"."handle_password_change"("current" "text", "new" "text", "userid" "uuid") TO "service_role";
 
 
 

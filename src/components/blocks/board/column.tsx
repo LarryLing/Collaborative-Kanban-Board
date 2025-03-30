@@ -1,23 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "./card";
-import DropIndicator from "./drop-indicator";
 import NewCard from "./new-card";
-import {
-	Card as CardType,
-	Column as ColumnType,
-} from "../../../../database.types";
+import { Card as CardType, Column as ColumnType } from "@/lib/types";
 import ColumnOptionsDropdown from "./column-options-dropdown";
 import RenameColumnDialog from "./rename-column-dialog";
 import CardOptionsDropdown from "./card-options-dropdown";
+import { createClient } from "@/lib/supabase/client";
 
 type ColumnProps = {
 	index: number;
 	boardId: string;
 	column: ColumnType;
 	columns: ColumnType[];
-	cards: CardType[];
 };
 
 export default function Column({
@@ -25,26 +21,63 @@ export default function Column({
 	boardId,
 	column,
 	columns,
-	cards,
 }: ColumnProps) {
 	const [isRenameColumnDialogOpen, setIsRenameColumnDialogOpen] =
 		useState(false);
+	const [cards, setCards] = useState<CardType[]>([]);
 
-	const filteredCards = cards.filter((card) => card.column_id === column.id);
-
+	const supabase = createClient();
 	const { id, title, color } = column;
+
+	useEffect(() => {
+		async function fetchInitialData() {
+			const { data: cardsData, error: cardsError } = await supabase
+				.from("cards")
+				.select("*")
+				.eq("column_id", id)
+				.single();
+
+			if (cardsError) throw cardsError;
+
+			setCards(cardsData.cards as CardType[]);
+		}
+
+		fetchInitialData();
+	}, []);
+
+	useEffect(() => {
+		const cardsChannel = supabase
+			.channel(`reatime cards`)
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "cards",
+				},
+				(payload) => {
+					if (payload.new.column_id === id)
+						setCards(payload.new.cards as CardType[]);
+				},
+			)
+			.subscribe();
+
+		return () => {
+			supabase.removeChannel(cardsChannel);
+		};
+	}, [supabase, cards, setCards]);
 
 	return (
 		<>
 			<div className="w-64 shrink-0">
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between mb-2">
 					<div className="rounded-md font-semibold">
 						<span
 							className={`mr-3 ${color} w-[125px] text-ellipsis text-nowrap`}
 						>
 							{title}
 						</span>
-						<span className="text-sm">{filteredCards.length}</span>
+						<span className="text-sm">{cards.length}</span>
 					</div>
 					<div className="space-x-2">
 						<ColumnOptionsDropdown
@@ -52,49 +85,31 @@ export default function Column({
 							boardId={boardId}
 							column={column}
 							columns={columns}
-							cards={cards}
 							setIsRenameColumnDialogOpen={
 								setIsRenameColumnDialogOpen
 							}
 						/>
-						<NewCard
-							size="icon"
-							boardId={boardId}
-							columnId={id}
-							cards={cards}
-						/>
+						<NewCard size="icon" columnId={id} cards={cards} />
 					</div>
 				</div>
-				<div>
-					{cards.map(
-						(card, index) =>
-							card.column_id === column.id && (
-								<div key={card.id} className="relative">
-									<DropIndicator
-										columnId={card.column_id}
-									></DropIndicator>
-									<Card
-										index={index}
-										boardId={boardId}
-										card={card}
-										cards={cards}
-									/>
-									<CardOptionsDropdown
-										index={index}
-										boardId={boardId}
-										card={card}
-										cards={cards}
-									/>
-								</div>
-							),
-					)}
-					<DropIndicator columnId={column.id} />
-					<NewCard
-						size="default"
-						boardId={boardId}
-						columnId={id}
-						cards={cards}
-					/>
+				<div className="space-y-1">
+					{cards.map((card, index) => (
+						<div key={card.id} className="relative">
+							<Card
+								index={index}
+								columnId={id}
+								card={card}
+								cards={cards}
+							/>
+							<CardOptionsDropdown
+								index={index}
+								columnId={id}
+								card={card}
+								cards={cards}
+							/>
+						</div>
+					))}
+					<NewCard size="default" columnId={id} cards={cards} />
 				</div>
 			</div>
 			<RenameColumnDialog

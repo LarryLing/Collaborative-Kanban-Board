@@ -1,7 +1,24 @@
-import { Tables } from "../../database.types";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database, Tables } from "../../database.types";
+
+export type TypedSupabaseClient = SupabaseClient<Database>;
 
 export type UserProfile = Tables<"profiles"> & { socials: { url: string }[]; }
 export type Board = Tables<"boards">;
+
+export type Card = {
+    id: string;
+    column_id: string;
+    title: string;
+    description: string;
+    created_at: string;
+}
+
+export type Column = {
+    id: string;
+    title: string;
+    color: ColumnColorOptions;
+}
 
 export type OwnershipOptions = "me" | "not-me" | "anyone";
 export type SortOptions = "asc" | "des" | "last-opened";

@@ -11,16 +11,15 @@ import {
 import { Ellipsis, PenLine, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Card, Column } from "../../../../database.types";
+import { Column as ColumnType } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { ColumnColorOptions } from "@/lib/types";
 
 type ColumnOptionsDropdownProps = {
 	index: number;
 	boardId: string;
-	column: Column;
-	columns: Column[];
-	cards: Card[];
+	column: ColumnType;
+	columns: ColumnType[];
 	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
 
@@ -29,7 +28,6 @@ export default function ColumnOptionsDropdown({
 	boardId,
 	column,
 	columns,
-	cards,
 	setIsRenameColumnDialogOpen,
 }: ColumnOptionsDropdownProps) {
 	const { theme } = useTheme();
@@ -50,25 +48,19 @@ export default function ColumnOptionsDropdown({
 
 		if (updateColumnsError) throw updateColumnsError;
 
-		const updatedCardsJson = cards.filter(
-			(filteredCard) => filteredCard.column_id !== column.id,
-		);
-
-		const { error: updateCardsError } = await supabase
+		const { error: deleteCardsError } = await supabase
 			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
+			.delete()
+			.eq("column_id", column.id);
 
-		if (updateCardsError) throw updateCardsError;
+		if (deleteCardsError) throw deleteCardsError;
 	}
 
 	async function updateColumnColor(textColor: ColumnColorOptions) {
 		const updatedColumn = {
 			...column,
 			color: textColor,
-		} as Column;
+		} as ColumnType;
 
 		const updatedColumnsJson = [...columns];
 		updatedColumnsJson.splice(index, 1, updatedColumn);

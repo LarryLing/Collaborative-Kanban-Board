@@ -1,29 +1,23 @@
 "use client";
 
-import {
-	Card as CardType,
-	Column as ColumnType,
-} from "../../../../database.types";
 import React, { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import Column from "./column";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { Column as ColumnType } from "@/lib/types";
 
 type BoardClientComponentProps = {
 	boardId: string;
-	fetchedCards: CardType[];
 	fetchedColumns: ColumnType[];
 };
 
 export default function BoardClientComponent({
 	boardId,
-	fetchedCards,
 	fetchedColumns,
 }: BoardClientComponentProps) {
 	const supabase = createClient();
 
-	const [cards, setCards] = useState<CardType[]>(fetchedCards);
 	const [columns, setColumns] = useState<ColumnType[]>(fetchedColumns);
 
 	useEffect(() => {
@@ -47,32 +41,13 @@ export default function BoardClientComponent({
 		};
 	}, [supabase, columns, setColumns]);
 
-	useEffect(() => {
-		const cardsChannel = supabase
-			.channel("realtime cards")
-			.on(
-				"postgres_changes",
-				{
-					event: "UPDATE",
-					schema: "public",
-					table: "cards",
-				},
-				(payload) => {
-					setCards(payload.new.cards as CardType[]);
-				},
-			)
-			.subscribe();
-
-		return () => {
-			supabase.removeChannel(cardsChannel);
-		};
-	}, [supabase, cards, setCards]);
-
 	async function createColumn() {
+		const newColumnId = crypto.randomUUID();
+
 		const updatedColumnsJson = [
 			...columns,
 			{
-				id: crypto.randomUUID(),
+				id: newColumnId,
 				title: "New Column",
 				color: "text-primary",
 			},
@@ -86,6 +61,12 @@ export default function BoardClientComponent({
 			.eq("board_id", boardId);
 
 		if (newColumnError) throw newColumnError;
+
+		const { error: newCardsError } = await supabase
+			.from("cards")
+			.insert({ column_id: newColumnId, board_id: boardId });
+
+		if (newCardsError) throw newCardsError;
 	}
 
 	return (
@@ -97,7 +78,6 @@ export default function BoardClientComponent({
 					boardId={boardId}
 					column={column}
 					columns={columns}
-					cards={cards}
 				/>
 			))}
 			<Button variant="ghost" onClick={() => createColumn()}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { Card as CardType } from "../../../../database.types";
+import { Card as CardType } from "@/lib/types";
 import React, { useRef, useState } from "react";
 import {
 	Dialog,
@@ -18,12 +18,12 @@ import { createClient } from "@/lib/supabase/client";
 
 type CardProps = {
 	index: number;
-	boardId: string;
+	columnId: string;
 	card: CardType;
 	cards: CardType[];
 };
 
-export default function Card({ index, boardId, card, cards }: CardProps) {
+export default function Card({ index, columnId, card, cards }: CardProps) {
 	const supabase = createClient();
 
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
@@ -48,7 +48,7 @@ export default function Card({ index, boardId, card, cards }: CardProps) {
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("board_id", boardId);
+			.eq("column_id", columnId);
 
 		setSaveStatus("Saved");
 

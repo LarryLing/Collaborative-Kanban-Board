@@ -14,18 +14,16 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { Card } from "../../../../database.types";
+import { Card as CardType } from "@/lib/types";;
 
 type NewCardProps = {
 	size: "default" | "icon";
-	boardId: string;
 	columnId: string;
-	cards: Card[];
+	cards: CardType[];
 };
 
 export default function NewCard({
 	size,
-	boardId,
 	columnId,
 	cards,
 }: NewCardProps) {
@@ -35,7 +33,7 @@ export default function NewCard({
 	const titleRef = useRef<HTMLInputElement>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+	async function createCard(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
 		setPending(true);
@@ -54,14 +52,14 @@ export default function NewCard({
 				description: description,
 				created_at: new Date().toISOString().toLocaleString(),
 			},
-		] as Card[];
+		] as CardType[];
 
 		const { error: newCardError } = await supabase
 			.from("cards")
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("board_id", boardId);
+			.eq("column_id", columnId);
 
 		setIsDialogOpen(false);
 		setPending(false);
@@ -90,7 +88,7 @@ export default function NewCard({
 			</DialogTrigger>
 			<DialogContent className="size-[500px] px-8">
 				<form
-					onSubmit={(e) => handleSubmit(e)}
+					onSubmit={(e) => createCard(e)}
 					className="flex flex-col gap-4"
 				>
 					<DialogHeader

@@ -563,14 +563,17 @@ export async function createBoard() {
 
     if (userError) throw userError;
 
-    const { data: boardData, error: boardError } = await supabase.from("boards").insert({
+    const newBoardId = crypto.randomUUID();
+
+    const { error: boardError } = await supabase.from("boards").insert({
+        id: newBoardId,
         profile_id: userData.user.id,
-    }).select().single();
+    })
 
     if (boardError) throw boardError;
 
     revalidatePath("/")
-    redirect("/board/" + boardData.id);
+    redirect("/board/" + newBoardId);
 }
 
 export async function deleteBoard(boardId: string) {

@@ -9,19 +9,19 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Copy, Ellipsis, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "../../../../database.types";
 import { createClient } from "@/lib/supabase/client";
+import { Card as CardType } from "@/lib/types";
 
 type CardOptionsDropdownProps = {
 	index: number;
-	boardId: string;
-	card: Card;
-	cards: Card[];
+	columnId: string;
+	card: CardType;
+	cards: CardType[];
 };
 
 export default function CardOptionsDropdown({
 	index,
-	boardId,
+	columnId,
 	card,
 	cards,
 }: CardOptionsDropdownProps) {
@@ -31,7 +31,7 @@ export default function CardOptionsDropdown({
 		const duplicatedCard = {
 			...card,
 			id: crypto.randomUUID(),
-		} as Card;
+		} as CardType;
 
 		const updatedCardsJson = [...cards];
 		updatedCardsJson.splice(index, 0, duplicatedCard);
@@ -41,7 +41,7 @@ export default function CardOptionsDropdown({
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("board_id", boardId);
+			.eq("column_id", columnId);
 
 		if (updateCardsError) throw updateCardsError;
 	}
@@ -56,7 +56,7 @@ export default function CardOptionsDropdown({
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("board_id", boardId);
+			.eq("column_id", columnId);
 
 		if (updateCardsError) throw updateCardsError;
 	}
@@ -67,7 +67,7 @@ export default function CardOptionsDropdown({
 				<Button
 					variant="ghost"
 					size="icon"
-					className="absolute right-2 top-[13px]"
+					className="absolute right-2 top-2"
 				>
 					<Ellipsis />
 				</Button>
