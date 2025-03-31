@@ -14,14 +14,14 @@ import { Card as CardType } from "@/lib/types";
 
 type CardOptionsDropdownProps = {
 	index: number;
-	columnId: string;
+	boardId: string;
 	card: CardType;
 	cards: CardType[];
 };
 
 export default function CardOptionsDropdown({
 	index,
-	columnId,
+	boardId,
 	card,
 	cards,
 }: CardOptionsDropdownProps) {
@@ -41,7 +41,7 @@ export default function CardOptionsDropdown({
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("column_id", columnId);
+			.eq("board_id", boardId);
 
 		if (updateCardsError) throw updateCardsError;
 	}
@@ -56,7 +56,7 @@ export default function CardOptionsDropdown({
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("column_id", columnId);
+			.eq("board_id", boardId);
 
 		if (updateCardsError) throw updateCardsError;
 	}

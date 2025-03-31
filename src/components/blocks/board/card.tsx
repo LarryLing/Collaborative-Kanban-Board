@@ -15,15 +15,25 @@ import { Input } from "@/components/ui/input";
 import { getDateString } from "@/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { createClient } from "@/lib/supabase/client";
+import CardOptionsDropdown from "./card-options-dropdown";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 type CardProps = {
 	index: number;
+	boardId: string;
 	columnId: string;
 	card: CardType;
 	cards: CardType[];
 };
 
-export default function Card({ index, columnId, card, cards }: CardProps) {
+export default function Card({
+	index,
+	boardId,
+	columnId,
+	card,
+	cards,
+}: CardProps) {
 	const supabase = createClient();
 
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
@@ -48,12 +58,12 @@ export default function Card({ index, columnId, card, cards }: CardProps) {
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("column_id", columnId);
+			.eq("board_id", boardId);
 
 		setSaveStatus("Saved");
 
 		if (updateCardsError) throw updateCardsError;
-	}, 2000);
+	}, 1500);
 
 	async function handleEdit() {
 		setSaveStatus("Saving...");
@@ -61,11 +71,27 @@ export default function Card({ index, columnId, card, cards }: CardProps) {
 		await debounceUpdateCards();
 	}
 
+	const { attributes, listeners, setNodeRef, transform, transition } =
+		useSortable({
+			id: card.id,
+			data: {
+				card: card,
+			},
+		});
+
+	const style = {
+		transition,
+		transform: CSS.Transform.toString(transform),
+	};
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
 				<div
-					draggable
+					ref={setNodeRef}
+					{...attributes}
+					{...listeners}
+					style={style}
 					className="text-sm font-semibold w-full h-[50px] border border-border rounded-md overflow-hidden flex justify-start items-center px-4 py-2 hover:cursor-pointer hover:bg-accent/60 hover:text-accent-foreground transition-colors active:cursor-grabbing"
 				>
 					<span>{card.title}</span>

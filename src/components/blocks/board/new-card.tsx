@@ -14,16 +14,18 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/lib/supabase/client";
-import { Card as CardType } from "@/lib/types";;
+import { Card as CardType } from "@/lib/types";
 
 type NewCardProps = {
 	size: "default" | "icon";
+	boardId: string;
 	columnId: string;
 	cards: CardType[];
 };
 
 export default function NewCard({
 	size,
+	boardId,
 	columnId,
 	cards,
 }: NewCardProps) {
@@ -59,7 +61,7 @@ export default function NewCard({
 			.update({
 				cards: updatedCardsJson,
 			})
-			.eq("column_id", columnId);
+			.eq("board_id", boardId);
 
 		setIsDialogOpen(false);
 		setPending(false);

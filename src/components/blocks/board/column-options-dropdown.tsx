@@ -11,13 +11,14 @@ import {
 import { Ellipsis, PenLine, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
-import { Column as ColumnType } from "@/lib/types";
+import { Card as CardType, Column as ColumnType } from "@/lib/types";
 import { createClient } from "@/lib/supabase/client";
 import { ColumnColorOptions } from "@/lib/types";
 
 type ColumnOptionsDropdownProps = {
 	index: number;
 	boardId: string;
+	cards: CardType[];
 	column: ColumnType;
 	columns: ColumnType[];
 	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
@@ -26,6 +27,7 @@ type ColumnOptionsDropdownProps = {
 export default function ColumnOptionsDropdown({
 	index,
 	boardId,
+	cards,
 	column,
 	columns,
 	setIsRenameColumnDialogOpen,
@@ -48,12 +50,18 @@ export default function ColumnOptionsDropdown({
 
 		if (updateColumnsError) throw updateColumnsError;
 
-		const { error: deleteCardsError } = await supabase
-			.from("cards")
-			.delete()
-			.eq("column_id", column.id);
+		const updatedCardsJson = cards.filter(
+			(filteredCard) => filteredCard.column_id !== column.id,
+		);
 
-		if (deleteCardsError) throw deleteCardsError;
+		const { error: updatedCardsError } = await supabase
+			.from("cards")
+			.update({
+				cards: updatedCardsJson,
+			})
+			.eq("board_id", boardId);
+
+		if (updatedCardsError) throw updatedCardsError;
 	}
 
 	async function updateColumnColor(textColor: ColumnColorOptions) {

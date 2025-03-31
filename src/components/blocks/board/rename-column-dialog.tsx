@@ -9,15 +9,15 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Column } from "../../../../database.types";
 import { FormEvent, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Column as ColumnType } from "@/lib/types";
 
 type RenameColumnDialogProps = {
 	index: number;
 	boardId: string;
-	column: Column;
-	columns: Column[];
+	column: ColumnType;
+	columns: ColumnType[];
 	isRenameColumnDialogOpen: boolean;
 	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
@@ -44,7 +44,7 @@ export default function RenameColumnDialog({
 		const updatedColumn = {
 			...column,
 			title: titleRef.current?.value || "Untitled Column",
-		} as Column;
+		} as ColumnType;
 
 		const updatedColumnsJson = [...columns];
 		updatedColumnsJson.splice(index, 1, updatedColumn);
