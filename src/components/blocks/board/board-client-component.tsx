@@ -195,10 +195,9 @@ export default function BoardClientComponent({
 				onDragEnd={handleDragEnd}
 				onDragOver={handleDragOver}
 			>
-				{columns.map((column, index) => (
+				{columns.map((column) => (
 					<Column
 						key={column.id}
-						index={index}
 						boardId={boardId}
 						cards={cards}
 						column={column}

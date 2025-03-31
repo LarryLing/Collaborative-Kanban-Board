@@ -14,7 +14,6 @@ import CardOptionsDropdown from "./card-options-dropdown";
 import { useDroppable } from "@dnd-kit/core";
 
 type ColumnProps = {
-	index: number;
 	boardId: string;
 	cards: CardType[];
 	column: ColumnType;
@@ -22,7 +21,6 @@ type ColumnProps = {
 };
 
 export default function Column({
-	index,
 	boardId,
 	cards,
 	column,
@@ -81,6 +79,7 @@ export default function Column({
 									boardId={boardId}
 									card={card}
 									cards={cards}
+									columns={columns}
 								/>
 							</div>
 						))}
