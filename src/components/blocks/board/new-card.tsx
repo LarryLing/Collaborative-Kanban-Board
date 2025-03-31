@@ -74,9 +74,8 @@ export default function NewCard({
 			<DialogTrigger asChild>
 				{size === "default" ? (
 					<Button
-						draggable="true"
 						variant="ghost"
-						className="w-full active:cursor-grabbing h-[50px]"
+						className="w-full h-[50px]"
 						onClick={() => setIsDialogOpen(true)}
 					>
 						<Plus className="size-4" />

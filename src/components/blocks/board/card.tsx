@@ -15,25 +15,16 @@ import { Input } from "@/components/ui/input";
 import { getDateString } from "@/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
 import { createClient } from "@/lib/supabase/client";
-import CardOptionsDropdown from "./card-options-dropdown";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 type CardProps = {
-	index: number;
 	boardId: string;
-	columnId: string;
 	card: CardType;
 	cards: CardType[];
 };
 
-export default function Card({
-	index,
-	boardId,
-	columnId,
-	card,
-	cards,
-}: CardProps) {
+export default function Card({ boardId, card, cards }: CardProps) {
 	const supabase = createClient();
 
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
@@ -44,14 +35,15 @@ export default function Card({
 	const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
 	const debounceUpdateCards = useDebouncedCallback(async () => {
-		const updatedCard = {
-			...card,
-			title: titleRef.current?.value || "Untitled Card",
-			description: descriptionRef.current?.value || "",
-		} as CardType;
-
-		const updatedCardsJson = [...cards];
-		updatedCardsJson.splice(index, 1, updatedCard);
+		const updatedCardsJson = cards.map((idxCard) =>
+			idxCard.id === card.id
+				? {
+						...idxCard,
+						title: titleRef.current?.value || "Untitled Card",
+						description: descriptionRef.current?.value || "",
+					}
+				: idxCard,
+		);
 
 		const { error: updateCardsError } = await supabase
 			.from("cards")
@@ -74,14 +66,11 @@ export default function Card({
 	const { attributes, listeners, setNodeRef, transform, transition } =
 		useSortable({
 			id: card.id,
-			data: {
-				card: card,
-			},
 		});
 
 	const style = {
-		transition,
 		transform: CSS.Transform.toString(transform),
+		transition,
 	};
 
 	return (

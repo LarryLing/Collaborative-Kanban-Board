@@ -13,14 +13,12 @@ import { createClient } from "@/lib/supabase/client";
 import { Card as CardType } from "@/lib/types";
 
 type CardOptionsDropdownProps = {
-	index: number;
 	boardId: string;
 	card: CardType;
 	cards: CardType[];
 };
 
 export default function CardOptionsDropdown({
-	index,
 	boardId,
 	card,
 	cards,
@@ -33,7 +31,8 @@ export default function CardOptionsDropdown({
 			id: crypto.randomUUID(),
 		} as CardType;
 
-		const updatedCardsJson = [...cards];
+		const index = cards.findIndex((idxCard) => idxCard.id === card.id);
+		let updatedCardsJson = [...cards];
 		updatedCardsJson.splice(index, 0, duplicatedCard);
 
 		const { error: updateCardsError } = await supabase

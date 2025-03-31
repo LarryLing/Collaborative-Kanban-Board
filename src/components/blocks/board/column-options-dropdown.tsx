@@ -16,7 +16,6 @@ import { createClient } from "@/lib/supabase/client";
 import { ColumnColorOptions } from "@/lib/types";
 
 type ColumnOptionsDropdownProps = {
-	index: number;
 	boardId: string;
 	cards: CardType[];
 	column: ColumnType;
@@ -25,7 +24,6 @@ type ColumnOptionsDropdownProps = {
 };
 
 export default function ColumnOptionsDropdown({
-	index,
 	boardId,
 	cards,
 	column,
@@ -65,13 +63,14 @@ export default function ColumnOptionsDropdown({
 	}
 
 	async function updateColumnColor(textColor: ColumnColorOptions) {
-		const updatedColumn = {
-			...column,
-			color: textColor,
-		} as ColumnType;
-
-		const updatedColumnsJson = [...columns];
-		updatedColumnsJson.splice(index, 1, updatedColumn);
+		const updatedColumnsJson = columns.map((idxColumn) =>
+			idxColumn.id === column.id
+				? {
+						...idxColumn,
+						color: textColor,
+					}
+				: idxColumn,
+		);
 
 		const { error: updateColumnsError } = await supabase
 			.from("columns")

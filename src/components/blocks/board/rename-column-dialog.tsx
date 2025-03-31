@@ -14,7 +14,6 @@ import { createClient } from "@/lib/supabase/client";
 import { Column as ColumnType } from "@/lib/types";
 
 type RenameColumnDialogProps = {
-	index: number;
 	boardId: string;
 	column: ColumnType;
 	columns: ColumnType[];
@@ -23,7 +22,6 @@ type RenameColumnDialogProps = {
 };
 
 export default function RenameColumnDialog({
-	index,
 	boardId,
 	column,
 	columns,
@@ -41,13 +39,14 @@ export default function RenameColumnDialog({
 
 		const supabase = createClient();
 
-		const updatedColumn = {
-			...column,
-			title: titleRef.current?.value || "Untitled Column",
-		} as ColumnType;
-
-		const updatedColumnsJson = [...columns];
-		updatedColumnsJson.splice(index, 1, updatedColumn);
+		const updatedColumnsJson = columns.map((idxColumn) =>
+			idxColumn.id === column.id
+				? {
+						...idxColumn,
+						title: titleRef.current?.value || "Untitled Column",
+					}
+				: idxColumn,
+		);
 
 		const { error: updateColumnsError } = await supabase
 			.from("columns")

@@ -10,16 +10,12 @@ import {
 	closestCorners,
 	DndContext,
 	DragEndEvent,
+	DragOverEvent,
 	MouseSensor,
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
-import {
-	arrayMove,
-	horizontalListSortingStrategy,
-	SortableContext,
-} from "@dnd-kit/sortable";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import { arrayMove } from "@dnd-kit/sortable";
 
 type BoardClientComponentProps = {
 	boardId: string;
@@ -101,72 +97,119 @@ export default function BoardClientComponent({
 		if (newColumnError) throw newColumnError;
 	}
 
-	async function handleDragEnd(event: DragEndEvent) {
+	function findColumnId(itemId: string) {
+		if (columns.some((column) => column.id === itemId)) {
+			return itemId as ColumnType["id"];
+		}
+
+		return cards.find((card) => card.id === itemId)?.column_id;
+	}
+
+	async function handleDragEnd(event: DragOverEvent) {
 		const { active, over } = event;
 
 		if (!over) return;
 
-		if (active.id === over.id) return;
+		const activeId = active.id as CardType["id"];
+		const overId = over.id as CardType["id"];
 
-		const activeIndex = columns.findIndex(
-			(column) => column.id === (active.id as ColumnType["id"]),
+		const activeColumnId = findColumnId(activeId);
+		const overColumnId = findColumnId(overId);
+
+		if (!activeColumnId || !overColumnId) return;
+
+		if (activeColumnId === overColumnId && activeId !== overId) {
+			const activeIndex = cards.findIndex((card) => card.id === activeId);
+			const overIndex = cards.findIndex((card) => card.id === overId);
+
+			if (activeIndex !== -1 && overIndex !== -1) {
+				const updatedCardsJson = arrayMove(
+					cards,
+					activeIndex,
+					overIndex,
+				);
+				setCards(updatedCardsJson);
+
+				const { error: updatedCardsError } = await supabase
+					.from("cards")
+					.update({
+						cards: updatedCardsJson,
+					})
+					.eq("board_id", boardId);
+
+				if (updatedCardsError) throw updatedCardsError;
+			}
+		}
+	}
+
+	async function handleDragOver(event: DragEndEvent) {
+		const { active, over } = event;
+
+		if (!over) return;
+
+		const activeId = active.id as CardType["id"];
+		const overId = over.id as ColumnType["id"];
+
+		const activeColumnId = findColumnId(activeId);
+		const overColumnId = findColumnId(overId);
+
+		if (!activeColumnId || !overColumnId) return;
+		if (activeColumnId === overColumnId && activeId !== overId) return;
+		if (activeColumnId === overColumnId) return;
+
+		const updatedCardsJson = cards.map((card) =>
+			card.id === activeId
+				? {
+						...card,
+						column_id: overColumnId,
+					}
+				: card,
 		);
-		const overIndex = columns.findIndex(
-			(column) => column.id === (over.id as ColumnType["id"]),
-		);
 
-		const updatedColumnsJson = arrayMove(columns, activeIndex, overIndex);
+		setCards(updatedCardsJson);
 
-		setColumns(updatedColumnsJson);
-
-		const { error: updateColumnsError } = await supabase
-			.from("columns")
+		const { error: updatedCardsError } = await supabase
+			.from("cards")
 			.update({
-				columns: updatedColumnsJson,
+				cards: updatedCardsJson,
 			})
 			.eq("board_id", boardId);
 
-		if (updateColumnsError) throw updateColumnsError;
+		if (updatedCardsError) throw updatedCardsError;
 	}
 
 	const sensors = useSensors(
 		useSensor(MouseSensor, {
 			activationConstraint: {
 				delay: 500,
-				tolerance: 0,
+				tolerance: 10,
 			},
 		}),
 	);
 
 	return (
-		<DndContext
-			collisionDetection={closestCorners}
-			onDragEnd={handleDragEnd}
-			sensors={sensors}
-			modifiers={[restrictToHorizontalAxis]}
-		>
-			<div className="flex gap-4 w-full overflow-auto pb-4">
-				<SortableContext
-					items={columns}
-					strategy={horizontalListSortingStrategy}
-				>
-					{columns.map((column, index) => (
-						<Column
-							key={column.id}
-							index={index}
-							boardId={boardId}
-							cards={cards}
-							setCards={setCards}
-							column={column}
-							columns={columns}
-						/>
-					))}
-				</SortableContext>
-				<Button variant="ghost" onClick={() => createColumn()}>
-					<Plus />
-					<span>New Column</span>
-				</Button>
-			</div>
-		</DndContext>
+		<div className="flex gap-4 w-full overflow-auto pb-4">
+			<DndContext
+				sensors={sensors}
+				collisionDetection={closestCorners}
+				onDragEnd={handleDragEnd}
+				onDragOver={handleDragOver}
+			>
+				{columns.map((column, index) => (
+					<Column
+						key={column.id}
+						index={index}
+						boardId={boardId}
+						cards={cards}
+						column={column}
+						columns={columns}
+					/>
+				))}
+			</DndContext>
+			<Button variant="ghost" onClick={() => createColumn()}>
+				<Plus />
+				<span>New Column</span>
+			</Button>
+		</div>
 	);
 }
