@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Card from "./card";
 import NewCard from "./new-card";
-import { Card as CardType, Column as ColumnType } from "@/lib/types";
+import { Column as ColumnType } from "@/lib/types";
 import ColumnOptionsDropdown from "./column-options-dropdown";
 import RenameColumnDialog from "./rename-column-dialog";
 import {
@@ -12,20 +12,30 @@ import {
 } from "@dnd-kit/sortable";
 import CardOptionsDropdown from "./card-options-dropdown";
 import { useDroppable } from "@dnd-kit/core";
+import { UseCardsType } from "@/hooks/use-cards";
+import { UseColumnsType } from "@/hooks/use-columns";
 
 type ColumnProps = {
-	boardId: string;
-	cards: CardType[];
 	column: ColumnType;
-	columns: ColumnType[];
+	useCardsObject: UseCardsType;
+	useColumnsObject: UseColumnsType;
 };
 
 export default function Column({
-	boardId,
-	cards,
 	column,
-	columns,
+	useCardsObject,
+	useColumnsObject,
 }: ColumnProps) {
+	const { columns, renameColumn } = useColumnsObject;
+	const {
+		cards,
+		createCard,
+		editCard,
+		duplicateCard,
+		deleteCard,
+		moveCardToColumn,
+	} = useCardsObject;
+
 	const filteredCards = cards.filter((card) => card.column_id === column.id);
 
 	const [isRenameColumnDialogOpen, setIsRenameColumnDialogOpen] =
@@ -47,19 +57,17 @@ export default function Column({
 					</div>
 					<div className="space-x-2">
 						<ColumnOptionsDropdown
-							boardId={boardId}
-							cards={cards}
 							column={column}
-							columns={columns}
 							setIsRenameColumnDialogOpen={
 								setIsRenameColumnDialogOpen
 							}
+							useCardsObject={useCardsObject}
+							useColumnsObject={useColumnsObject}
 						/>
 						<NewCard
 							size="icon"
-							boardId={boardId}
 							columnId={column.id}
-							cards={cards}
+							createCard={createCard}
 						/>
 					</div>
 				</div>
@@ -70,32 +78,27 @@ export default function Column({
 					<div className="space-y-2">
 						{filteredCards.map((card) => (
 							<div key={card.id} className="relative">
-								<Card
-									boardId={boardId}
-									card={card}
-									cards={cards}
-								/>
+								<Card card={card} editCard={editCard} />
 								<CardOptionsDropdown
-									boardId={boardId}
 									card={card}
-									cards={cards}
 									columns={columns}
+									duplicateCard={duplicateCard}
+									deleteCard={deleteCard}
+									moveCardToColumn={moveCardToColumn}
 								/>
 							</div>
 						))}
 						<NewCard
 							size="default"
-							boardId={boardId}
 							columnId={column.id}
-							cards={cards}
+							createCard={createCard}
 						/>
 					</div>
 				</SortableContext>
 			</div>
 			<RenameColumnDialog
-				boardId={boardId}
 				column={column}
-				columns={columns}
+				renameColumn={renameColumn}
 				isRenameColumnDialogOpen={isRenameColumnDialogOpen}
 				setIsRenameColumnDialogOpen={setIsRenameColumnDialogOpen}
 			/>

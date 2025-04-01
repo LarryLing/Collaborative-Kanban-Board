@@ -14,19 +14,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { getDateString } from "@/lib/utils";
 import { useDebouncedCallback } from "use-debounce";
-import { createClient } from "@/lib/supabase/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { UseCardsType } from "@/hooks/use-cards";
 
 type CardProps = {
-	boardId: string;
 	card: CardType;
-	cards: CardType[];
+	editCard: UseCardsType["editCard"];
 };
 
-export default function Card({ boardId, card, cards }: CardProps) {
-	const supabase = createClient();
-
+export default function Card({ card, editCard }: CardProps) {
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
 		"Saved",
 	);
@@ -34,33 +31,20 @@ export default function Card({ boardId, card, cards }: CardProps) {
 	const titleRef = useRef<HTMLInputElement | null>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
 
-	const debounceUpdateCards = useDebouncedCallback(async () => {
-		const updatedCardsJson = cards.map((idxCard) =>
-			idxCard.id === card.id
-				? {
-						...idxCard,
-						title: titleRef.current?.value || "Untitled Card",
-						description: descriptionRef.current?.value || "",
-					}
-				: idxCard,
+	const debounceEditCard = useDebouncedCallback(async () => {
+		await editCard(
+			card.id,
+			titleRef.current?.value || "Untitled Card",
+			descriptionRef.current?.value || "",
 		);
 
-		const { error: updateCardsError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
 		setSaveStatus("Saved");
-
-		if (updateCardsError) throw updateCardsError;
 	}, 1500);
 
 	async function handleEdit() {
 		setSaveStatus("Saving...");
 
-		await debounceUpdateCards();
+		await debounceEditCard();
 	}
 
 	const { attributes, listeners, setNodeRef, transform, transition } =
@@ -99,7 +83,7 @@ export default function Card({ boardId, card, cards }: CardProps) {
 							className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
 							placeholder="New Card"
 							defaultValue={card.title}
-							onChange={() => handleEdit()}
+							onChange={handleEdit}
 						/>
 					</DialogTitle>
 				</DialogHeader>
@@ -110,7 +94,7 @@ export default function Card({ boardId, card, cards }: CardProps) {
 					className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
 					placeholder="Enter some description text..."
 					defaultValue={card.description}
-					onChange={() => handleEdit()}
+					onChange={handleEdit}
 				/>
 				<DialogFooter className="flex-row sm:justify-between text-sm text-muted-foreground">
 					<div>{saveStatus}</div>

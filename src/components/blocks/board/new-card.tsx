@@ -13,60 +13,34 @@ import {
 import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
-import { Card as CardType } from "@/lib/types";
+import { UseCardsType } from "@/hooks/use-cards";
 
 type NewCardProps = {
 	size: "default" | "icon";
-	boardId: string;
 	columnId: string;
-	cards: CardType[];
+	createCard: UseCardsType["createCard"];
 };
 
-export default function NewCard({
-	size,
-	boardId,
-	columnId,
-	cards,
-}: NewCardProps) {
+export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [pending, setPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement>(null);
 
-	async function createCard(e: FormEvent<HTMLFormElement>) {
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
 		setPending(true);
 
-		const title = titleRef.current?.value || "New Card";
-		const description = descriptionRef.current?.value || "";
-
-		const supabase = createClient();
-
-		const updatedCardsJson = [
-			...cards,
-			{
-				id: crypto.randomUUID(),
-				column_id: columnId,
-				title: title,
-				description: description,
-				created_at: new Date().toISOString().toLocaleString(),
-			},
-		] as CardType[];
-
-		const { error: newCardError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
+		await createCard(
+			columnId,
+			titleRef.current?.value || "New Card",
+			descriptionRef.current?.value || "",
+		);
 
 		setIsDialogOpen(false);
 		setPending(false);
-
-		if (newCardError) throw newCardError;
 	}
 
 	return (
@@ -89,7 +63,7 @@ export default function NewCard({
 			</DialogTrigger>
 			<DialogContent className="size-[500px] px-8">
 				<form
-					onSubmit={(e) => createCard(e)}
+					onSubmit={(e) => handleSubmit(e)}
 					className="flex flex-col gap-4"
 				>
 					<DialogHeader

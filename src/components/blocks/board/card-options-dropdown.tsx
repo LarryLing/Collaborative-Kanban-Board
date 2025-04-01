@@ -12,79 +12,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Copy, Ellipsis, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { Card as CardType, Column as ColumnType } from "@/lib/types";
+import { UseCardsType } from "@/hooks/use-cards";
 
 type CardOptionsDropdownProps = {
-	boardId: string;
 	card: CardType;
-	cards: CardType[];
 	columns: ColumnType[];
+	duplicateCard: UseCardsType["duplicateCard"];
+	deleteCard: UseCardsType["deleteCard"];
+	moveCardToColumn: UseCardsType["moveCardToColumn"];
 };
 
 export default function CardOptionsDropdown({
-	boardId,
 	card,
-	cards,
 	columns,
+	duplicateCard,
+	deleteCard,
+	moveCardToColumn,
 }: CardOptionsDropdownProps) {
-	const supabase = createClient();
-
-	async function duplicateCard() {
-		const duplicatedCard = {
-			...card,
-			id: crypto.randomUUID(),
-		} as CardType;
-
-		const index = cards.findIndex((idxCard) => idxCard.id === card.id);
-		let updatedCardsJson = [...cards];
-		updatedCardsJson.splice(index, 0, duplicatedCard);
-
-		const { error: updateCardsError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (updateCardsError) throw updateCardsError;
-	}
-
-	async function deleteCard() {
-		const updatedCardsJson = cards.filter(
-			(filteredCard) => filteredCard.id !== card.id,
-		);
-
-		const { error: updateCardsError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (updateCardsError) throw updateCardsError;
-	}
-
-	async function handleMoveCard(column_id: string) {
-		const updatedCardsJson = cards.map((idxCard) =>
-			idxCard.id === card.id
-				? {
-						...idxCard,
-						column_id: column_id,
-					}
-				: idxCard,
-		);
-
-		const { error: updateCardsError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (updateCardsError) throw updateCardsError;
-	}
-
 	return (
 		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
@@ -97,19 +42,21 @@ export default function CardOptionsDropdown({
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
-				<DropdownMenuItem onClick={() => duplicateCard()}>
+				<DropdownMenuItem onClick={() => duplicateCard(card)}>
 					<Copy className="size-4" />
 					<span>Duplicate</span>
 				</DropdownMenuItem>
 
-				<DropdownMenuItem onClick={() => deleteCard()}>
+				<DropdownMenuItem onClick={() => deleteCard(card.id)}>
 					<Trash2 className="size-4" />
 					<span>Delete</span>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup
 					value={card.column_id}
-					onValueChange={(value) => handleMoveCard(value)}
+					onValueChange={(columnId) =>
+						moveCardToColumn(card.id, columnId)
+					}
 				>
 					{columns.map((column) => (
 						<DropdownMenuRadioItem

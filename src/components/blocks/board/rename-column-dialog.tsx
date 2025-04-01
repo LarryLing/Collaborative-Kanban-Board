@@ -10,21 +10,19 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useRef, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Column as ColumnType } from "@/lib/types";
+import { UseColumnsType } from "@/hooks/use-columns";
 
 type RenameColumnDialogProps = {
-	boardId: string;
 	column: ColumnType;
-	columns: ColumnType[];
+	renameColumn: UseColumnsType["renameColumn"];
 	isRenameColumnDialogOpen: boolean;
 	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
 
 export default function RenameColumnDialog({
-	boardId,
 	column,
-	columns,
+	renameColumn,
 	isRenameColumnDialogOpen,
 	setIsRenameColumnDialogOpen,
 }: RenameColumnDialogProps) {
@@ -32,33 +30,18 @@ export default function RenameColumnDialog({
 
 	const titleRef = useRef<HTMLInputElement>(null);
 
-	async function renameColumn(e: FormEvent<HTMLFormElement>) {
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 
 		setPending(true);
 
-		const supabase = createClient();
-
-		const updatedColumnsJson = columns.map((idxColumn) =>
-			idxColumn.id === column.id
-				? {
-						...idxColumn,
-						title: titleRef.current?.value || "Untitled Column",
-					}
-				: idxColumn,
+		await renameColumn(
+			titleRef.current?.value || "Untitled Column",
+			column.id,
 		);
-
-		const { error: updateColumnsError } = await supabase
-			.from("columns")
-			.update({
-				columns: updatedColumnsJson,
-			})
-			.eq("board_id", boardId);
 
 		setPending(false);
 		setIsRenameColumnDialogOpen(false);
-
-		if (updateColumnsError) throw updateColumnsError;
 	}
 
 	return (
@@ -73,7 +56,7 @@ export default function RenameColumnDialog({
 						Please enter a new name for this column
 					</DialogDescription>
 				</DialogHeader>
-				<form onSubmit={(e) => renameColumn(e)}>
+				<form onSubmit={(e) => handleSubmit(e)}>
 					<Input
 						ref={titleRef}
 						id="title"

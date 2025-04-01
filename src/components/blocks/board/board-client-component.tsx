@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createClient } from "@/lib/supabase/client";
 import Column from "./column";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,8 @@ import {
 	useSensor,
 	useSensors,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
+import useColumns from "@/hooks/use-columns";
+import useCards from "@/hooks/use-cards";
 
 type BoardClientComponentProps = {
 	boardId: string;
@@ -30,77 +31,15 @@ export default function BoardClientComponent({
 }: BoardClientComponentProps) {
 	const supabase = createClient();
 
-	const [columns, setColumns] = useState<ColumnType[]>(fetchedColumns);
-	const [cards, setCards] = useState<CardType[]>(fetchedCards);
+	const useColumnsObject = useColumns(supabase, boardId, fetchedColumns);
+	const useCardsObject = useCards(supabase, boardId, fetchedCards);
 
-	useEffect(() => {
-		const columnsChannel = supabase
-			.channel("realtime columns")
-			.on(
-				"postgres_changes",
-				{
-					event: "UPDATE",
-					schema: "public",
-					table: "columns",
-				},
-				(payload) => {
-					setColumns(payload.new.columns as ColumnType[]);
-				},
-			)
-			.subscribe();
-
-		return () => {
-			supabase.removeChannel(columnsChannel);
-		};
-	}, [supabase, columns, setColumns]);
-
-	useEffect(() => {
-		const cardsChannel = supabase
-			.channel(`reatime cards`)
-			.on(
-				"postgres_changes",
-				{
-					event: "UPDATE",
-					schema: "public",
-					table: "cards",
-				},
-				(payload) => {
-					setCards(payload.new.cards as CardType[]);
-				},
-			)
-			.subscribe();
-
-		return () => {
-			supabase.removeChannel(cardsChannel);
-		};
-	}, [supabase, cards, setCards]);
-
-	async function createColumn() {
-		const newColumnId = crypto.randomUUID();
-
-		const updatedColumnsJson = [
-			...columns,
-			{
-				id: newColumnId,
-				title: "New Column",
-				color: "text-primary",
-			},
-		] as ColumnType[];
-
-		const { error: newColumnError } = await supabase
-			.from("columns")
-			.update({
-				columns: updatedColumnsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (newColumnError) throw newColumnError;
-	}
+	const { columns, createColumn } = useColumnsObject;
+	const { cards, moveCardToColumn, moveCard } = useCardsObject;
 
 	function findColumnId(itemId: string) {
-		if (columns.some((column) => column.id === itemId)) {
+		if (columns.some((column) => column.id === itemId))
 			return itemId as ColumnType["id"];
-		}
 
 		return cards.find((card) => card.id === itemId)?.column_id;
 	}
@@ -122,23 +61,8 @@ export default function BoardClientComponent({
 			const activeIndex = cards.findIndex((card) => card.id === activeId);
 			const overIndex = cards.findIndex((card) => card.id === overId);
 
-			if (activeIndex !== -1 && overIndex !== -1) {
-				const updatedCardsJson = arrayMove(
-					cards,
-					activeIndex,
-					overIndex,
-				);
-				setCards(updatedCardsJson);
-
-				const { error: updatedCardsError } = await supabase
-					.from("cards")
-					.update({
-						cards: updatedCardsJson,
-					})
-					.eq("board_id", boardId);
-
-				if (updatedCardsError) throw updatedCardsError;
-			}
+			if (activeIndex !== -1 && overIndex !== -1)
+				await moveCard(activeIndex, overIndex);
 		}
 	}
 
@@ -157,25 +81,7 @@ export default function BoardClientComponent({
 		if (activeColumnId === overColumnId && activeId !== overId) return;
 		if (activeColumnId === overColumnId) return;
 
-		const updatedCardsJson = cards.map((card) =>
-			card.id === activeId
-				? {
-						...card,
-						column_id: overColumnId,
-					}
-				: card,
-		);
-
-		setCards(updatedCardsJson);
-
-		const { error: updatedCardsError } = await supabase
-			.from("cards")
-			.update({
-				cards: updatedCardsJson,
-			})
-			.eq("board_id", boardId);
-
-		if (updatedCardsError) throw updatedCardsError;
+		await moveCardToColumn(activeId, overColumnId);
 	}
 
 	const sensors = useSensors(
@@ -198,14 +104,13 @@ export default function BoardClientComponent({
 				{columns.map((column) => (
 					<Column
 						key={column.id}
-						boardId={boardId}
-						cards={cards}
 						column={column}
-						columns={columns}
+						useCardsObject={useCardsObject}
+						useColumnsObject={useColumnsObject}
 					/>
 				))}
 			</DndContext>
-			<Button variant="ghost" onClick={() => createColumn()}>
+			<Button variant="ghost" onClick={createColumn}>
 				<Plus />
 				<span>New Column</span>
 			</Button>

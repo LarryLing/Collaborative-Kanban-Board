@@ -11,7 +11,6 @@ import {
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
-    UploadSchema,
     RenameBoardSchema,
     BoardFormState,
 } from "@/lib/definitions";
