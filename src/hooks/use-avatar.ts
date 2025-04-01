@@ -3,13 +3,14 @@ import { uploadAvatar } from '@/lib/actions';
 import { useToast } from './use-toast';
 
 export default function useAvatar(userId: string, publicUrl: string) {
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
     const { toast } = useToast();
 
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
     const [preview, setPreview] = useState(publicUrl);
     const [uploading, setUploading] = useState(false);
-    const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     const changeAvatar = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
         setUploading(true);

@@ -1,4 +1,5 @@
 import { Column, ColumnColorOptions, TypedSupabaseClient } from '@/lib/types'
+import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useState } from 'react'
 
 export type UseColumnsType = {
@@ -7,6 +8,7 @@ export type UseColumnsType = {
     deleteColumn: (columnId: string) => Promise<void>
     changeColumnColor: (textColor: ColumnColorOptions, columnId: string) => Promise<void>
     renameColumn: (newTitle: string, columnId: string) => Promise<void>
+    moveColumn: (from: number, to: number) => Promise<void>
 }
 
 export default function useColumns(supabase: TypedSupabaseClient, boardId: string, fetchedColumns: Column[]) {
@@ -82,6 +84,12 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 		await updateColumns(updatedColumns);
     }, [columns])
 
+    const moveColumn = useCallback(async (from: number, to: number) => {
+        const updatedColumns = arrayMove(columns, from, to);
+
+        await updateColumns(updatedColumns);
+    }, [columns])
+
     const updateColumns = useCallback(async (updatedColumns: Column[]) => {
         setColumns(updatedColumns);
 
@@ -95,6 +103,6 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
             if (updateColumnsError) throw updateColumnsError;
     }, [])
 
-    return {columns, createColumn, deleteColumn, changeColumnColor, renameColumn} as UseColumnsType;
+    return {columns, createColumn, deleteColumn, changeColumnColor, renameColumn, moveColumn} as UseColumnsType;
 }
 

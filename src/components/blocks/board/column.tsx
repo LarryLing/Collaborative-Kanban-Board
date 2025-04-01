@@ -8,12 +8,14 @@ import ColumnOptionsDropdown from "./column-options-dropdown";
 import RenameColumnDialog from "./rename-column-dialog";
 import {
 	SortableContext,
+	useSortable,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import CardOptionsDropdown from "./card-options-dropdown";
 import { useDroppable } from "@dnd-kit/core";
 import { UseCardsType } from "@/hooks/use-cards";
 import { UseColumnsType } from "@/hooks/use-columns";
+import { CSS } from "@dnd-kit/utilities";
 
 type ColumnProps = {
 	column: ColumnType;
@@ -43,10 +45,29 @@ export default function Column({
 
 	const { setNodeRef: droppableNodeRef } = useDroppable({ id: column.id });
 
+	const {
+		attributes,
+		listeners,
+		setNodeRef: sortableNodeRef,
+		transform,
+		transition,
+	} = useSortable({
+		id: column.id,
+	});
+
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	};
+
 	return (
 		<>
-			<div ref={droppableNodeRef} className="w-64 shrink-0">
-				<div className="flex items-center justify-between mb-2">
+			<div ref={sortableNodeRef} style={style} className="w-64 shrink-0">
+				<div
+					{...attributes}
+					{...listeners}
+					className="flex items-center justify-between mb-2 active:cursor-grabbing"
+				>
 					<div className="rounded-md font-semibold">
 						<span
 							className={`mr-3 ${column.color} w-[125px] text-ellipsis text-nowrap`}
@@ -75,7 +96,7 @@ export default function Column({
 					items={filteredCards}
 					strategy={verticalListSortingStrategy}
 				>
-					<div className="space-y-2">
+					<div ref={droppableNodeRef} className="space-y-2">
 						{filteredCards.map((card) => (
 							<div key={card.id} className="relative">
 								<Card card={card} editCard={editCard} />

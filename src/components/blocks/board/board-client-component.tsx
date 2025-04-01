@@ -17,6 +17,10 @@ import {
 } from "@dnd-kit/core";
 import useColumns from "@/hooks/use-columns";
 import useCards from "@/hooks/use-cards";
+import {
+	horizontalListSortingStrategy,
+	SortableContext,
+} from "@dnd-kit/sortable";
 
 type BoardClientComponentProps = {
 	boardId: string;
@@ -34,12 +38,15 @@ export default function BoardClientComponent({
 	const useColumnsObject = useColumns(supabase, boardId, fetchedColumns);
 	const useCardsObject = useCards(supabase, boardId, fetchedCards);
 
-	const { columns, createColumn } = useColumnsObject;
+	const { columns, createColumn, moveColumn } = useColumnsObject;
 	const { cards, moveCardToColumn, moveCard } = useCardsObject;
 
+	function isColumn(itemId: string) {
+		return columns.some((column) => column.id === itemId);
+	}
+
 	function findColumnId(itemId: string) {
-		if (columns.some((column) => column.id === itemId))
-			return itemId as ColumnType["id"];
+		if (isColumn(itemId)) return itemId as ColumnType["id"];
 
 		return cards.find((card) => card.id === itemId)?.column_id;
 	}
@@ -49,8 +56,20 @@ export default function BoardClientComponent({
 
 		if (!over) return;
 
-		const activeId = active.id as CardType["id"];
-		const overId = over.id as CardType["id"];
+		const activeId = active.id as string;
+		const overId = over.id as string;
+
+		if (isColumn(activeId) && isColumn(overId)) {
+			const activeIndex = columns.findIndex(
+				(column) => column.id === activeId,
+			);
+			const overIndex = columns.findIndex(
+				(column) => column.id === overId,
+			);
+
+			if (activeIndex !== -1 && overIndex !== -1)
+				await moveColumn(activeIndex, overIndex);
+		}
 
 		const activeColumnId = findColumnId(activeId);
 		const overColumnId = findColumnId(overId);
@@ -101,14 +120,19 @@ export default function BoardClientComponent({
 				onDragEnd={handleDragEnd}
 				onDragOver={handleDragOver}
 			>
-				{columns.map((column) => (
-					<Column
-						key={column.id}
-						column={column}
-						useCardsObject={useCardsObject}
-						useColumnsObject={useColumnsObject}
-					/>
-				))}
+				<SortableContext
+					items={columns}
+					strategy={horizontalListSortingStrategy}
+				>
+					{columns.map((column) => (
+						<Column
+							key={column.id}
+							column={column}
+							useCardsObject={useCardsObject}
+							useColumnsObject={useColumnsObject}
+						/>
+					))}
+				</SortableContext>
 			</DndContext>
 			<Button variant="ghost" onClick={createColumn}>
 				<Plus />
