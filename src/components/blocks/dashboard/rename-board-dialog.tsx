@@ -17,7 +17,7 @@ type RenameDialogProps = {
 	setIsRenameDialogOpen: (arg0: boolean) => void;
 };
 
-export default function RenameDialog({
+export default function RenameBoardDialog({
 	boardId,
 	title,
 	isRenameDialogOpen,

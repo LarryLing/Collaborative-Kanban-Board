@@ -5,11 +5,11 @@ import { getDateString } from "@/lib/utils";
 import { Users, Bookmark } from "lucide-react";
 import { useEffect, useState } from "react";
 import BoardOptionsDropdown from "./board-options-dropdown";
-import DeleteDialog from "./delete-dialog";
-import RenameDialog from "./rename-dialog";
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import RenameBoardDialog from "./rename-board-dialog";
+import DeleteBoardDialog from "./delete-board-dialog";
 
 type BoardProps = {
 	view: ViewOptions;
@@ -40,6 +40,8 @@ export default function Board({ view, board }: BoardProps) {
 		fetchCoverUrl();
 	}, [supabase]);
 
+	const lastOpenedDateString = getDateString(last_opened);
+
 	return (
 		<div
 			className={`${view === "gallery" ? "h-[280px] max-w-[450px] md:max-h-none group" : "h-auto hover:bg-accent/60 hover:text-accent-foreground transition-colors"} w-full border border-border rounded-md overflow-hidden relative`}
@@ -69,7 +71,7 @@ export default function Board({ view, board }: BoardProps) {
 									<Bookmark className="size-4 inline-block" />
 								)}
 								<span className="font-normal text-sm">
-									Opened {getDateString(last_opened)}
+									Opened {lastOpenedDateString}
 								</span>
 							</div>
 						</div>
@@ -79,7 +81,7 @@ export default function Board({ view, board }: BoardProps) {
 						<span className="font-semibold text-md">{title}</span>
 						<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
 							<span className="w-[150px]">
-								Opened {getDateString(last_opened)}
+								Opened {lastOpenedDateString}
 							</span>
 							<div className="space-x-2">
 								{collaborators > 1 && (
@@ -104,13 +106,13 @@ export default function Board({ view, board }: BoardProps) {
 					setIsDeleteDialogOpen={setIsDeleteDialogOpen}
 				/>
 			</div>
-			<RenameDialog
+			<RenameBoardDialog
 				boardId={id}
 				title={title}
 				isRenameDialogOpen={isRenameDialogOpen}
 				setIsRenameDialogOpen={setIsRenameDialogOpen}
 			/>
-			<DeleteDialog
+			<DeleteBoardDialog
 				boardId={id}
 				isDeleteDialogOpen={isDeleteDialogOpen}
 				setIsDeleteDialogOpen={setIsDeleteDialogOpen}

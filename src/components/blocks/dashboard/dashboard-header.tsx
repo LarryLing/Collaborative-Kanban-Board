@@ -16,7 +16,7 @@ export default function DashboardHeader() {
 		<div className="flex flex-col gap-4">
 			<h2 className="font-semibold text-3xl">Dashboard</h2>
 			<div className="flex justify-between">
-				<Button onClick={() => createBoard()}>
+				<Button onClick={createBoard}>
 					<Plus className="size-4" />
 					<span>New Board</span>
 				</Button>
