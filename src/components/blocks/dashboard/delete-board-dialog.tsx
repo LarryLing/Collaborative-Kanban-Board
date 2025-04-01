@@ -15,7 +15,7 @@ type DeleteDialogProps = {
 	setIsDeleteDialogOpen: (arg0: boolean) => void;
 };
 
-export default function DeleteDialog({
+export default function DeleteBoardDialog({
 	boardId,
 	isDeleteDialogOpen,
 	setIsDeleteDialogOpen,

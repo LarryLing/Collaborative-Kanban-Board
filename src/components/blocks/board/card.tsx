@@ -1,9 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card as CardType } from "@/lib/types";
-import React, { useState } from "react";
-import DropIndicator from "./drop-indicator";
+import React, { useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -15,48 +13,94 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { getDateString } from "@/lib/utils";
+import { useDebouncedCallback } from "use-debounce";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { UseCardsType } from "@/hooks/use-cards";
 
 type CardProps = {
 	card: CardType;
+	editCard: UseCardsType["editCard"];
 };
 
-export default function Card({ card }: CardProps) {
-	const [isSaving, setIsSaving] = useState(false);
+export default function Card({ card, editCard }: CardProps) {
+	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
+		"Saved",
+	);
+
+	const titleRef = useRef<HTMLInputElement | null>(null);
+	const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
+
+	const debounceEditCard = useDebouncedCallback(async () => {
+		await editCard(
+			card.id,
+			titleRef.current?.value || "Untitled Card",
+			descriptionRef.current?.value || "",
+		);
+
+		setSaveStatus("Saved");
+	}, 1500);
+
+	async function handleEdit() {
+		setSaveStatus("Saving...");
+
+		await debounceEditCard();
+	}
+
+	const { attributes, listeners, setNodeRef, transform, transition } =
+		useSortable({
+			id: card.id,
+		});
+
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	};
 
 	return (
-		<>
-			<DropIndicator beforeId={card.id} columnId={card.column_id} />
-			<Dialog>
-				<DialogTrigger asChild>
-					<Button
-						draggable="true"
-						variant="outline"
-						className="justify-start w-full active:cursor-grabbing h-[50px]"
-					>
-						<span>{card.name}</span>
-					</Button>
-				</DialogTrigger>
-				<DialogContent className="flex flex-col size-[500px] px-8">
-					<DialogHeader className="hover:cursor-text">
-						<DialogTitle>
-							<Input
-								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg"
-								placeholder="New Card"
-								defaultValue={card.name}
-							/>
-						</DialogTitle>
-					</DialogHeader>
-					<Textarea
-						className="h-full resize-none border-none focus-visible:ring-0 p-0"
-						placeholder="Enter some description text..."
-						defaultValue={card.description}
-					/>
-					<DialogFooter className="flex-row sm:justify-between text-sm text-muted-foreground">
-						<div>{isSaving ? "Saving..." : ""}</div>
-						<span>Created {getDateString(card.created_at)}</span>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
-		</>
+		<Dialog>
+			<DialogTrigger asChild>
+				<div
+					ref={setNodeRef}
+					{...attributes}
+					{...listeners}
+					style={style}
+					className="text-sm font-semibold w-full h-[50px] border border-border rounded-md overflow-hidden flex justify-start items-center px-4 py-2 hover:cursor-pointer hover:bg-accent/60 hover:text-accent-foreground transition-colors active:cursor-grabbing"
+				>
+					<span>{card.title}</span>
+				</div>
+			</DialogTrigger>
+			<DialogContent className="flex flex-col size-[500px] px-8">
+				<DialogHeader
+					className="hover:cursor-text"
+					aria-description={card.title}
+				>
+					<DialogTitle>
+						<Input
+							ref={titleRef}
+							id="title"
+							name="title"
+							className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
+							placeholder="New Card"
+							defaultValue={card.title}
+							onChange={handleEdit}
+						/>
+					</DialogTitle>
+				</DialogHeader>
+				<Textarea
+					ref={descriptionRef}
+					id="description"
+					name="description"
+					className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
+					placeholder="Enter some description text..."
+					defaultValue={card.description}
+					onChange={handleEdit}
+				/>
+				<DialogFooter className="flex-row sm:justify-between text-sm text-muted-foreground">
+					<div>{saveStatus}</div>
+					<span>Created {getDateString(card.created_at)}</span>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
 	);
 }

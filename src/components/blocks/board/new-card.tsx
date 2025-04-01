@@ -13,23 +13,16 @@ import {
 import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
+import { UseCardsType } from "@/hooks/use-cards";
 
 type NewCardProps = {
 	size: "default" | "icon";
-	boardId: string;
 	columnId: string;
-	position: number;
+	createCard: UseCardsType["createCard"];
 };
 
-export default function NewCard({
-	size,
-	boardId,
-	columnId,
-	position,
-}: NewCardProps) {
+export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const [nextPosition, setNextPosition] = useState(position);
 	const [pending, setPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);
@@ -40,23 +33,13 @@ export default function NewCard({
 
 		setPending(true);
 
-		const title = titleRef.current?.value || "New Card";
-		const description = descriptionRef.current?.value || "";
-
-		const supabase = createClient();
-
-		const { error: newCardError } = await supabase.from("cards").insert({
-			board_id: boardId,
-			column_id: columnId,
-			position: nextPosition,
-			name: title,
-			description: description,
-		});
-
-		if (newCardError) throw newCardError;
+		await createCard(
+			columnId,
+			titleRef.current?.value || "New Card",
+			descriptionRef.current?.value || "",
+		);
 
 		setIsDialogOpen(false);
-		setNextPosition((nextPosition) => nextPosition + 1);
 		setPending(false);
 	}
 
@@ -65,9 +48,8 @@ export default function NewCard({
 			<DialogTrigger asChild>
 				{size === "default" ? (
 					<Button
-						draggable="true"
-						variant="outline"
-						className="w-full active:cursor-grabbing h-[50px]"
+						variant="ghost"
+						className="w-full h-[50px]"
 						onClick={() => setIsDialogOpen(true)}
 					>
 						<Plus className="size-4" />
@@ -84,13 +66,16 @@ export default function NewCard({
 					onSubmit={(e) => handleSubmit(e)}
 					className="flex flex-col gap-4"
 				>
-					<DialogHeader className="hover:cursor-text">
+					<DialogHeader
+						className="hover:cursor-text"
+						aria-description="New Card"
+					>
 						<DialogTitle>
 							<Input
 								ref={titleRef}
 								id="title"
 								name="title"
-								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg"
+								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
 								placeholder="New Card"
 								defaultValue="New Card"
 							/>
@@ -100,7 +85,7 @@ export default function NewCard({
 						ref={descriptionRef}
 						id="description"
 						name="description"
-						className="h-full resize-none border-none focus-visible:ring-0 p-0"
+						className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
 						placeholder="Enter some description text..."
 					/>
 					<DialogFooter>
@@ -110,7 +95,7 @@ export default function NewCard({
 							disabled={pending}
 							onClick={() => setIsDialogOpen(false)}
 						>
-							Go Back
+							Discard
 						</Button>
 						<Button type="submit" disabled={pending}>
 							{pending ? "Creating Card..." : "Create Card"}

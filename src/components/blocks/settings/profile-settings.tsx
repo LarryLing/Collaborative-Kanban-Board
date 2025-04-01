@@ -10,14 +10,15 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { ChangeEvent, useActionState, useEffect, useState } from "react";
-import { updateUserProfile, uploadAvatar } from "@/lib/actions";
+import React, { useActionState, useEffect } from "react";
+import { updateUserProfile } from "@/lib/actions";
 import { Textarea } from "@/components/ui/textarea";
 import { UserProfile } from "@/lib/types";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSocialIcon } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import useAvatar from "@/hooks/use-avatar";
 
 type ProfileSettingsProps = {
 	userProfile: UserProfile;
@@ -30,71 +31,35 @@ export default function ProfileSettings({
 }: ProfileSettingsProps) {
 	const { toast } = useToast();
 
-	const [profileState, profileAction, profilePending] = useActionState(
+	const [state, action, pending] = useActionState(
 		updateUserProfile,
 		undefined,
 	);
-	const [avatarState, avatarAction, avatarPending] = useActionState(
-		uploadAvatar,
-		undefined,
+
+	const { preview, uploading, changeAvatar, avatarInputRef } = useAvatar(
+		userProfile.id,
+		publicUrl,
 	);
-	const [avatarPreview, setAvatarPreview] = useState(publicUrl);
-	const [uploading, setUploading] = useState(false);
-	const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-	async function handleChange(e: ChangeEvent<HTMLInputElement>) {
-		setUploading(true);
-
-		if (!e.target.files || e.target.files?.length === 0) {
-			setUploading(false);
-			return;
-		}
-
-		if (e.target.files[0].size > MAX_FILE_SIZE) {
-			setUploading(false);
-			return;
-		}
-
-		const file = e.target.files[0];
-		setAvatarPreview(URL.createObjectURL(file));
-		setUploading(false);
-	}
 
 	useEffect(() => {
-		if (profileState?.updatedProfile !== undefined) {
+		if (state?.updatedProfile !== undefined) {
 			toast({
 				title: "Success!",
 				description: "Your profile has been successfully updated.",
 			});
 		}
 
-		if (avatarState?.publicUrl !== undefined) {
-			setAvatarPreview(avatarState.publicUrl);
-			toast({
-				title: "Success!",
-				description: "Your avatar has been successfully updated.",
-			});
-		}
-
-		if (profileState?.errorMessage !== undefined) {
+		if (state?.errorMessage !== undefined) {
 			toast({
 				title: "Something went wrong...",
-				description: profileState.errorMessage,
+				description: state.errorMessage,
 			});
 		}
+	}, [state?.updatedProfile, state?.errorMessage]);
 
-		if (avatarState?.errorMessage !== undefined) {
-			toast({
-				title: "Something went wrong...",
-				description: avatarState.errorMessage,
-			});
-		}
-	}, [
-		profileState?.updatedProfile,
-		avatarState?.publicUrl,
-		profileState?.errorMessage,
-		avatarState?.errorMessage,
-	]);
+	function openAvatarUploadInput() {
+		if (avatarInputRef.current) avatarInputRef.current.click();
+	}
 
 	return (
 		<Card className="border-none shadow-none flex-auto">
@@ -107,38 +72,38 @@ export default function ProfileSettings({
 			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="flex flex-col lg:flex-row-reverse gap-6">
-					<form className="space-y-2" action={avatarAction}>
+					<form className="space-y-2">
 						<Label htmlFor="avatar">Avatar</Label>
 						<Avatar className="size-[200px]">
-							<AvatarImage src={avatarPreview} />
+							<AvatarImage src={preview} />
 							<AvatarFallback>
 								{userProfile.display_name
 									.substring(0, 2)
 									.toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
-						<Input
-							id="avatar"
-							name="avatar"
-							type="file"
-							accept="image/*"
-							onChange={(e) => handleChange(e)}
-							disabled={uploading}
-							className="justify-center items-center"
-						/>
-						{avatarState?.errors?.avatar && (
-							<p className="text-sm text-destructive">
-								{avatarState?.errors?.avatar}
-							</p>
-						)}
-						<Button type="submit" disabled={avatarPending}>
-							{avatarPending ? "Uploading..." : "Upload Avatar"}
-						</Button>
+						<div className="relative">
+							<Input
+								ref={avatarInputRef}
+								id="avatar"
+								name="avatar"
+								type="file"
+								accept="image/*"
+								onChange={(e) => changeAvatar(e)}
+								disabled={uploading}
+								className="hidden"
+							/>
+							<Button
+								type="button"
+								onClick={openAvatarUploadInput}
+								className="absolute inset-0 z-5"
+								disabled={uploading}
+							>
+								{uploading ? "Uploading..." : "Upload Avatar"}
+							</Button>
+						</div>
 					</form>
-					<form
-						action={profileAction}
-						className="basis-[500px] space-y-6"
-					>
+					<form action={action} className="basis-[500px] space-y-6">
 						<div className="space-y-1">
 							<Label htmlFor="displayName">Display Name</Label>
 							<Input
@@ -146,13 +111,13 @@ export default function ProfileSettings({
 								name="displayName"
 								type="text"
 								defaultValue={
-									profileState?.updatedProfile?.displayName ||
+									state?.updatedProfile?.displayName ||
 									userProfile.display_name
 								}
 							/>
-							{profileState?.errors?.displayName && (
+							{state?.errors?.displayName && (
 								<p className="text-sm text-destructive">
-									{profileState.errors.displayName}
+									{state.errors.displayName}
 								</p>
 							)}
 							<p className="text-sm text-muted-foreground font-normal">
@@ -167,13 +132,13 @@ export default function ProfileSettings({
 								name="aboutMe"
 								className="resize-none h-[100px]"
 								defaultValue={
-									profileState?.updatedProfile?.aboutMe ||
+									state?.updatedProfile?.aboutMe ||
 									userProfile.about_me
 								}
 							/>
-							{profileState?.errors?.aboutMe && (
+							{state?.errors?.aboutMe && (
 								<p className="text-sm text-destructive">
-									{profileState.errors.aboutMe}
+									{state.errors.aboutMe}
 								</p>
 							)}
 						</div>
@@ -196,29 +161,29 @@ export default function ProfileSettings({
 									</div>
 								);
 							})}
-							{profileState?.errors?.social0 && (
+							{state?.errors?.social0 && (
 								<p className="text-sm text-destructive">
-									{profileState?.errors?.social0}
+									{state?.errors?.social0}
 								</p>
 							)}
-							{profileState?.errors?.social1 && (
+							{state?.errors?.social1 && (
 								<p className="text-sm text-destructive">
-									{profileState?.errors?.social1}
+									{state?.errors?.social1}
 								</p>
 							)}
-							{profileState?.errors?.social2 && (
+							{state?.errors?.social2 && (
 								<p className="text-sm text-destructive">
-									{profileState?.errors?.social2}
+									{state?.errors?.social2}
 								</p>
 							)}
-							{profileState?.errors?.social3 && (
+							{state?.errors?.social3 && (
 								<p className="text-sm text-destructive">
-									{profileState?.errors?.social3}
+									{state?.errors?.social3}
 								</p>
 							)}
 						</div>
-						<Button type="submit" disabled={profilePending}>
-							{profilePending ? "Updating..." : "Update Profile"}
+						<Button type="submit" disabled={pending}>
+							{pending ? "Updating..." : "Update Profile"}
 						</Button>
 					</form>
 				</div>
