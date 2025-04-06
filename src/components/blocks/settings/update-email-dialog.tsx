@@ -1,28 +1,27 @@
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { updateEmail } from "@/lib/actions";
 import { useActionState, useEffect } from "react";
 
 type UpdateEmailDialogProps = {
-	isDialogOpen: boolean;
-	setIsDialogOpen: (arg0: boolean) => void;
 	email: string;
-	toast: (arg0: { title: string; description: string }) => void;
 };
 
 export default function UpdateEmailDialog({
-	isDialogOpen,
-	setIsDialogOpen,
 	email,
-	toast,
 }: UpdateEmailDialogProps) {
+	const { toast } = useToast();
+
 	const [state, action, pending] = useActionState(updateEmail, undefined);
 
 	useEffect(() => {
@@ -31,13 +30,14 @@ export default function UpdateEmailDialog({
 				title: state.toast.title,
 				description: state.toast.message,
 			});
-
-			setIsDialogOpen(false);
 		}
 	}, [state?.toast]);
 
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="outline">Update Email</Button>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Update Email</DialogTitle>
@@ -60,14 +60,15 @@ export default function UpdateEmailDialog({
 						</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button
-							type="button"
-							className="mb-2 sm:mb-0"
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go Back
-						</Button>
+						<DialogClose asChild>
+							<Button
+								type="button"
+								className="mb-2 sm:mb-0"
+								variant="outline"
+							>
+								Go Back
+							</Button>
+						</DialogClose>
 						<Button
 							type="submit"
 							className="mb-2 sm:mb-0"

@@ -21,12 +21,14 @@ import { useToast } from "@/hooks/use-toast";
 import useAvatar from "@/hooks/use-avatar";
 
 type ProfileSettingsProps = {
-	userProfile: UserProfile;
 	publicUrl: string;
-};
+} & UserProfile;
 
 export default function ProfileSettings({
-	userProfile,
+	id,
+	display_name,
+	about_me,
+	socials,
 	publicUrl,
 }: ProfileSettingsProps) {
 	const { toast } = useToast();
@@ -37,7 +39,7 @@ export default function ProfileSettings({
 	);
 
 	const { preview, uploading, changeAvatar, avatarInputRef } = useAvatar(
-		userProfile.id,
+		id,
 		publicUrl,
 	);
 
@@ -77,9 +79,7 @@ export default function ProfileSettings({
 						<Avatar className="size-[200px]">
 							<AvatarImage src={preview} />
 							<AvatarFallback>
-								{userProfile.display_name
-									.substring(0, 2)
-									.toUpperCase()}
+								{display_name.substring(0, 2).toUpperCase()}
 							</AvatarFallback>
 						</Avatar>
 						<div className="relative">
@@ -112,7 +112,7 @@ export default function ProfileSettings({
 								type="text"
 								defaultValue={
 									state?.updatedProfile?.displayName ||
-									userProfile.display_name
+									display_name
 								}
 							/>
 							{state?.errors?.displayName && (
@@ -132,8 +132,7 @@ export default function ProfileSettings({
 								name="aboutMe"
 								className="resize-none h-[100px]"
 								defaultValue={
-									state?.updatedProfile?.aboutMe ||
-									userProfile.about_me
+									state?.updatedProfile?.aboutMe || about_me
 								}
 							/>
 							{state?.errors?.aboutMe && (
@@ -143,8 +142,8 @@ export default function ProfileSettings({
 							)}
 						</div>
 						<div className="space-y-1">
-							<Label htmlFor="social">Social Accounts</Label>
-							{userProfile.socials.map((social, index) => {
+							<Label>Social Accounts</Label>
+							{socials.map((social, index) => {
 								return (
 									<div
 										key={`social${index}`}

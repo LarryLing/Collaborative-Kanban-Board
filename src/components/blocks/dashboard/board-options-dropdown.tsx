@@ -5,31 +5,25 @@ import {
 	DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-	Bookmark,
-	Ellipsis,
-	PenLine,
-	SquareArrowOutUpRight,
-	Trash2,
-} from "lucide-react";
-import React from "react";
+import { Bookmark, Ellipsis, SquareArrowOutUpRight } from "lucide-react";
+import React, { memo } from "react";
 import Link from "next/link";
 import { bookmarkBoard } from "@/lib/actions";
+import RenameBoardDialog from "./rename-board-dialog";
+import DeleteBoardDialog from "./delete-board-dialog";
 
 type OptionsDropdownProps = {
 	side: "top" | "right" | "bottom" | "left" | undefined;
 	boardId: string;
+	boardTitle: string;
 	bookmarked: boolean;
-	setIsRenameDialogOpen: (arg0: boolean) => void;
-	setIsDeleteDialogOpen: (arg0: boolean) => void;
 };
 
 export default function BoardOptionsDropdown({
 	side,
 	boardId,
+	boardTitle,
 	bookmarked,
-	setIsRenameDialogOpen,
-	setIsDeleteDialogOpen,
 }: OptionsDropdownProps) {
 	return (
 		<DropdownMenu modal={false}>
@@ -39,20 +33,14 @@ export default function BoardOptionsDropdown({
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side={side}>
-				<DropdownMenuItem onClick={() => setIsRenameDialogOpen(true)}>
-					<PenLine className="size-4" />
-					<span>Rename</span>
-				</DropdownMenuItem>
+				<RenameBoardDialog boardId={boardId} title={boardTitle} />
 				<DropdownMenuItem
 					onClick={() => bookmarkBoard(boardId, bookmarked)}
 				>
 					<Bookmark className="size-4" />
 					<span>Bookmark</span>
 				</DropdownMenuItem>
-				<DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
-					<Trash2 className="size-4" />
-					<span>Delete</span>
-				</DropdownMenuItem>
+				<DeleteBoardDialog boardId={boardId} />
 				<Link
 					href={`/board/${boardId}`}
 					target="_blank"
@@ -67,3 +55,5 @@ export default function BoardOptionsDropdown({
 		</DropdownMenu>
 	);
 }
+
+export const MemoizedBoardOptionsDropdown = memo(BoardOptionsDropdown);

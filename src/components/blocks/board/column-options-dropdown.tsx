@@ -14,28 +14,29 @@ import { useTheme } from "next-themes";
 import { Column as ColumnType } from "@/lib/types";
 import { UseCardsType } from "@/hooks/use-cards";
 import { UseColumnsType } from "@/hooks/use-columns";
+import RenameColumnDialog from "./rename-column-dialog";
 
 type ColumnOptionsDropdownProps = {
-	column: ColumnType;
-	useCardsObject: UseCardsType;
-	useColumnsObject: UseColumnsType;
-	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
-};
+	renameColumn: UseColumnsType["renameColumn"];
+	deleteColumn: UseColumnsType["deleteColumn"];
+	deleteCardsByColumnId: UseCardsType["deleteCardsByColumnId"];
+	changeColumnColor: UseColumnsType["changeColumnColor"];
+} & ColumnType;
 
 export default function ColumnOptionsDropdown({
-	column,
-	useCardsObject,
-	useColumnsObject,
-	setIsRenameColumnDialogOpen,
+	id,
+	title,
+	color,
+	renameColumn,
+	deleteColumn,
+	deleteCardsByColumnId,
+	changeColumnColor,
 }: ColumnOptionsDropdownProps) {
 	const { theme } = useTheme();
 
-	const { deleteColumn, changeColumnColor } = useColumnsObject;
-	const { deleteCardsByColumnId } = useCardsObject;
-
 	async function handleDeleteColumn() {
-		const deleteColumnPromise = await deleteColumn(column.id);
-		const deleteCardsPromise = await deleteCardsByColumnId(column.id);
+		const deleteColumnPromise = await deleteColumn(id);
+		const deleteCardsPromise = await deleteCardsByColumnId(id);
 
 		await Promise.all([deleteColumnPromise, deleteCardsPromise]);
 	}
@@ -48,26 +49,18 @@ export default function ColumnOptionsDropdown({
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent>
-				<DropdownMenuItem
-					onClick={() => setIsRenameColumnDialogOpen(true)}
-				>
-					<PenLine className="size-4" />
-					<span>Rename</span>
-				</DropdownMenuItem>
-
+				<RenameColumnDialog
+					columnId={id}
+					columnTitle={title}
+					renameColumn={renameColumn}
+				/>
 				<DropdownMenuItem onClick={handleDeleteColumn}>
 					<Trash2 className="size-4" />
 					<span>Delete</span>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-primary",
-							column.id,
-						)
-					}
+					onClick={() => changeColumnColor(color, "text-primary", id)}
 				>
 					<div
 						className={`${theme === "dark" ? "bg-white" : "bg-black"} rounded-sm size-4`}
@@ -76,11 +69,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-amber-900",
-							column.id,
-						)
+						changeColumnColor(color, "text-amber-900", id)
 					}
 				>
 					<div className="bg-amber-900 rounded-sm size-4" />
@@ -88,11 +77,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-orange-400",
-							column.id,
-						)
+						changeColumnColor(color, "text-orange-400", id)
 					}
 				>
 					<div className="bg-orange-400 rounded-sm size-4" />
@@ -100,11 +85,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-yellow-400",
-							column.id,
-						)
+						changeColumnColor(color, "text-yellow-400", id)
 					}
 				>
 					<div className="bg-yellow-400 rounded-sm size-4" />
@@ -112,11 +93,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-green-800",
-							column.id,
-						)
+						changeColumnColor(color, "text-green-800", id)
 					}
 				>
 					<div className="bg-green-800 rounded-sm size-4" />
@@ -124,11 +101,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-blue-500",
-							column.id,
-						)
+						changeColumnColor(color, "text-blue-500", id)
 					}
 				>
 					<div className="bg-blue-500 rounded-sm size-4" />
@@ -136,11 +109,7 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-purple-800",
-							column.id,
-						)
+						changeColumnColor(color, "text-purple-800", id)
 					}
 				>
 					<div className="bg-purple-800 rounded-sm size-4" />
@@ -148,24 +117,14 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-pink-400",
-							column.id,
-						)
+						changeColumnColor(color, "text-pink-400", id)
 					}
 				>
 					<div className="bg-pink-400 rounded-sm size-4" />
 					<span>Pink</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(
-							column.color,
-							"text-red-600",
-							column.id,
-						)
-					}
+					onClick={() => changeColumnColor(color, "text-red-600", id)}
 				>
 					<div className="bg-red-600 rounded-sm size-4" />
 					<span>Red</span>
@@ -174,3 +133,5 @@ export default function ColumnOptionsDropdown({
 		</DropdownMenu>
 	);
 }
+
+export const MemoizedColumnOptionsDropdown = React.memo(ColumnOptionsDropdown);

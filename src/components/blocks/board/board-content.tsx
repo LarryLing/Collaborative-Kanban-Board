@@ -129,9 +129,9 @@ export default function BoardContent({
 						{columns.map((column) => (
 							<Column
 								key={column.id}
-								column={column}
-								useCardsObject={useCardsObject}
-								useColumnsObject={useColumnsObject}
+								{...column}
+								{...useColumnsObject}
+								{...useCardsObject}
 							/>
 						))}
 					</SortableContext>

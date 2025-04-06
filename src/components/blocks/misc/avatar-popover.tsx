@@ -16,12 +16,14 @@ import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
 
 type AvatarPopoverProps = {
-	userProfile: UserProfile;
 	publicUrl: string;
-};
+} & UserProfile;
 
 export default function AvatarPopover({
-	userProfile,
+	display_name,
+	email,
+	about_me,
+	socials,
 	publicUrl,
 }: AvatarPopoverProps) {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -32,7 +34,7 @@ export default function AvatarPopover({
 				<Avatar>
 					<AvatarImage src={publicUrl} />
 					<AvatarFallback>
-						{userProfile.display_name.substring(0, 2).toUpperCase()}
+						{display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
@@ -44,32 +46,27 @@ export default function AvatarPopover({
 					<Avatar>
 						<AvatarImage src={publicUrl} />
 						<AvatarFallback>
-							{userProfile.display_name
-								.substring(0, 2)
-								.toUpperCase()}
+							{display_name.substring(0, 2).toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div className="ml-2">
-						<h3 className="font-bold">
-							{userProfile.display_name}
-						</h3>
+						<h3 className="font-bold">{display_name}</h3>
 						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
-							{userProfile.email}
+							{email}
 						</p>
 					</div>
 				</div>
-				{userProfile.about_me && (
+				{about_me && (
 					<>
 						<Separator className="w-full" />
-						<p className="text-sm">{userProfile.about_me}</p>
+						<p className="text-sm">{about_me}</p>
 					</>
 				)}
-				{userProfile.socials.filter((social) => social.url !== "")
-					.length > 0 && (
+				{socials.filter((social) => social.url !== "").length > 0 && (
 					<>
 						<Separator className="w-full" />
 						<div className="text-sm space-y-1">
-							{userProfile.socials
+							{socials
 								.filter((social) => social.url !== "")
 								.map((social, index) => (
 									<Button

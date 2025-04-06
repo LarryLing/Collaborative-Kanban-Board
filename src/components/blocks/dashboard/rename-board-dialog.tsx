@@ -1,27 +1,27 @@
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { renameBoard } from "@/lib/actions";
-import { useActionState, useEffect } from "react";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { PenLine } from "lucide-react";
+import { useActionState } from "react";
 
 type RenameDialogProps = {
 	boardId: string;
 	title: string;
-	isRenameDialogOpen: boolean;
-	setIsRenameDialogOpen: (arg0: boolean) => void;
 };
 
 export default function RenameBoardDialog({
 	boardId,
 	title,
-	isRenameDialogOpen,
-	setIsRenameDialogOpen,
 }: RenameDialogProps) {
 	const initialState = {
 		errors: undefined,
@@ -31,12 +31,14 @@ export default function RenameBoardDialog({
 
 	const [state, action, pending] = useActionState(renameBoard, initialState);
 
-	useEffect(() => {
-		setIsRenameDialogOpen(false);
-	}, [state?.updatedTitle]);
-
 	return (
-		<Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+		<Dialog>
+			<DialogTrigger asChild>
+				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+					<PenLine className="size-4" />
+					<span>Rename</span>
+				</DropdownMenuItem>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Rename Board</DialogTitle>
@@ -58,13 +60,11 @@ export default function RenameBoardDialog({
 						</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={() => setIsRenameDialogOpen(false)}
-						>
-							Cancel
-						</Button>
+						<DialogClose asChild>
+							<Button type="button" variant="outline">
+								Cancel
+							</Button>
+						</DialogClose>
 						<Button
 							type="submit"
 							disabled={pending}

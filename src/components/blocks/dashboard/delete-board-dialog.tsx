@@ -6,22 +6,26 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { deleteBoard } from "@/lib/actions";
+import { DialogClose } from "@radix-ui/react-dialog";
+import { Trash2 } from "lucide-react";
 
 type DeleteDialogProps = {
 	boardId: string;
-	isDeleteDialogOpen: boolean;
-	setIsDeleteDialogOpen: (arg0: boolean) => void;
 };
 
-export default function DeleteBoardDialog({
-	boardId,
-	isDeleteDialogOpen,
-	setIsDeleteDialogOpen,
-}: DeleteDialogProps) {
+export default function DeleteBoardDialog({ boardId }: DeleteDialogProps) {
 	return (
-		<Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+		<Dialog>
+			<DialogTrigger asChild>
+				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+					<Trash2 className="size-4" />
+					<span>Delete</span>
+				</DropdownMenuItem>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Confirm Delete</DialogTitle>
@@ -30,12 +34,9 @@ export default function DeleteBoardDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<DialogFooter>
-					<Button
-						variant="outline"
-						onClick={() => setIsDeleteDialogOpen(false)}
-					>
-						Go back
-					</Button>
+					<DialogClose asChild>
+						<Button variant="outline">Go back</Button>
+					</DialogClose>
 					<Button
 						variant="destructive"
 						type="submit"

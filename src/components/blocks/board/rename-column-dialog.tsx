@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
@@ -10,21 +11,21 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { FormEvent, useRef, useState } from "react";
-import { Column as ColumnType } from "@/lib/types";
 import { UseColumnsType } from "@/hooks/use-columns";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { PenLine } from "lucide-react";
 
 type RenameColumnDialogProps = {
-	column: ColumnType;
+	columnId: string;
+	columnTitle: string;
 	renameColumn: UseColumnsType["renameColumn"];
-	isRenameColumnDialogOpen: boolean;
-	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
 
 export default function RenameColumnDialog({
-	column,
+	columnId,
+	columnTitle,
 	renameColumn,
-	isRenameColumnDialogOpen,
-	setIsRenameColumnDialogOpen,
 }: RenameColumnDialogProps) {
 	const [pending, setPending] = useState(false);
 
@@ -36,20 +37,22 @@ export default function RenameColumnDialog({
 		setPending(true);
 
 		await renameColumn(
-            column.title,
+			columnTitle,
 			titleRef.current?.value || "Untitled Column",
-			column.id,
+			columnId,
 		);
 
 		setPending(false);
-		setIsRenameColumnDialogOpen(false);
 	}
 
 	return (
-		<Dialog
-			open={isRenameColumnDialogOpen}
-			onOpenChange={setIsRenameColumnDialogOpen}
-		>
+		<Dialog>
+			<DialogTrigger asChild>
+				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+					<PenLine className="size-4" />
+					<span>Rename</span>
+				</DropdownMenuItem>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Rename Column</DialogTitle>
@@ -63,18 +66,19 @@ export default function RenameColumnDialog({
 						id="title"
 						name="title"
 						placeholder="Column Title"
-						defaultValue={column.title}
+						defaultValue={columnTitle}
 						className="col-span-3"
 					/>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button
-							type="button"
-							variant="outline"
-							disabled={pending}
-							onClick={() => setIsRenameColumnDialogOpen(false)}
-						>
-							Cancel
-						</Button>
+						<DialogClose asChild>
+							<Button
+								type="button"
+								variant="outline"
+								disabled={pending}
+							>
+								Cancel
+							</Button>
+						</DialogClose>
 						<Button
 							type="submit"
 							disabled={pending}

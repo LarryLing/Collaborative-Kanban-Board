@@ -21,10 +21,7 @@ export default function AuthenticatedNavigationBar({
 			<Branding href="/dashboard" />
 			<div className="flex justify-center items-center gap-2">
 				<ThemeToggle />
-				<AvatarPopover
-					userProfile={userProfile}
-					publicUrl={publicUrl}
-				/>
+				<AvatarPopover {...userProfile} publicUrl={publicUrl} />
 			</div>
 		</NavigationMenu>
 	);
