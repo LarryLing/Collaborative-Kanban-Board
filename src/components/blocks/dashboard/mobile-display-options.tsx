@@ -47,9 +47,7 @@ export default function MobileDisplayOptions() {
 					<DropdownMenuRadioItem value="anyone">
 						Owned by anyone
 					</DropdownMenuRadioItem>
-					<DropdownMenuRadioItem value="me">
-						Owned by me
-					</DropdownMenuRadioItem>
+					<DropdownMenuRadioItem value="me">Owned by me</DropdownMenuRadioItem>
 					<DropdownMenuRadioItem value="not-me">
 						Not owned by me
 					</DropdownMenuRadioItem>
@@ -57,9 +55,7 @@ export default function MobileDisplayOptions() {
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup
 					value={sortState}
-					onValueChange={(value) =>
-						handleSortChange(value as SortOptions)
-					}
+					onValueChange={(value) => handleSortChange(value as SortOptions)}
 				>
 					<DropdownMenuRadioItem value="last-opened">
 						Last opened
@@ -74,9 +70,7 @@ export default function MobileDisplayOptions() {
 				<DropdownMenuSeparator />
 				<DropdownMenuRadioGroup
 					value={viewState}
-					onValueChange={(value) =>
-						handleViewChange(value as ViewOptions)
-					}
+					onValueChange={(value) => handleViewChange(value as ViewOptions)}
 				>
 					<DropdownMenuRadioItem value="gallery">
 						<span>Gallery view</span>

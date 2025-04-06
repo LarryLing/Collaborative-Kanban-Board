@@ -34,9 +34,7 @@ export default function BoardOptionsDropdown({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent side={side}>
 				<RenameBoardDialog boardId={boardId} title={boardTitle} />
-				<DropdownMenuItem
-					onClick={() => bookmarkBoard(boardId, bookmarked)}
-				>
+				<DropdownMenuItem onClick={() => bookmarkBoard(boardId, bookmarked)}>
 					<Bookmark className="size-4" />
 					<span>Bookmark</span>
 				</DropdownMenuItem>

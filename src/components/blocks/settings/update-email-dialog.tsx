@@ -17,9 +17,7 @@ type UpdateEmailDialogProps = {
 	email: string;
 };
 
-export default function UpdateEmailDialog({
-	email,
-}: UpdateEmailDialogProps) {
+export default function UpdateEmailDialog({ email }: UpdateEmailDialogProps) {
 	const { toast } = useToast();
 
 	const [state, action, pending] = useActionState(updateEmail, undefined);
@@ -42,8 +40,8 @@ export default function UpdateEmailDialog({
 				<DialogHeader>
 					<DialogTitle>Update Email</DialogTitle>
 					<DialogDescription>
-						Enter your new email below. Confirmation emails will be
-						sent to your old and new inboxes.
+						Enter your new email below. Confirmation emails will be sent to
+						your old and new inboxes.
 					</DialogDescription>
 				</DialogHeader>
 				<form>
@@ -55,9 +53,7 @@ export default function UpdateEmailDialog({
 						className="max-w-[400px]"
 					/>
 					{state?.errors?.email && (
-						<p className="text-sm text-destructive">
-							{state.errors.email}
-						</p>
+						<p className="text-sm text-destructive">{state.errors.email}</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>

@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { LayoutGrid, LogOut, Settings2 } from "lucide-react";
@@ -82,9 +78,7 @@ export default function AvatarPopover({
 											target="_blank"
 											rel="noopener noreferrer"
 										>
-											{new URL(
-												social.url,
-											).pathname.substring(1)}
+											{new URL(social.url).pathname.substring(1)}
 										</Link>
 									</Button>
 								))}

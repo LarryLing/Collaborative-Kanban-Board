@@ -20,9 +20,7 @@ export default function ViewButton() {
 						aria-label="Toggle view"
 						variant="outline"
 						onClick={() =>
-							handleViewChange(
-								viewState === "gallery" ? "list" : "gallery",
-							)
+							handleViewChange(viewState === "gallery" ? "list" : "gallery")
 						}
 						size="icon"
 					>

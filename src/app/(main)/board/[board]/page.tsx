@@ -84,7 +84,7 @@ export default async function BoardPage({
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-				boardId={board.id}
+				boardId={boardId}
 				boardTitle={board.title}
 				boardCover={boardCover}
 			/>

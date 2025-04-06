@@ -62,10 +62,7 @@ export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 				)}
 			</DialogTrigger>
 			<DialogContent className="size-[500px] px-8">
-				<form
-					onSubmit={(e) => handleSubmit(e)}
-					className="flex flex-col gap-4"
-				>
+				<form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-4">
 					<DialogHeader
 						className="hover:cursor-text"
 						aria-description="New Card"

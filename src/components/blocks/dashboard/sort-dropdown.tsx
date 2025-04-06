@@ -37,9 +37,7 @@ export default function SortDropdown() {
 			<DropdownMenuContent onCloseAutoFocus={(e) => e.preventDefault()}>
 				<DropdownMenuRadioGroup
 					value={sortState}
-					onValueChange={(value) =>
-						handleSortChange(value as SortOptions)
-					}
+					onValueChange={(value) => handleSortChange(value as SortOptions)}
 				>
 					<DropdownMenuRadioItem value="last-opened">
 						Last opened

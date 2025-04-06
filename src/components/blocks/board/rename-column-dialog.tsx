@@ -71,19 +71,11 @@ export default function RenameColumnDialog({
 					/>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
-							<Button
-								type="button"
-								variant="outline"
-								disabled={pending}
-							>
+							<Button type="button" variant="outline" disabled={pending}>
 								Cancel
 							</Button>
 						</DialogClose>
-						<Button
-							type="submit"
-							disabled={pending}
-							className="mb-2 sm:mb-0"
-						>
+						<Button type="submit" disabled={pending} className="mb-2 sm:mb-0">
 							{pending ? "Renaming..." : "Rename"}
 						</Button>
 					</div>

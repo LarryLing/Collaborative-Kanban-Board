@@ -65,14 +65,9 @@ export default async function SettingsPage(props: {
 					</Button>
 				</div>
 				{tab === "" && (
-					<ProfileSettings
-						{...userProfile}
-						publicUrl={publicUrl.publicUrl}
-					/>
+					<ProfileSettings {...userProfile} publicUrl={publicUrl.publicUrl} />
 				)}
-				{tab === "account" && (
-					<AccountSettings email={userProfile.email} />
-				)}
+				{tab === "account" && <AccountSettings email={userProfile.email} />}
 			</div>
 		</div>
 	);

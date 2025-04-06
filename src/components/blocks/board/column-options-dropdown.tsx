@@ -68,57 +68,43 @@ export default function ColumnOptionsDropdown({
 					<span>Default</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-amber-900", id)
-					}
+					onClick={() => changeColumnColor(color, "text-amber-900", id)}
 				>
 					<div className="bg-amber-900 rounded-sm size-4" />
 					<span>Brown</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-orange-400", id)
-					}
+					onClick={() => changeColumnColor(color, "text-orange-400", id)}
 				>
 					<div className="bg-orange-400 rounded-sm size-4" />
 					<span>Orange</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-yellow-400", id)
-					}
+					onClick={() => changeColumnColor(color, "text-yellow-400", id)}
 				>
 					<div className="bg-yellow-400 rounded-sm size-4" />
 					<span>Yellow</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-green-800", id)
-					}
+					onClick={() => changeColumnColor(color, "text-green-800", id)}
 				>
 					<div className="bg-green-800 rounded-sm size-4" />
 					<span>Green</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-blue-500", id)
-					}
+					onClick={() => changeColumnColor(color, "text-blue-500", id)}
 				>
 					<div className="bg-blue-500 rounded-sm size-4" />
 					<span>Blue</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-purple-800", id)
-					}
+					onClick={() => changeColumnColor(color, "text-purple-800", id)}
 				>
 					<div className="bg-purple-800 rounded-sm size-4" />
 					<span>Purple</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() =>
-						changeColumnColor(color, "text-pink-400", id)
-					}
+					onClick={() => changeColumnColor(color, "text-pink-400", id)}
 				>
 					<div className="bg-pink-400 rounded-sm size-4" />
 					<span>Pink</span>

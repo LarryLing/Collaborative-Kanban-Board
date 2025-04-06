@@ -26,9 +26,7 @@ export default function BookmarkToggle() {
 							pressed={bookmarkedState === "true"}
 							onPressedChange={() =>
 								handleBookmarkedChange(
-									bookmarkedState === "true"
-										? "false"
-										: "true",
+									bookmarkedState === "true" ? "false" : "true",
 								)
 							}
 						>

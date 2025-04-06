@@ -36,8 +36,8 @@ export default function UpdatePasswordDialog() {
 				<DialogHeader>
 					<DialogTitle>Update Password</DialogTitle>
 					<DialogDescription>
-						Please enter your new password below and confirm it.
-						Make sure to use a strong password for security.
+						Please enter your new password below and confirm it. Make sure to
+						use a strong password for security.
 					</DialogDescription>
 				</DialogHeader>
 				<form>

@@ -29,9 +29,7 @@ export default function Card({
 	created_at,
 	editCard,
 }: CardProps) {
-	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">(
-		"Saved",
-	);
+	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">("Saved");
 
 	const titleRef = useRef<HTMLInputElement | null>(null);
 	const descriptionRef = useRef<HTMLTextAreaElement | null>(null);
@@ -39,9 +37,9 @@ export default function Card({
 	const debounceEditCard = useDebouncedCallback(async () => {
 		await editCard(
 			id,
-            title,
+			title,
 			titleRef.current?.value || "Untitled Card",
-            description,
+			description,
 			descriptionRef.current?.value || "",
 		);
 
@@ -54,10 +52,9 @@ export default function Card({
 		await debounceEditCard();
 	}
 
-	const { attributes, listeners, setNodeRef, transform, transition } =
-		useSortable({
-			id: id,
-		});
+	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+		id: id,
+	});
 
 	const style = {
 		transform: CSS.Transform.toString(transform),
@@ -78,10 +75,7 @@ export default function Card({
 				</div>
 			</DialogTrigger>
 			<DialogContent className="flex flex-col size-[500px] px-8">
-				<DialogHeader
-					className="hover:cursor-text"
-					aria-description={title}
-				>
+				<DialogHeader className="hover:cursor-text" aria-description={title}>
 					<DialogTitle>
 						<Input
 							ref={titleRef}

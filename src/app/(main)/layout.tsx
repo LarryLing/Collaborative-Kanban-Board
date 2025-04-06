@@ -2,11 +2,7 @@ import AuthenticatedNavigationBar from "@/components/blocks/misc/authenticated-n
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function GroupLayout({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export default async function GroupLayout({ children }: { children: React.ReactNode }) {
 	const supabase = await createClient();
 	const { data: user } = await supabase.auth.getUser();
 

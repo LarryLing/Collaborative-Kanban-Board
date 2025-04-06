@@ -24,8 +24,7 @@ export default function AccountSettings({ email }: AccountSettingsProps) {
 			<CardHeader className="md:pt-0">
 				<CardTitle>Account</CardTitle>
 				<CardDescription>
-					Set your preferred language and manage your account
-					credentials.
+					Set your preferred language and manage your account credentials.
 				</CardDescription>
 			</CardHeader>
 			<CardContent className="space-y-6">
@@ -33,8 +32,7 @@ export default function AccountSettings({ email }: AccountSettingsProps) {
 				<div className="space-y-1">
 					<Label>Email</Label>
 					<p className="text-sm text-muted-foreground font-normal">
-						This is the email you will use to login and receive
-						emails for.
+						This is the email you will use to login and receive emails for.
 					</p>
 					<UpdateEmailDialog email={email} />
 				</div>

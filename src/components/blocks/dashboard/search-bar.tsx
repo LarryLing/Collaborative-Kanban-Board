@@ -35,9 +35,7 @@ export default function SearchBar() {
 							<Toggle
 								variant="outline"
 								pressed={isSearchOpen}
-								onPressedChange={() =>
-									setIsSearchOpen(!isSearchOpen)
-								}
+								onPressedChange={() => setIsSearchOpen(!isSearchOpen)}
 							>
 								<Search className="size-5" />
 							</Toggle>

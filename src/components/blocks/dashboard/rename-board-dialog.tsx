@@ -19,10 +19,7 @@ type RenameDialogProps = {
 	title: string;
 };
 
-export default function RenameBoardDialog({
-	boardId,
-	title,
-}: RenameDialogProps) {
+export default function RenameBoardDialog({ boardId, title }: RenameDialogProps) {
 	const initialState = {
 		errors: undefined,
 		boardId: boardId,
@@ -55,9 +52,7 @@ export default function RenameBoardDialog({
 						className="col-span-3"
 					/>
 					{state?.errors?.title && (
-						<p className="text-sm text-destructive">
-							{state.errors.title}
-						</p>
+						<p className="text-sm text-destructive">{state.errors.title}</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
@@ -65,11 +60,7 @@ export default function RenameBoardDialog({
 								Cancel
 							</Button>
 						</DialogClose>
-						<Button
-							type="submit"
-							disabled={pending}
-							className="mb-2 sm:mb-0"
-						>
+						<Button type="submit" disabled={pending} className="mb-2 sm:mb-0">
 							{pending ? "Renaming..." : "Rename"}
 						</Button>
 					</div>

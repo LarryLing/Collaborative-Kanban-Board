@@ -33,15 +33,9 @@ export default function ProfileSettings({
 }: ProfileSettingsProps) {
 	const { toast } = useToast();
 
-	const [state, action, pending] = useActionState(
-		updateUserProfile,
-		undefined,
-	);
+	const [state, action, pending] = useActionState(updateUserProfile, undefined);
 
-	const { preview, uploading, changeAvatar, avatarInputRef } = useAvatar(
-		id,
-		publicUrl,
-	);
+	const { preview, uploading, changeAvatar, avatarInputRef } = useAvatar(id, publicUrl);
 
 	useEffect(() => {
 		if (state?.updatedProfile !== undefined) {
@@ -111,8 +105,7 @@ export default function ProfileSettings({
 								name="displayName"
 								type="text"
 								defaultValue={
-									state?.updatedProfile?.displayName ||
-									display_name
+									state?.updatedProfile?.displayName || display_name
 								}
 							/>
 							{state?.errors?.displayName && (
@@ -131,9 +124,7 @@ export default function ProfileSettings({
 								id="aboutMe"
 								name="aboutMe"
 								className="resize-none h-[100px]"
-								defaultValue={
-									state?.updatedProfile?.aboutMe || about_me
-								}
+								defaultValue={state?.updatedProfile?.aboutMe || about_me}
 							/>
 							{state?.errors?.aboutMe && (
 								<p className="text-sm text-destructive">

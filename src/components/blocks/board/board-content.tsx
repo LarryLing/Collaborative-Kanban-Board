@@ -15,10 +15,7 @@ import {
 } from "@dnd-kit/core";
 import useColumns from "@/hooks/use-columns";
 import useCards from "@/hooks/use-cards";
-import {
-	horizontalListSortingStrategy,
-	SortableContext,
-} from "@dnd-kit/sortable";
+import { horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import { MemoizedNewColumn } from "./new-column";
 
 type BoardContentProps = {
@@ -59,12 +56,8 @@ export default function BoardContent({
 		const overId = over.id as string;
 
 		if (isColumn(activeId) && isColumn(overId)) {
-			const activeIndex = columns.findIndex(
-				(column) => column.id === activeId,
-			);
-			const overIndex = columns.findIndex(
-				(column) => column.id === overId,
-			);
+			const activeIndex = columns.findIndex((column) => column.id === activeId);
+			const overIndex = columns.findIndex((column) => column.id === overId);
 
 			if (activeIndex !== -1 && overIndex !== -1) {
 				await moveColumn(activeIndex, overIndex);

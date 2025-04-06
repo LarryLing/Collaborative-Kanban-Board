@@ -33,11 +33,7 @@ export default function CardOptionsDropdown({
 	return (
 		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="absolute right-2 top-2"
-				>
+				<Button variant="ghost" size="icon" className="absolute right-2 top-2">
 					<Ellipsis />
 				</Button>
 			</DropdownMenuTrigger>
@@ -59,10 +55,7 @@ export default function CardOptionsDropdown({
 					}
 				>
 					{columns.map((column) => (
-						<DropdownMenuRadioItem
-							key={column.id}
-							value={column.id}
-						>
+						<DropdownMenuRadioItem key={column.id} value={column.id}>
 							{column.title}
 						</DropdownMenuRadioItem>
 					))}

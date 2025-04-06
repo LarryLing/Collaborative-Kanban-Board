@@ -24,8 +24,7 @@ export default function Board({
 	const supabase = createClient();
 
 	const coverPreview = cover_path
-		? supabase.storage.from("covers").getPublicUrl(cover_path).data
-				.publicUrl
+		? supabase.storage.from("covers").getPublicUrl(cover_path).data.publicUrl
 		: null;
 
 	const lastOpenedDateString = getDateString(last_opened);

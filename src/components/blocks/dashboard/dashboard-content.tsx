@@ -13,11 +13,7 @@ type DashboardContentProps = {
 	query: string;
 };
 
-export default function DashboardContent({
-	id,
-	boards,
-	query,
-}: DashboardContentProps) {
+export default function DashboardContent({ id, boards, query }: DashboardContentProps) {
 	const ownershipState = useSyncExternalStore(
 		ownership.subscribe,
 		ownership.getSnapshot,
@@ -31,14 +27,7 @@ export default function DashboardContent({
 
 	const processedBoards = useMemo(
 		() =>
-			processBoards(
-				id,
-				boards,
-				bookmarkedState,
-				ownershipState,
-				sortState,
-				query,
-			),
+			processBoards(id, boards, bookmarkedState, ownershipState, sortState, query),
 		[id, boards, bookmarkedState, ownershipState, sortState, query],
 	);
 

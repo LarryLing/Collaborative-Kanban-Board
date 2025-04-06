@@ -63,9 +63,7 @@ export default function Column({
 				className="flex items-center justify-between mb-2 active:cursor-grabbing"
 			>
 				<div className="rounded-md font-semibold">
-					<span
-						className={`mr-3 ${color} w-[125px] text-ellipsis text-nowrap`}
-					>
+					<span className={`mr-3 ${color} w-[125px] text-ellipsis text-nowrap`}>
 						{title}
 					</span>
 					<span className="text-sm">{filteredCards.length}</span>
@@ -80,17 +78,10 @@ export default function Column({
 						renameColumn={renameColumn}
 						deleteCardsByColumnId={deleteCardsByColumnId}
 					/>
-					<MemoizedNewCard
-						size="icon"
-						columnId={id}
-						createCard={createCard}
-					/>
+					<MemoizedNewCard size="icon" columnId={id} createCard={createCard} />
 				</div>
 			</div>
-			<SortableContext
-				items={filteredCards}
-				strategy={verticalListSortingStrategy}
-			>
+			<SortableContext items={filteredCards} strategy={verticalListSortingStrategy}>
 				<div ref={droppableNodeRef} className="space-y-2">
 					{filteredCards.map((card) => (
 						<div key={card.id} className="relative">

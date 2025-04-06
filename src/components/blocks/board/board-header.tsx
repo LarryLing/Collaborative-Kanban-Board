@@ -22,8 +22,10 @@ export default function BoardHeader({
 }: BoardHeaderProps) {
 	const supabase = createClient();
 
-	const { coverPreview, uploading, handleChange, coverPathRef } =
-		useBoardCover(boardId, boardCover);
+	const { coverPreview, uploading, handleChange, coverPathRef } = useBoardCover(
+		boardId,
+		boardCover,
+	);
 	const { editTitle, boardTitleRef } = useBoardTitle(supabase, boardId);
 
 	function openCoverPathInput() {
@@ -34,12 +36,7 @@ export default function BoardHeader({
 		<>
 			<div className="w-full h-[225px] bg-accent/30 group-hover:bg-accent/50 rounded-md relative overflow-hidden">
 				{coverPreview && (
-					<Image
-						src={coverPreview}
-						alt=""
-						objectFit="cover"
-						layout="fill"
-					/>
+					<Image src={coverPreview} alt="" objectFit="cover" layout="fill" />
 				)}
 				<div className="absolute top-2 right-2">
 					<div className="relative">
