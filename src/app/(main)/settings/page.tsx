@@ -16,19 +16,22 @@ export default async function SettingsPage(props: {
 	const tab = searchParams?.tab || "";
 
 	const supabase = await createClient();
-	const { data: user } = await supabase.auth.getUser();
 
-	if (!user.user) redirect("/login");
+	const { data: userData, error: userError } = await supabase.auth.getUser();
+
+	if (userError) throw userError;
+
+	if (!userData.user) redirect("/login");
 
 	const { data: userProfile, error: profileError } = await supabase
 		.from("profiles")
 		.select("*, socials(url)")
-		.eq("id", user.user.id)
+		.eq("id", userData.user.id)
 		.single();
 
 	if (profileError) throw profileError;
 
-	const { data: publicUrl } = await supabase.storage
+	const { data: publicUrl } = supabase.storage
 		.from("avatars")
 		.getPublicUrl(userProfile.avatar_path || "");
 

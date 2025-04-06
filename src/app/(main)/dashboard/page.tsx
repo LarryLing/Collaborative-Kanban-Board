@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
-import DashboardDisplay from "@/components/blocks/dashboard/dashboard-display";
+import DashboardContent from "@/components/blocks/dashboard/dashboard-content";
 import DashboardHeader from "@/components/blocks/dashboard/dashboard-header";
 
 export default async function DashboardPage(props: {
@@ -36,7 +36,7 @@ export default async function DashboardPage(props: {
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<DashboardHeader />
 			<Separator className="w-full" />
-			<DashboardDisplay
+			<DashboardContent
 				id={userData.user.id}
 				boards={boardsData.map((item) => item.boards)}
 				query={query}

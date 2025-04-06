@@ -5,21 +5,19 @@ import { Board as BoardType } from "@/lib/types";
 import { processBoards } from "@/lib/utils";
 import { ownership, sort, bookmarked, view } from "../../../lib/storage-utils";
 import Board from "./board";
-import { Button } from "@/components/ui/button";
-import { createBoard } from "@/lib/actions";
-import { Plus } from "lucide-react";
+import { MemoizedNewBoard } from "./new-board";
 
-type DashboardDisplayProps = {
+type DashboardContentProps = {
 	id: string;
 	boards: BoardType[];
 	query: string;
 };
 
-export default function DashboardDisplay({
+export default function DashboardContent({
 	id,
 	boards,
 	query,
-}: DashboardDisplayProps) {
+}: DashboardContentProps) {
 	const ownershipState = useSyncExternalStore(
 		ownership.subscribe,
 		ownership.getSnapshot,
@@ -53,16 +51,9 @@ export default function DashboardDisplay({
 			}
 		>
 			{processedBoards.map((board) => {
-				return <Board key={board.id} board={board} view={viewState} />;
+				return <Board key={board.id} {...board} view={viewState} />;
 			})}
-			<Button
-				variant="ghost"
-				className={`${viewState === "gallery" ? "h-[280px]" : "h-[56px] overflow-hidden pl-4 pr-2"} w-full flex items-center justify-center gap-2`}
-				onClick={createBoard}
-			>
-				<Plus className="size-4" />
-				<span className="font-semibold text-md">New Board</span>
-			</Button>
+			<MemoizedNewBoard viewState={viewState} />
 		</div>
 	);
 }

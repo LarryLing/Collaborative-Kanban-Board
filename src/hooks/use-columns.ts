@@ -1,3 +1,4 @@
+import { updateColumnsByBoardId } from '@/lib/queries';
 import { Column, ColumnColorOptions, TypedSupabaseClient } from '@/lib/types'
 import { arrayMove } from '@dnd-kit/sortable';
 import { useCallback, useEffect, useState } from 'react'
@@ -6,8 +7,8 @@ export type UseColumnsType = {
     columns: Column[];
     createColumn: () => Promise<void>
     deleteColumn: (columnId: string) => Promise<void>
-    changeColumnColor: (textColor: ColumnColorOptions, columnId: string) => Promise<void>
-    renameColumn: (newTitle: string, columnId: string) => Promise<void>
+    changeColumnColor: (oldTextColor: ColumnColorOptions, newTextColor: ColumnColorOptions, columnId: string) => Promise<void>
+    renameColumn: (oldTitle: string, newTitle: string, columnId: string) => Promise<void>
     moveColumn: (from: number, to: number) => Promise<void>
 }
 
@@ -47,7 +48,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
             },
         ] as Column[];
 
-        await updateColumns(updatedColumns);
+        await updateColumnsByBoardId(supabase, boardId, updatedColumns);
     }, [columns])
 
     const deleteColumn = useCallback(async (columnId: string) => {
@@ -55,23 +56,27 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 			(columns) => columns.id !== columnId,
 		);
 
-        await updateColumns(updatedColumns);
+        await updateColumnsByBoardId(supabase, boardId, updatedColumns);
 	}, [columns])
 
-    const changeColumnColor = useCallback(async (textColor: ColumnColorOptions, columnId: string) => {
+    const changeColumnColor = useCallback(async (oldTextColor: ColumnColorOptions, newTextColor: ColumnColorOptions, columnId: string) => {
+        if (oldTextColor === newTextColor) return;
+
         const updatedColumns = columns.map((column) =>
             column.id === columnId
                 ? {
                         ...column,
-                        color: textColor,
+                        color: newTextColor,
                     }
                 : column,
         )
 
-        await updateColumns(updatedColumns);
+        await updateColumnsByBoardId(supabase, boardId, updatedColumns);
     }, [columns])
 
-    const renameColumn = useCallback(async (newTitle: string, columnId: string) => {
+    const renameColumn = useCallback(async (oldTitle: string, newTitle: string, columnId: string) => {
+        if (oldTitle === newTitle) return;
+
         const updatedColumns = columns.map((column) =>
 			column.id === columnId
 				? {
@@ -81,27 +86,15 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 				: column,
 		);
 
-		await updateColumns(updatedColumns);
+        setColumns(updatedColumns);
     }, [columns])
 
     const moveColumn = useCallback(async (from: number, to: number) => {
         const updatedColumns = arrayMove(columns, from, to);
 
-        await updateColumns(updatedColumns);
-    }, [columns])
-
-    const updateColumns = useCallback(async (updatedColumns: Column[]) => {
         setColumns(updatedColumns);
-
-        const { error: updateColumnsError } = await supabase
-			.from("columns")
-			.update({
-				columns: updatedColumns,
-			})
-			.eq("board_id", boardId);
-
-            if (updateColumnsError) throw updateColumnsError;
-    }, [])
+        await updateColumnsByBoardId(supabase, boardId, updatedColumns);
+    }, [columns])
 
     return {columns, createColumn, deleteColumn, changeColumnColor, renameColumn, moveColumn} as UseColumnsType;
 }

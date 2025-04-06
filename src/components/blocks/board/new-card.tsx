@@ -106,3 +106,5 @@ export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 		</Dialog>
 	);
 }
+
+export const MemoizedNewCard = React.memo(NewCard);

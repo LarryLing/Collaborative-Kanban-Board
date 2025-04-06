@@ -247,10 +247,7 @@ export async function updatePassword(formState: UserFormState, formData: FormDat
             },
         );
 
-        if (passwordError) {
-            console.log(passwordError);
-            throw passwordError;
-        }
+        if (passwordError) throw passwordError;
 
         revalidatePath("/");
 
@@ -289,10 +286,7 @@ export async function updateEmail(formState: UserFormState, formData: FormData) 
             .select("email")
             .eq("email", validatedFields.data.email);
 
-        if (emailExistsError) {
-            console.log(emailExistsError)
-            throw emailExistsError;
-        }
+        if (emailExistsError) throw emailExistsError;
 
         if (emailExistsData.length > 0) {
             return {
@@ -425,22 +419,23 @@ export async function uploadAvatar(userId: string, file: File) {
         const fileExt = file.name.split(".").pop();
         const filePath = `${userId}/avatar_${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const uploadAvatarPromise = supabase.storage
             .from("avatars")
             .upload(filePath, file);
 
-        if (uploadError) throw uploadError;
-
-        const { error: profileError } = await supabase
+        const updateProfilePromise = supabase
             .from("profiles")
             .update({
                 avatar_path: filePath,
             })
             .eq("id", userId);
 
-        if (profileError) throw profileError;
+        const [uploadAvatarResponse, updateProfileResponse] = await Promise.all([uploadAvatarPromise, updateProfilePromise])
 
-        const { data: publicUrl } = await supabase.storage
+        if (uploadAvatarResponse.error) throw uploadAvatarResponse.error;
+        if (updateProfileResponse.error) throw updateProfileResponse.error;
+
+        const { data: publicUrl } = supabase.storage
             .from("avatars")
             .getPublicUrl(filePath);
 
@@ -464,28 +459,23 @@ export async function uploadCover(boardId: string, file: File) {
         const fileExt = file.name.split(".").pop();
         const filePath = `${boardId}/cover_${Date.now()}.${fileExt}`;
 
-        const { error: uploadError } = await supabase.storage
+        const uploadCoverPromise = supabase.storage
             .from("covers")
             .upload(filePath, file);
 
-        if (uploadError) {
-            console.log(uploadError.message)
-            throw uploadError;
-        }
-
-        const { error: boardError } = await supabase
+        const updateBoardPromise = supabase
             .from("boards")
             .update({
                 cover_path: filePath,
             })
             .eq("id", boardId);
 
-        if (boardError) {
-            console.log(boardError.message)
-            throw boardError;
-        }
+        const [uploadCoverResponse, updateBoardResponse] = await Promise.all([uploadCoverPromise, updateBoardPromise])
 
-        const { data: publicUrl } = await supabase.storage
+        if (uploadCoverResponse.error) throw uploadCoverResponse.error;
+        if (updateBoardResponse.error) throw updateBoardResponse.error;
+
+        const { data: publicUrl } = supabase.storage
             .from("covers")
             .getPublicUrl(filePath);
 

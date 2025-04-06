@@ -3,8 +3,6 @@
 import React from "react";
 import { createClient } from "@/lib/supabase/client";
 import Column from "./column";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { Card as CardType, Column as ColumnType } from "@/lib/types";
 import {
 	closestCorners,
@@ -21,18 +19,19 @@ import {
 	horizontalListSortingStrategy,
 	SortableContext,
 } from "@dnd-kit/sortable";
+import { MemoizedNewColumn } from "./new-column";
 
-type BoardClientComponentProps = {
+type BoardContentProps = {
 	boardId: string;
 	fetchedColumns: ColumnType[];
 	fetchedCards: CardType[];
 };
 
-export default function BoardClientComponent({
+export default function BoardContent({
 	boardId,
 	fetchedColumns,
 	fetchedCards,
-}: BoardClientComponentProps) {
+}: BoardContentProps) {
 	const supabase = createClient();
 
 	const useColumnsObject = useColumns(supabase, boardId, fetchedColumns);
@@ -67,8 +66,9 @@ export default function BoardClientComponent({
 				(column) => column.id === overId,
 			);
 
-			if (activeIndex !== -1 && overIndex !== -1)
+			if (activeIndex !== -1 && overIndex !== -1) {
 				await moveColumn(activeIndex, overIndex);
+			}
 		}
 
 		const activeColumnId = findColumnId(activeId);
@@ -80,8 +80,9 @@ export default function BoardClientComponent({
 			const activeIndex = cards.findIndex((card) => card.id === activeId);
 			const overIndex = cards.findIndex((card) => card.id === overId);
 
-			if (activeIndex !== -1 && overIndex !== -1)
+			if (activeIndex !== -1 && overIndex !== -1) {
 				await moveCard(activeIndex, overIndex);
+			}
 		}
 	}
 
@@ -100,7 +101,7 @@ export default function BoardClientComponent({
 		if (activeColumnId === overColumnId && activeId !== overId) return;
 		if (activeColumnId === overColumnId) return;
 
-		await moveCardToColumn(activeId, overColumnId);
+		await moveCardToColumn(activeId, activeColumnId, overColumnId);
 	}
 
 	const sensors = useSensors(
@@ -113,31 +114,30 @@ export default function BoardClientComponent({
 	);
 
 	return (
-		<div className="flex gap-4 w-full overflow-auto pb-4">
-			<DndContext
-				sensors={sensors}
-				collisionDetection={closestCorners}
-				onDragEnd={handleDragEnd}
-				onDragOver={handleDragOver}
-			>
-				<SortableContext
-					items={columns}
-					strategy={horizontalListSortingStrategy}
+		<div className="flex justify-center">
+			<div className="flex gap-4 w-full overflow-auto pb-4">
+				<DndContext
+					sensors={sensors}
+					collisionDetection={closestCorners}
+					onDragEnd={handleDragEnd}
+					onDragOver={handleDragOver}
 				>
-					{columns.map((column) => (
-						<Column
-							key={column.id}
-							column={column}
-							useCardsObject={useCardsObject}
-							useColumnsObject={useColumnsObject}
-						/>
-					))}
-				</SortableContext>
-			</DndContext>
-			<Button variant="ghost" onClick={createColumn}>
-				<Plus />
-				<span>New Column</span>
-			</Button>
+					<SortableContext
+						items={columns}
+						strategy={horizontalListSortingStrategy}
+					>
+						{columns.map((column) => (
+							<Column
+								key={column.id}
+								column={column}
+								useCardsObject={useCardsObject}
+								useColumnsObject={useColumnsObject}
+							/>
+						))}
+					</SortableContext>
+				</DndContext>
+				<MemoizedNewColumn createColumn={createColumn} />
+			</div>
 		</div>
 	);
 }

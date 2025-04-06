@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { login, loginWithGoogle, loginWithGithub } from "@/lib/actions";
-import { mona_sans, roboto } from "@/lib/fonts";
 import Link from "next/link";
 import React, { useActionState, useEffect } from "react";
 
@@ -35,7 +34,7 @@ export default function LoginPage() {
 					<Button
 						onClick={loginWithGoogle}
 						disabled={pending}
-						className={`${roboto.className} bg-google hover:bg-google/70 text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
+						className="bg-google hover:bg-google/70 text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto"
 					>
 						<GoogleIcon className="size-5" />
 						<span>Sign in with Google</span>
@@ -43,7 +42,7 @@ export default function LoginPage() {
 					<Button
 						onClick={loginWithGithub}
 						disabled={pending}
-						className={`${mona_sans.className} bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
+						className="bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto"
 					>
 						<GithubIcon />
 						<span>Sign in with Github</span>

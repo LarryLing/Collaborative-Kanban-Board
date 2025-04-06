@@ -1,11 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import Card from "./card";
-import NewCard from "./new-card";
+import { MemoizedCard } from "./card";
+import { MemoizedNewCard } from "./new-card";
 import { Column as ColumnType } from "@/lib/types";
 import ColumnOptionsDropdown from "./column-options-dropdown";
-import RenameColumnDialog from "./rename-column-dialog";
 import {
 	SortableContext,
 	useSortable,
@@ -16,6 +15,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { UseCardsType } from "@/hooks/use-cards";
 import { UseColumnsType } from "@/hooks/use-columns";
 import { CSS } from "@dnd-kit/utilities";
+import RenameColumnDialog from "./rename-column-dialog";
 
 type ColumnProps = {
 	column: ColumnType;
@@ -32,10 +32,10 @@ export default function Column({
 	const {
 		cards,
 		createCard,
-		editCard,
 		duplicateCard,
 		deleteCard,
 		moveCardToColumn,
+		editCard,
 	} = useCardsObject;
 
 	const filteredCards = cards.filter((card) => card.column_id === column.id);
@@ -79,13 +79,13 @@ export default function Column({
 					<div className="space-x-2">
 						<ColumnOptionsDropdown
 							column={column}
+							useCardsObject={useCardsObject}
+							useColumnsObject={useColumnsObject}
 							setIsRenameColumnDialogOpen={
 								setIsRenameColumnDialogOpen
 							}
-							useCardsObject={useCardsObject}
-							useColumnsObject={useColumnsObject}
 						/>
-						<NewCard
+						<MemoizedNewCard
 							size="icon"
 							columnId={column.id}
 							createCard={createCard}
@@ -99,7 +99,7 @@ export default function Column({
 					<div ref={droppableNodeRef} className="space-y-2">
 						{filteredCards.map((card) => (
 							<div key={card.id} className="relative">
-								<Card card={card} editCard={editCard} />
+								<MemoizedCard {...card} editCard={editCard} />
 								<CardOptionsDropdown
 									card={card}
 									columns={columns}
@@ -109,7 +109,7 @@ export default function Column({
 								/>
 							</div>
 						))}
-						<NewCard
+						<MemoizedNewCard
 							size="default"
 							columnId={column.id}
 							createCard={createCard}

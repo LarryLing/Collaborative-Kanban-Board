@@ -17,16 +17,16 @@ import { UseColumnsType } from "@/hooks/use-columns";
 
 type ColumnOptionsDropdownProps = {
 	column: ColumnType;
-	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 	useCardsObject: UseCardsType;
 	useColumnsObject: UseColumnsType;
+	setIsRenameColumnDialogOpen: (arg0: boolean) => void;
 };
 
 export default function ColumnOptionsDropdown({
 	column,
-	setIsRenameColumnDialogOpen,
 	useCardsObject,
 	useColumnsObject,
+	setIsRenameColumnDialogOpen,
 }: ColumnOptionsDropdownProps) {
 	const { theme } = useTheme();
 
@@ -61,7 +61,13 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem
-					onClick={() => changeColumnColor("text-primary", column.id)}
+					onClick={() =>
+						changeColumnColor(
+							column.color,
+							"text-primary",
+							column.id,
+						)
+					}
 				>
 					<div
 						className={`${theme === "dark" ? "bg-white" : "bg-black"} rounded-sm size-4`}
@@ -70,7 +76,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-amber-900", column.id)
+						changeColumnColor(
+							column.color,
+							"text-amber-900",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-amber-900 rounded-sm size-4" />
@@ -78,7 +88,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-orange-400", column.id)
+						changeColumnColor(
+							column.color,
+							"text-orange-400",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-orange-400 rounded-sm size-4" />
@@ -86,7 +100,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-yellow-400", column.id)
+						changeColumnColor(
+							column.color,
+							"text-yellow-400",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-yellow-400 rounded-sm size-4" />
@@ -94,7 +112,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-green-800", column.id)
+						changeColumnColor(
+							column.color,
+							"text-green-800",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-green-800 rounded-sm size-4" />
@@ -102,7 +124,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-blue-500", column.id)
+						changeColumnColor(
+							column.color,
+							"text-blue-500",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-blue-500 rounded-sm size-4" />
@@ -110,7 +136,11 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-purple-800", column.id)
+						changeColumnColor(
+							column.color,
+							"text-purple-800",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-purple-800 rounded-sm size-4" />
@@ -118,14 +148,24 @@ export default function ColumnOptionsDropdown({
 				</DropdownMenuItem>
 				<DropdownMenuItem
 					onClick={() =>
-						changeColumnColor("text-pink-400", column.id)
+						changeColumnColor(
+							column.color,
+							"text-pink-400",
+							column.id,
+						)
 					}
 				>
 					<div className="bg-pink-400 rounded-sm size-4" />
 					<span>Pink</span>
 				</DropdownMenuItem>
 				<DropdownMenuItem
-					onClick={() => changeColumnColor("text-red-600", column.id)}
+					onClick={() =>
+						changeColumnColor(
+							column.color,
+							"text-red-600",
+							column.id,
+						)
+					}
 				>
 					<div className="bg-red-600 rounded-sm size-4" />
 					<span>Red</span>

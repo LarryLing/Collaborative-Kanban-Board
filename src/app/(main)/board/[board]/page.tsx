@@ -1,4 +1,4 @@
-import BoardClientComponent from "@/components/blocks/board/board-client-component";
+import BoardContent from "@/components/blocks/board/board-content";
 import BoardHeader from "@/components/blocks/board/board-header";
 import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { Separator } from "@/components/ui/separator";
@@ -31,7 +31,7 @@ export default async function BoardPage({
 
 	const supabase = await createServerClient();
 
-	const { data: boardData, error: updateOpenedError } = await supabase
+	const updateDateOpenedPromise = supabase
 		.from("boards")
 		.update({
 			last_opened: new Date().toISOString().toLocaleString(),
@@ -40,34 +40,42 @@ export default async function BoardPage({
 		.select()
 		.single();
 
-	if (updateOpenedError) throw updateOpenedError;
-
-	const { data: columnsData, error: columnsError } = await supabase
+	const selectColumnsPromise = supabase
 		.from("columns")
 		.select("columns")
 		.eq("board_id", boardId)
 		.single();
 
-	if (columnsError) throw columnsError;
-
-	const fetchedColumns = columnsData.columns as Column[];
-
-	const { data: cardsData, error: cardsError } = await supabase
+	const selectCardsPromise = supabase
 		.from("cards")
 		.select("cards")
 		.eq("board_id", boardId)
 		.single();
 
-	if (cardsError) throw cardsError;
+	const [
+		updateDateOpenedResponse,
+		selectColumnsResponse,
+		selectCardsResponse,
+	] = await Promise.all([
+		updateDateOpenedPromise,
+		selectColumnsPromise,
+		selectCardsPromise,
+	]);
 
-	const fetchedCards = cardsData.cards as Card[];
+	if (updateDateOpenedResponse.error) throw updateDateOpenedResponse.error;
+	if (selectColumnsResponse.error) throw selectColumnsResponse.error;
+	if (selectCardsResponse.error) throw selectCardsResponse.error;
+
+	const board = updateDateOpenedResponse.data;
+	const fetchedColumns = selectColumnsResponse.data.columns as Column[];
+	const fetchedCards = selectCardsResponse.data.cards as Card[];
 
 	let boardCover = null;
 
-	if (boardData.cover_path) {
-		const { data: publicUrl } = await supabase.storage
+	if (board.cover_path) {
+		const { data: publicUrl } = supabase.storage
 			.from("covers")
-			.getPublicUrl(boardData.cover_path);
+			.getPublicUrl(board.cover_path);
 
 		boardCover = publicUrl.publicUrl;
 	}
@@ -76,18 +84,16 @@ export default async function BoardPage({
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-				boardId={boardData.id}
-				boardTitle={boardData.title}
+				boardId={board.id}
+				boardTitle={board.title}
 				boardCover={boardCover}
 			/>
 			<Separator className="w-full" />
-			<div className="flex justify-center">
-				<BoardClientComponent
-					boardId={boardId}
-					fetchedColumns={fetchedColumns}
-					fetchedCards={fetchedCards}
-				/>
-			</div>
+			<BoardContent
+				boardId={boardId}
+				fetchedColumns={fetchedColumns}
+				fetchedCards={fetchedCards}
+			/>
 		</div>
 	);
 }

@@ -55,7 +55,7 @@ export default function CardOptionsDropdown({
 				<DropdownMenuRadioGroup
 					value={card.column_id}
 					onValueChange={(columnId) =>
-						moveCardToColumn(card.id, columnId)
+						moveCardToColumn(card.id, card.column_id, columnId)
 					}
 				>
 					{columns.map((column) => (

@@ -36,6 +36,7 @@ export default function RenameColumnDialog({
 		setPending(true);
 
 		await renameColumn(
+            column.title,
 			titleRef.current?.value || "Untitled Column",
 			column.id,
 		);
