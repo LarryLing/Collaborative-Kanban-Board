@@ -1,11 +1,7 @@
 "use client";
 
-import React from "react";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import React, { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { LayoutGrid, LogOut, Settings2 } from "lucide-react";
@@ -16,17 +12,25 @@ import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
 
 type AvatarPopoverProps = {
-	userProfile: UserProfile;
-};
+	publicUrl: string;
+} & UserProfile;
 
-export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
+export default function AvatarPopover({
+	display_name,
+	email,
+	about_me,
+	socials,
+	publicUrl,
+}: AvatarPopoverProps) {
+	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
 	return (
-		<Popover>
+		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={userProfile.avatarUrl} />
+					<AvatarImage src={publicUrl} />
 					<AvatarFallback>
-						{userProfile.displayName.substring(0, 2).toUpperCase()}
+						{display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
@@ -36,47 +40,45 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 			>
 				<div className="flex justify-start items-center">
 					<Avatar>
-						<AvatarImage src={userProfile.avatarUrl} />
+						<AvatarImage src={publicUrl} />
 						<AvatarFallback>
-							{userProfile.displayName
-								.substring(0, 2)
-								.toUpperCase()}
+							{display_name.substring(0, 2).toUpperCase()}
 						</AvatarFallback>
 					</Avatar>
 					<div className="ml-2">
-						<h3 className="font-bold">{userProfile.displayName}</h3>
+						<h3 className="font-bold">{display_name}</h3>
 						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
-							{userProfile.email}
+							{email}
 						</p>
 					</div>
 				</div>
-				{userProfile.aboutMe && (
+				{about_me && (
 					<>
 						<Separator className="w-full" />
-						<p className="text-sm">{userProfile.aboutMe}</p>
+						<p className="text-sm">{about_me}</p>
 					</>
 				)}
-				{userProfile.socials.filter((social) => social !== "").length >
-					0 && (
+				{socials.filter((social) => social.url !== "").length > 0 && (
 					<>
 						<Separator className="w-full" />
 						<div className="text-sm space-y-1">
-							{userProfile.socials
-								.filter((social) => social !== "")
+							{socials
+								.filter((social) => social.url !== "")
 								.map((social, index) => (
 									<Button
 										variant="link"
 										className="flex"
 										key={`social_${index}`}
+										onClick={() => setIsPopoverOpen(false)}
 									>
-										{getSocialIcon(social)}
+										{getSocialIcon(social.url)}
 										<Link
-											href={social}
+											href={social.url}
 											className="underline-offset-4 hover:underline"
+											target="_blank"
+											rel="noopener noreferrer"
 										>
-											{new URL(social).pathname.substring(
-												1,
-											)}
+											{new URL(social.url).pathname.substring(1)}
 										</Link>
 									</Button>
 								))}
@@ -89,6 +91,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 						variant="ghost"
 						className="w-full justify-start"
 						asChild
+						onClick={() => setIsPopoverOpen(false)}
 					>
 						<Link href="/dashboard">
 							<LayoutGrid />
@@ -99,6 +102,7 @@ export default function AvatarPopover({ userProfile }: AvatarPopoverProps) {
 						variant="ghost"
 						className="w-full justify-start"
 						asChild
+						onClick={() => setIsPopoverOpen(false)}
 					>
 						<Link href="/settings">
 							<Settings2 />

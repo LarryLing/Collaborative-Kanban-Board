@@ -1,26 +1,21 @@
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
 	DialogTitle,
+	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { updatePassword } from "@/lib/actions";
 import { useActionState, useEffect } from "react";
 
-type UpdatePasswordDialogProps = {
-	isDialogOpen: boolean;
-	setIsDialogOpen: (arg0: boolean) => void;
-	toast: (arg0: { title: string; description: string }) => void;
-};
+export default function UpdatePasswordDialog() {
+	const { toast } = useToast();
 
-export default function UpdatePasswordDialog({
-	isDialogOpen,
-	setIsDialogOpen,
-	toast,
-}: UpdatePasswordDialogProps) {
 	const [state, action, pending] = useActionState(updatePassword, undefined);
 
 	useEffect(() => {
@@ -29,19 +24,20 @@ export default function UpdatePasswordDialog({
 				title: state.toast.title,
 				description: state.toast.message,
 			});
-
-			setIsDialogOpen(false);
 		}
 	}, [state?.toast]);
 
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="outline">Update Password</Button>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Update Password</DialogTitle>
 					<DialogDescription>
-						Please enter your new password below and confirm it.
-						Make sure to use a strong password for security.
+						Please enter your new password below and confirm it. Make sure to
+						use a strong password for security.
 					</DialogDescription>
 				</DialogHeader>
 				<form>
@@ -70,14 +66,15 @@ export default function UpdatePasswordDialog({
 						</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button
-							type="button"
-							className="mb-2 sm:mb-0"
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go Back
-						</Button>
+						<DialogClose asChild>
+							<Button
+								type="button"
+								className="mb-2 sm:mb-0"
+								variant="outline"
+							>
+								Go Back
+							</Button>
+						</DialogClose>
 						<Button
 							type="submit"
 							formAction={action}

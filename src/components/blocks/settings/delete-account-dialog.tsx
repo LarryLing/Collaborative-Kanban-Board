@@ -5,55 +5,49 @@ import {
 	DialogContent,
 	DialogTitle,
 	DialogDescription,
+	DialogTrigger,
+	DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { deleteAccount } from "@/lib/actions";
 import { useActionState } from "react";
 
-type DeleteAccountDialogProps = {
-	isDialogOpen: boolean;
-	setIsDialogOpen: (arg0: boolean) => void;
-	displayname: string;
-};
-
-export default function DeleteAccountDialog({
-	isDialogOpen,
-	setIsDialogOpen,
-	displayname,
-}: DeleteAccountDialogProps) {
+export default function DeleteAccountDialog() {
 	const [state, action, pending] = useActionState(deleteAccount, undefined);
 
 	return (
-		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+		<Dialog>
+			<DialogTrigger asChild>
+				<Button variant="destructive">Delete Account</Button>
+			</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Delete Account</DialogTitle>
 					<DialogDescription>
-						Please type your username below to confirm this action.
+						Please type your email below to confirm this action.
 					</DialogDescription>
 				</DialogHeader>
 				<form>
 					<Input
-						id="displayName"
-						name="displayName"
+						id="prompt"
+						name="prompt"
 						type="text"
-						placeholder={displayname}
+						placeholder="delete my account"
 						className="max-w-[400px]"
 					/>
-					{state?.errors?.displayName && (
-						<p className="text-sm text-destructive">
-							{state.errors.displayName}
-						</p>
+					{state?.errors?.prompt && (
+						<p className="text-sm text-destructive">{state.errors.prompt}</p>
 					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
-						<Button
-							type="button"
-							className="mb-2 sm:mb-0"
-							variant="outline"
-							onClick={() => setIsDialogOpen(false)}
-						>
-							Go Back
-						</Button>
+						<DialogClose asChild>
+							<Button
+								type="button"
+								className="mb-2 sm:mb-0"
+								variant="outline"
+							>
+								Go Back
+							</Button>
+						</DialogClose>
 						<Button
 							type="submit"
 							variant="destructive"

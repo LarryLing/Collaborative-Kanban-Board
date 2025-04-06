@@ -17,6 +17,7 @@ import React, { useActionState, useEffect } from "react";
 
 export default function ForgotPasswordPage() {
 	const { toast } = useToast();
+
 	const [state, action, pending] = useActionState(sendOtpEmail, undefined);
 
 	useEffect(() => {

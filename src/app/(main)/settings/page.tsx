@@ -1,64 +1,73 @@
-"use client";
-
-import AuthenticatedNavigationBar from "@/components/blocks/misc/authenticated-navigation-bar";
-import AccountSettings from "@/components/blocks/settings/account-settings";
-import ProfileSettings from "@/components/blocks/settings/profile-settings";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { useClientUser } from "@/hooks/use-client-user";
-import { useToast } from "@/hooks/use-toast";
+import { createClient } from "@/lib/supabase/server";
 import { Settings, User } from "lucide-react";
-import React, { useState } from "react";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import ProfileSettings from "@/components/blocks/settings/profile-settings";
+import AccountSettings from "@/components/blocks/settings/account-settings";
 
-export default function ProfileSettingsPage() {
-	const { userProfile, setUserProfile } = useClientUser();
-	const [activeTab, setActiveTab] = useState<"profile" | "account">(
-		"profile",
-	);
-	const { toast } = useToast();
+export default async function SettingsPage(props: {
+	searchParams?: Promise<{
+		tab?: string;
+	}>;
+}) {
+	const searchParams = await props.searchParams;
+	const tab = searchParams?.tab || "";
+
+	const supabase = await createClient();
+
+	const { data: userData, error: userError } = await supabase.auth.getUser();
+
+	if (userError) throw userError;
+
+	if (!userData.user) redirect("/login");
+
+	const { data: userProfile, error: profileError } = await supabase
+		.from("profiles")
+		.select("*, socials(url)")
+		.eq("id", userData.user.id)
+		.single();
+
+	if (profileError) throw profileError;
+
+	const { data: publicUrl } = supabase.storage
+		.from("avatars")
+		.getPublicUrl(userProfile.avatar_path || "");
 
 	return (
-		<div className="flex flex-col justify-center items-center">
-			<AuthenticatedNavigationBar userProfile={userProfile} />
-			<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
-				<div className="flex flex-col gap-4">
-					<h2 className="font-semibold text-3xl">Settings</h2>
-				</div>
-				<Separator className="w-full" />
-				<div className="flex flex-col md:flex-row">
-					<div className="flex flex-col gap-2 lg:basis-[250px] md:basis-[200px] basis-full">
-						<Button
-							variant="ghost"
-							className={`w-full justify-start  ${activeTab === "profile" ? "bg-accent" : ""}`}
-							onClick={() => setActiveTab("profile")}
-						>
+		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
+			<div className="flex flex-col gap-4">
+				<h2 className="font-semibold text-3xl">Settings</h2>
+			</div>
+			<Separator className="w-full" />
+			<div className="flex flex-col md:flex-row">
+				<div className="flex flex-col gap-2 lg:basis-[250px] md:basis-[200px] basis-full">
+					<Button
+						variant="ghost"
+						className={`w-full ${tab === "" ? "bg-accent" : ""} justify-start`}
+						asChild
+					>
+						<Link href="/settings">
 							<User />
 							<span>Profile</span>
-						</Button>
-						<Button
-							variant="ghost"
-							className={`w-full justify-start ${activeTab === "account" ? "bg-accent" : ""}`}
-							onClick={() => setActiveTab("account")}
-						>
+						</Link>
+					</Button>
+					<Button
+						variant="ghost"
+						className={`w-full ${tab === "account" ? "bg-accent" : ""} justify-start`}
+						asChild
+					>
+						<Link href="/settings/?tab=account">
 							<Settings />
 							<span>Account</span>
-						</Button>
-					</div>
-					{activeTab === "profile" && (
-						<ProfileSettings
-							userProfile={userProfile}
-							setUserProfile={setUserProfile}
-							toast={toast}
-						/>
-					)}
-					{activeTab === "account" && (
-						<AccountSettings
-							userProfile={userProfile}
-							setUserProfile={setUserProfile}
-							toast={toast}
-						/>
-					)}
+						</Link>
+					</Button>
 				</div>
+				{tab === "" && (
+					<ProfileSettings {...userProfile} publicUrl={publicUrl.publicUrl} />
+				)}
+				{tab === "account" && <AccountSettings email={userProfile.email} />}
 			</div>
 		</div>
 	);

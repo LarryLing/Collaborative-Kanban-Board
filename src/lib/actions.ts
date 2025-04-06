@@ -4,24 +4,24 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "./supabase/server";
 import {
-	FormState,
+	UserFormState,
 	LoginFormSchema,
 	EmailFormSchema,
 	SignupFormSchema,
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
+    RenameBoardSchema,
+    BoardFormState,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
 
-export async function signup(formState: FormState, formData: FormData) {
-	const supabase = await createClient();
-
-	const validatedFields = SignupFormSchema.safeParse({
+export async function signup(formState: UserFormState, formData: FormData) {
+    const validatedFields = SignupFormSchema.safeParse({
 		displayName: formData.get("displayName"),
 		email: formData.get("email"),
-		password: formData.get("password"),
-		confirm: formData.get("confirm"),
+		newPassword: formData.get("newPassword"),
+		confirmPassword: formData.get("confirmPassword"),
 	});
 
 	if (!validatedFields.success) {
@@ -30,61 +30,63 @@ export async function signup(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { data: signupData, error: signupError } = await supabase.auth.signUp(
-		{
-			email: validatedFields.data.email,
-			password: validatedFields.data.password,
-			options: {
-				data: {
-					display_name: validatedFields.data.displayName,
-				},
-			},
-		},
-	);
+    try {
+        const supabase = await createClient();
 
-	if (signupError) {
-		return {
+        const { data: signupData, error: signupError } = await supabase.auth.signUp(
+            {
+                email: validatedFields.data.email,
+                password: validatedFields.data.newPassword,
+                options: {
+                    data: {
+                        display_name: validatedFields.data.displayName,
+                    },
+                },
+            },
+        );
+
+        if (signupError) throw signupError;
+
+        if (
+            signupData.user &&
+            signupData.user.identities &&
+            signupData.user.identities.length === 0
+        ) {
+            const { error: resendError } = await supabase.auth.resend({
+                type: "signup",
+                email: validatedFields.data.email,
+            });
+
+            if (resendError) throw resendError;
+
+            return {
+                errors: {
+                    email: ["This email is already associated with an account."],
+                },
+            };
+        }
+
+        revalidatePath("/", "layout");
+
+        return {
+            toast: {
+                title: "Success!",
+                message: "Please check your inbox to confirm your signup.",
+            },
+        };
+    } catch {
+        return {
 			toast: {
 				title: "Something went wrong...",
 				message:
 					"We couldn't sign you up at this time. Please try again.",
 			},
 		};
-	}
-
-	if (
-		signupData.user &&
-		signupData.user.identities &&
-		signupData.user.identities.length === 0
-	) {
-		const { error: resendError } = await supabase.auth.resend({
-			type: "signup",
-			email: validatedFields.data.email,
-		});
-
-		if (resendError) throw resendError;
-
-		return {
-			errors: {
-				email: ["This email is already associated with an account."],
-			},
-		};
-	}
-
-	revalidatePath("/", "layout");
-
-	return {
-		toast: {
-			title: "Success!",
-			message: "Please check your inbox to confirm your signup.",
-		},
-	};
+    }
 }
 
-export async function login(formState: FormState, formData: FormData) {
-	const supabase = await createClient();
-
-	const validatedFields = LoginFormSchema.safeParse({
+export async function login(formState: UserFormState, formData: FormData) {
+    const validatedFields = LoginFormSchema.safeParse({
 		email: formData.get("email"),
 		password: formData.get("password"),
 	});
@@ -95,39 +97,43 @@ export async function login(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { error: signinError } = await supabase.auth.signInWithPassword(
-		validatedFields.data,
-	);
+    try {
+        const supabase = await createClient();
 
-	if (signinError?.code === "invalid_credentials") {
-		const { error: updateError } = await supabase.auth.verifyOtp({
-			email: validatedFields.data.email,
-			token: validatedFields.data.password,
-			type: "email",
-		});
+        const { error: signinError } = await supabase.auth.signInWithPassword(
+            validatedFields.data,
+        );
 
-		if (updateError) {
-			return {
-				errors: {
-					email: ["Incorrect email or password."],
-				},
-			};
-		}
+        if (signinError?.code === "invalid_credentials") {
+            const { error: updateError } = await supabase.auth.verifyOtp({
+                email: validatedFields.data.email,
+                token: validatedFields.data.password,
+                type: "email",
+            });
 
-		revalidatePath("/", "layout");
-		redirect("/dashboard");
-	} else if (signinError?.status && signinError.status >= 500) {
-		return {
-			toast: {
-				title: "Something went wrong...",
-				message:
-					"We couldn't log you in at this time. Please try again.",
-			},
-		};
-	}
+            if (updateError) {
+                return {
+                    errors: {
+                        email: ["Incorrect email or password."],
+                    },
+                };
+            }
 
-	revalidatePath("/", "layout");
-	redirect("/dashboard");
+            revalidatePath("/", "layout");
+            redirect("/dashboard");
+        } else if (signinError?.status && signinError.status >= 500) throw signinError;
+
+        revalidatePath("/", "layout");
+        redirect("/dashboard");
+    } catch {
+        return {
+            toast: {
+                title: "Something went wrong...",
+                message:
+                    "We couldn't log you in at this time. Please try again.",
+            },
+        };
+    }
 }
 
 export async function loginWithGoogle() {
@@ -176,9 +182,7 @@ export async function signout() {
 }
 
 export async function sendOtpEmail(formState: unknown, formData: FormData) {
-	const supabase = await createClient();
-
-	const validatedFields = EmailFormSchema.safeParse({
+    const validatedFields = EmailFormSchema.safeParse({
 		email: formData.get("email"),
 	});
 
@@ -188,39 +192,36 @@ export async function sendOtpEmail(formState: unknown, formData: FormData) {
 		};
 	}
 
-	const { error: otpError } = await supabase.auth.signInWithOtp({
-		email: validatedFields.data.email,
-		options: {
-			shouldCreateUser: false,
-		},
-	});
+    try {
+        const supabase = await createClient();
 
-	if (otpError) {
+        const { error: otpError } = await supabase.auth.signInWithOtp({
+            email: validatedFields.data.email,
+            options: {
+                shouldCreateUser: false,
+            },
+        });
+
+        if (otpError) throw otpError;
+
+        return {
+            toast: {
+                title: "Success!",
+                message: "Please check your inbox to see your one-time password.",
+            },
+        };
+    } catch {
         return {
             toast: {
                 title: "Something went wrong...",
                 message: "We could not send you a one-time password. Please try again.",
             },
         };
-    };
-
-	return {
-		toast: {
-			title: "Success!",
-			message: "Please check your inbox to see your one-time password.",
-		},
-	};
+    }
 }
 
-export async function updatePassword(formState: FormState, formData: FormData) {
-	const supabase = await createClient();
-	const { data: userData, error: userError } = await supabase.auth.getUser();
-
-	if (userError) throw userError;
-
-	const userid = userData.user.id;
-
-	const validatedFields = ResetPasswordFormSchema.safeParse({
+export async function updatePassword(formState: UserFormState, formData: FormData) {
+    const validatedFields = ResetPasswordFormSchema.safeParse({
 		newPassword: formData.get("newPassword"),
 		confirmPassword: formData.get("confirmPassword"),
 	});
@@ -231,37 +232,43 @@ export async function updatePassword(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { error: passwordError } = await supabase.rpc(
-		"handle_password_change",
-		{
-			newpassword: validatedFields.data.newPassword,
-			userid: userid,
-		},
-	);
+    try {
+        const supabase = await createClient();
 
-	if (passwordError) {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        const { error: passwordError } = await supabase.rpc(
+            "handle_password_change",
+            {
+                newpassword: validatedFields.data.newPassword,
+                userid: userData.user.id,
+            },
+        );
+
+        if (passwordError) throw passwordError;
+
+        revalidatePath("/");
+
+        return {
+            toast: {
+                title: "Success!",
+                message: "Your password has been successfully updated.",
+            },
+        };
+    } catch {
         return {
             toast: {
                 title: "Something went wrong...",
                 message: "We could not update your password. Please try again.",
             },
-        };
-    };
-
-	revalidatePath("/");
-
-	return {
-		toast: {
-			title: "Success!",
-			message: "Your password has been successfully updated.",
-		},
-	};
+        }
+    }
 }
 
-export async function updateEmail(formState: FormState, formData: FormData) {
-	const supabase = await createClient();
-
-	const validatedFields = EmailFormSchema.safeParse({
+export async function updateEmail(formState: UserFormState, formData: FormData) {
+    const validatedFields = EmailFormSchema.safeParse({
 		email: formData.get("email"),
 	});
 
@@ -271,58 +278,56 @@ export async function updateEmail(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { data: emailExistsData, error: emailExistsError } = await supabase
-		.from("profiles")
-		.select("email")
-		.eq("email", validatedFields.data.email);
+    try {
+        const supabase = await createClient();
 
-	if (emailExistsError) {
+        const { data: emailExistsData, error: emailExistsError } = await supabase
+            .from("profiles")
+            .select("email")
+            .eq("email", validatedFields.data.email);
+
+        if (emailExistsError) throw emailExistsError;
+
+        if (emailExistsData.length > 0) {
+            return {
+                errors: {
+                    email: ["This email is already associated with an account!"],
+                },
+            };
+        }
+
+        const { error: updateError } = await supabase.auth.updateUser({
+            email: validatedFields.data.email,
+            data: {
+                email: validatedFields.data.email,
+            },
+        });
+
+        if (updateError) throw updateError;
+
+        revalidatePath("/");
+
         return {
             toast: {
-                title: "Something went wrong...",
-                message: "We could not determine if this email is in use. Please try again.",
+                title: "Success!",
+                message: "Please check your inboxes for confirmation emails.",
             },
         };
-    };
-
-	if (emailExistsData.length > 0) {
-		return {
-			errors: {
-				email: ["This email is already associated with an account!"],
-			},
-		};
-	}
-
-	const { error: updateError } = await supabase.auth.updateUser({
-		email: validatedFields.data.email,
-		data: {
-			email: validatedFields.data.email,
-		},
-	});
-
-	if (updateError) {
+    } catch {
         return {
             toast: {
                 title: "Something went wrong...",
                 message: "We could not update your email. Please try again.",
             },
-        };
-    };;
-
-	revalidatePath("/");
-
-	return {
-		updatedEmail: validatedFields.data.email,
-	};
+        }
+    }
 }
 
 export async function updateUserProfile(
-	formState: FormState,
+	formState: UserFormState,
 	formData: FormData,
 ) {
-	const supabase = await createClient();
-
-	const validatedFields = EditProfileFormSchema.safeParse({
+    const validatedFields = EditProfileFormSchema.safeParse({
 		displayName: formData.get("displayName"),
 		aboutMe: formData.get("aboutMe"),
 		social0: formData.get("social0"),
@@ -337,101 +342,159 @@ export async function updateUserProfile(
 		};
 	}
 
-	const { data: userData, error: userError } = await supabase.auth.getUser();
+    try {
+        const supabase = await createClient();
 
-	if (userError) {
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        const { error: profileError } = await supabase
+            .from("profiles")
+            .update({
+                display_name: validatedFields.data.displayName,
+                about_me: validatedFields.data.aboutMe,
+            })
+            .eq("id", userData.user.id);
+
+        if (profileError) throw profileError;
+
+        const { error: socialsDeleteError } = await supabase
+            .from("socials")
+            .delete()
+            .eq("profile_id", userData.user.id);
+
+        if (socialsDeleteError) socialsDeleteError;
+
+        const { error: socialsInsertError } = await supabase
+            .from("socials")
+            .insert([
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social0 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social1 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social2 || "",
+                },
+                {
+                    profile_id: userData.user.id,
+                    url: validatedFields.data.social3 || "",
+                },
+            ]);
+
+        if (socialsInsertError) throw socialsInsertError;
+
+        const { data: socialsSelectData, error: socialsSelectError } = await supabase
+            .from("socials")
+            .select("url")
+            .eq("profile_id", userData.user.id)
+
+        if (socialsSelectError) throw socialsSelectError;
+
+        revalidatePath("/");
+
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not retieve your ID. Please try again.",
+            updatedProfile: {
+                displayName: validatedFields.data.displayName,
+                aboutMe: validatedFields.data.aboutMe,
+                socials: socialsSelectData,
             },
         };
-    };
-
-	const { error: profileError } = await supabase
-		.from("profiles")
-		.update({
-			display_name: validatedFields.data.displayName,
-			about_me: validatedFields.data.aboutMe,
-		})
-		.eq("id", userData.user.id);
-
-	if (profileError) {
+    } catch {
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not update your profile information. Please try again.",
-            },
+            errorMessage: "We could not update your profile. Please try again.",
         };
-    };
-
-	const { error: socialsDeleteError } = await supabase
-		.from("socials")
-		.delete()
-		.eq("profile_id", userData.user.id);
-
-	if (socialsDeleteError) {
-        return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not delete uour old social data. Please try again.",
-            },
-        };
-    };
-
-	const { error: socialsInsertError } = await supabase
-		.from("socials")
-		.insert([
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social0 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social1 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social2 || "",
-			},
-			{
-				profile_id: userData.user.id,
-				url: validatedFields.data.social3 || "",
-			},
-		]);
-
-	if (socialsInsertError) {
-        return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not insert your new social data. Please try again.",
-            },
-        };
-    };
-
-	const socials = [
-		validatedFields.data.social0 || "",
-		validatedFields.data.social1 || "",
-		validatedFields.data.social2 || "",
-		validatedFields.data.social3 || "",
-	];
-
-	revalidatePath("/");
-
-	return {
-		updatedProfile: {
-			displayName: validatedFields.data.displayName,
-			aboutMe: validatedFields.data.aboutMe,
-			socials: socials,
-		},
-	};
+    }
 }
 
-export async function deleteAccount(formState: FormState, formData: FormData) {
-	const supabase = await createClient();
+export async function uploadAvatar(userId: string, file: File) {
+    try {
+        const supabase = await createClient();
 
-	const validatedFields = DeleteAccountFormSchema.safeParse({
-		displayName: formData.get("displayName"),
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${userId}/avatar_${Date.now()}.${fileExt}`;
+
+        const uploadAvatarPromise = supabase.storage
+            .from("avatars")
+            .upload(filePath, file);
+
+        const updateProfilePromise = supabase
+            .from("profiles")
+            .update({
+                avatar_path: filePath,
+            })
+            .eq("id", userId);
+
+        const [uploadAvatarResponse, updateProfileResponse] = await Promise.all([uploadAvatarPromise, updateProfilePromise])
+
+        if (uploadAvatarResponse.error) throw uploadAvatarResponse.error;
+        if (updateProfileResponse.error) throw updateProfileResponse.error;
+
+        const { data: publicUrl } = supabase.storage
+            .from("avatars")
+            .getPublicUrl(filePath);
+
+        revalidatePath("/settings");
+
+        return {
+            publicUrl: publicUrl.publicUrl,
+        }
+
+    } catch {
+        return {
+            errorMessage: "We could not update your avatar. Please try again.",
+        };
+    }
+}
+
+export async function uploadCover(boardId: string, file: File) {
+    try {
+        const supabase = await createClient();
+
+        const fileExt = file.name.split(".").pop();
+        const filePath = `${boardId}/cover_${Date.now()}.${fileExt}`;
+
+        const uploadCoverPromise = supabase.storage
+            .from("covers")
+            .upload(filePath, file);
+
+        const updateBoardPromise = supabase
+            .from("boards")
+            .update({
+                cover_path: filePath,
+            })
+            .eq("id", boardId);
+
+        const [uploadCoverResponse, updateBoardResponse] = await Promise.all([uploadCoverPromise, updateBoardPromise])
+
+        if (uploadCoverResponse.error) throw uploadCoverResponse.error;
+        if (updateBoardResponse.error) throw updateBoardResponse.error;
+
+        const { data: publicUrl } = supabase.storage
+            .from("covers")
+            .getPublicUrl(filePath);
+
+        revalidatePath("/");
+
+        return {
+            publicUrl: publicUrl.publicUrl,
+        }
+
+    } catch {
+        return {
+            errorMessage: "We could not update this board's cover. Please try again.",
+        };
+    }
+}
+
+export async function deleteAccount(formState: UserFormState, formData: FormData) {
+    const validatedFields = DeleteAccountFormSchema.safeParse({
+		prompt: formData.get("prompt"),
 	});
 
 	if (!validatedFields.success) {
@@ -440,66 +503,134 @@ export async function deleteAccount(formState: FormState, formData: FormData) {
 		};
 	}
 
-	const { data: userData, error: userError } = await supabase
-		.from("profiles")
-		.select("id")
-		.eq("display_name", validatedFields.data.displayName)
-		.single();
+    try {
+        const supabase = await createClient();
 
-	if (userError) {
-		return {
-			errors: {
-				displayName: ["Incorrect display name."],
-			},
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) throw userError;
+
+        const { data: folderData, error: folderError } = await supabase.storage
+            .from("avatars")
+            .list(`${userData.user.id}`);
+
+        if (folderError) throw folderError;
+
+        if (folderData.length > 0) {
+            const files = folderData.map((file) => `${userData.user.id}/${file.name}`);
+            const { error: removeError } = await supabase.storage
+                .from("avatars")
+                .remove(files);
+
+            if (removeError) throw removeError;
+        }
+
+        const { error: deleteError } = await supabase.rpc(
+            "handle_delete_user"
+        );
+
+        if (deleteError) throw deleteError;
+
+        const { error: signoutError } = await supabase.auth.signOut();
+
+        if (signoutError) throw signoutError;
+
+        revalidatePath("/");
+        redirect("/");
+    } catch {
+        return {
+            errorMessage: "We could not delete your account. Please try again."
+        }
+    }
+}
+
+export async function createBoard() {
+    const supabase = await createClient();
+
+    const { data: userData, error: userError } =
+        await supabase.auth.getUser();
+
+    if (userError) throw userError;
+
+    const newBoardId = crypto.randomUUID();
+
+    const { error: boardError } = await supabase.from("boards").insert({
+        id: newBoardId,
+        profile_id: userData.user.id,
+    })
+
+    if (boardError) throw boardError;
+
+    revalidatePath("/")
+    redirect("/board/" + newBoardId);
+}
+
+export async function deleteBoard(boardId: string) {
+    const supabase = await createClient();
+
+    const { data: folderData, error: folderError } = await supabase.storage
+        .from("covers")
+        .list(boardId);
+
+    if (folderError) throw folderError;
+
+    if (folderData.length > 0) {
+        const files = folderData.map((file) => `${boardId}/${file.name}`);
+        const { error: removeError } = await supabase.storage
+            .from("covers")
+            .remove(files);
+
+        if (removeError) throw removeError;
+    }
+
+    const { error: deleteError } = await supabase
+        .from("boards")
+        .delete()
+        .eq("id", boardId);
+
+    if (deleteError) throw deleteError;
+
+    revalidatePath("/")
+}
+
+export async function bookmarkBoard(boardId: string, currentlyBookmarked: boolean) {
+    const supabase = await createClient();
+
+    const { error: bookmarkError } = await supabase
+        .from("boards")
+        .update({bookmarked: !currentlyBookmarked})
+        .eq("id", boardId);
+
+    if (bookmarkError) throw bookmarkError;
+
+    revalidatePath("/")
+}
+
+export async function renameBoard(formState: BoardFormState, formData: FormData) {
+    const validatedFields = RenameBoardSchema.safeParse({
+        title: formData.get("title")
+    })
+
+	if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
 		};
 	}
 
-	const userId = userData.id as string;
+    try {
+        const supabase = await createClient();
 
-	const { data: folderData, error: folderError } = await supabase.storage
-		.from("avatars")
-		.list(`${userId}`);
+        const { error: renameError } = await supabase
+            .from("boards")
+            .update({title: validatedFields.data.title})
+            .eq("id", formState?.boardId!);
 
-	if (folderError) {
+        if (renameError) throw renameError;
+
+        revalidatePath("/")
+    } catch {
         return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not retrieve the contents of your bucket folder. Please try again.",
-            },
-        };
-    };
-
-	if (folderData.length > 0) {
-		const files = folderData.map((file) => `${userId}/${file.name}`);
-		const { error: removeError } = await supabase.storage
-			.from("avatars")
-			.remove(files);
-
-		if (removeError) {
-            return {
-                toast: {
-                    title: "Something went wrong...",
-                    message: "We could not clear your bucket folder. Please try again.",
-                },
-            };
-        };;
-	}
-
-	const { error: deleteError } = await supabase.rpc("handle_delete_user");
-
-	if (deleteError) {
-        return {
-            toast: {
-                title: "Something went wrong...",
-                message: "We could not delete your account. Please try again.",
-            },
-        };
-    };
-
-	const { error: signoutError } = await supabase.auth.signOut();
-
-	if (signoutError) throw signoutError;
-
-	revalidatePath("/");
-	redirect("/");
+            updatedTitle: validatedFields.data.title,
+        }
+    }
 }

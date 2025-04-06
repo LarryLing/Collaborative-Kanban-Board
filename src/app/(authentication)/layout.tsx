@@ -10,15 +10,13 @@ export default async function AuthenticationLayout({
 	const supabase = await createClient();
 
 	const { data } = await supabase.auth.getUser();
-	if (data.user) {
-		redirect("/");
-	}
+	if (data.user) redirect("/");
 
 	return (
 		<section className="relative">
 			<div className="absolute top-0 left-0 w-full h-[80px] px-4 border-b-[1px] border-transparent">
 				<div className="flex justify-between items-center size-full">
-					<Branding />
+					<Branding href="/" />
 				</div>
 			</div>
 			{children}

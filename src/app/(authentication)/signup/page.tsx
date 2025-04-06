@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import { loginWithGoogle, loginWithGithub, signup } from "@/lib/actions";
-import { mona_sans, roboto } from "@/lib/fonts";
 import Link from "next/link";
 import React, { useActionState, useEffect } from "react";
 
@@ -35,7 +34,7 @@ export default function SignupPage() {
 					<Button
 						onClick={loginWithGoogle}
 						disabled={pending}
-						className={`${roboto.className} bg-google text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
+						className="bg-google hover:bg-google/70 text-background text-black [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto"
 					>
 						<GoogleIcon className="size-5" />
 						<span>Sign in with Google</span>
@@ -43,7 +42,7 @@ export default function SignupPage() {
 					<Button
 						onClick={loginWithGithub}
 						disabled={pending}
-						className={`${mona_sans.className}  bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto`}
+						className="bg-github hover:bg-github/70 text-background text-white [&_svg]:size-5 py-[10px] px-3 gap-[10px] h-auto"
 					>
 						<GithubIcon />
 						<span>Sign in with Github</span>
@@ -88,17 +87,17 @@ export default function SignupPage() {
 					<div className="grid gap-2">
 						<Label htmlFor="password">Password</Label>
 						<Input
-							id="password"
-							name="password"
+							id="newPassword"
+							name="newPassword"
 							type="password"
 							placeholder="••••••••"
 							className="text-sm"
 						/>
-						{state?.errors?.password && (
+						{state?.errors?.newPassword && (
 							<div className="text-sm text-destructive">
 								<p>Password must:</p>
 								<ul>
-									{state.errors.password.map((error) => (
+									{state.errors.newPassword.map((error) => (
 										<li key={error}>- {error}</li>
 									))}
 								</ul>
@@ -108,15 +107,15 @@ export default function SignupPage() {
 					<div className="grid gap-2">
 						<Label htmlFor="confirm">Confirm Password</Label>
 						<Input
-							id="confirm"
-							name="confirm"
+							id="confirmPassword"
+							name="confirmPassword"
 							type="password"
 							placeholder="••••••••"
 							className="text-sm"
 						/>
-						{state?.errors?.confirm && (
+						{state?.errors?.confirmPassword && (
 							<p className="text-sm text-destructive">
-								{state.errors.confirm}
+								{state.errors.confirmPassword}
 							</p>
 						)}
 					</div>

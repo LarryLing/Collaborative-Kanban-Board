@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -8,16 +8,10 @@ import {
 	CardFooter,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
-import Link from "next/link"
+} from "@/components/ui/card";
+import Link from "next/link";
 
-export default function ErrorPage({
-	error,
-	reset,
-}: {
-	error: Error
-	reset: () => void
-}) {
+export default function ErrorPage({ error, reset }: { error: Error; reset: () => void }) {
 	return (
 		<div className="flex justify-center items-center h-screen w-screen">
 			<Card className="w-[350px]">
@@ -27,8 +21,8 @@ export default function ErrorPage({
 				</CardHeader>
 				<CardContent>
 					<p>
-						Looks like something went wrong on our end. We'll try to
-						do better next time. Thank you for your patience!
+						Looks like something went wrong on our end. We'll try to do better
+						next time. Thank you for your patience!
 					</p>
 				</CardContent>
 				<CardFooter className="flex justify-between">
@@ -41,5 +35,5 @@ export default function ErrorPage({
 				</CardFooter>
 			</Card>
 		</div>
-	)
+	);
 }
