@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { renameBoard } from "@/lib/actions";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { PenLine } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 type RenameDialogProps = {
 	boardId: string;
@@ -26,10 +26,16 @@ export default function RenameBoardDialog({ boardId, title }: RenameDialogProps)
 		updatedTitle: title,
 	};
 
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	const [state, action, pending] = useActionState(renameBoard, initialState);
 
+	useEffect(() => {
+		if (state?.updatedTitle !== undefined) setIsDialogOpen(false);
+	}, [state?.updatedTitle]);
+
 	return (
-		<Dialog>
+		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
 				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
 					<PenLine className="size-4" />

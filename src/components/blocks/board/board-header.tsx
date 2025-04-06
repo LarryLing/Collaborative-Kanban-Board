@@ -66,7 +66,12 @@ export default function BoardHeader({
 				name="title"
 				className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl"
 				defaultValue={boardTitle}
-				onChange={editTitle}
+				onChange={() =>
+					editTitle(
+						boardTitle,
+						boardTitleRef.current?.value || "Untitled Board",
+					)
+				}
 			/>
 		</>
 	);

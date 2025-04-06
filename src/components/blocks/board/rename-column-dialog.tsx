@@ -27,6 +27,8 @@ export default function RenameColumnDialog({
 	columnTitle,
 	renameColumn,
 }: RenameColumnDialogProps) {
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
 	const [pending, setPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);
@@ -43,10 +45,11 @@ export default function RenameColumnDialog({
 		);
 
 		setPending(false);
+		setIsDialogOpen(false);
 	}
 
 	return (
-		<Dialog>
+		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 			<DialogTrigger asChild>
 				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
 					<PenLine className="size-4" />

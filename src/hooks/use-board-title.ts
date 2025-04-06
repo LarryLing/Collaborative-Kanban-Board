@@ -5,11 +5,13 @@ import { TypedSupabaseClient } from '@/lib/types';
 export default function useBoardTitle(supabase: TypedSupabaseClient, boardId: string) {
     const boardTitleRef = useRef<HTMLInputElement | null>(null);
 
-    const editTitle = useDebouncedCallback(async () => {
+    const editTitle = useDebouncedCallback(async (oldTitle: string, newTitle: string) => {
+        if (oldTitle === newTitle) return;
+
         const { error: updateTitleError } = await supabase
             .from("boards")
             .update({
-                title: boardTitleRef.current?.value || "Untitled Board",
+                title: newTitle,
             })
             .eq("id", boardId);
 

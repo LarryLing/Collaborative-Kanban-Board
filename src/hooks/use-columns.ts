@@ -86,7 +86,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 				: column,
 		);
 
-        setColumns(updatedColumns);
+        await updateColumnsByBoardId(supabase, boardId, updatedColumns);
     }, [columns])
 
     const moveColumn = useCallback(async (from: number, to: number) => {
