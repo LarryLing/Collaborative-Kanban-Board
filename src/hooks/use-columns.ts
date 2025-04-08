@@ -16,20 +16,21 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
     const [columns, setColumns] = useState<Column[]>(fetchedColumns);
 
     useEffect(() => {
+        async function setSupabaseAuth() {
+            await supabase.realtime.setAuth()
+        }
+
+        setSupabaseAuth();
+
         const columnsChannel = supabase
-            .channel("realtime columns")
+            .channel(`columns:${boardId}`)
             .on(
-                "postgres_changes",
-                {
-                    event: "UPDATE",
-                    schema: "public",
-                    table: "columns",
-                },
+                'broadcast',
+                { event: 'UPDATE' },
                 (payload) => {
-                    setColumns(payload.new.columns as Column[]);
-                },
-            )
-            .subscribe();
+                    setColumns(payload.payload.columns as Column[])
+                })
+            .subscribe()
 
         return () => {
             supabase.removeChannel(columnsChannel);

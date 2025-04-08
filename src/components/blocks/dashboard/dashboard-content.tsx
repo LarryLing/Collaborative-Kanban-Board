@@ -10,10 +10,16 @@ import { MemoizedNewBoard } from "./new-board";
 type DashboardContentProps = {
 	id: string;
 	boards: BoardType[];
+	viewerId: string;
 	query: string;
 };
 
-export default function DashboardContent({ id, boards, query }: DashboardContentProps) {
+export default function DashboardContent({
+	id,
+	boards,
+	viewerId,
+	query,
+}: DashboardContentProps) {
 	const ownershipState = useSyncExternalStore(
 		ownership.subscribe,
 		ownership.getSnapshot,
@@ -40,7 +46,14 @@ export default function DashboardContent({ id, boards, query }: DashboardContent
 			}
 		>
 			{processedBoards.map((board) => {
-				return <Board key={board.id} {...board} view={viewState} />;
+				return (
+					<Board
+						key={board.id}
+						{...board}
+						viewerId={viewerId}
+						view={viewState}
+					/>
+				);
 			})}
 			<MemoizedNewBoard viewState={viewState} />
 		</div>

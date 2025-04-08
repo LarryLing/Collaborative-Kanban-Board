@@ -18,20 +18,21 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
     const [cards, setCards] = useState<Card[]>(fetchedCards);
 
     useEffect(() => {
+        async function setSupabaseAuth() {
+            await supabase.realtime.setAuth()
+        }
+
+        setSupabaseAuth();
+
         const cardsChannel = supabase
-            .channel(`reatime cards`)
+            .channel(`cards:${boardId}`)
             .on(
-                "postgres_changes",
-                {
-                    event: "UPDATE",
-                    schema: "public",
-                    table: "cards",
-                },
+                'broadcast',
+                { event: 'UPDATE' },
                 (payload) => {
-                    setCards(payload.new.cards as Card[]);
-                },
-            )
-            .subscribe();
+                    setCards(payload.payload.cards as Card[])
+                })
+            .subscribe()
 
         return () => {
             supabase.removeChannel(cardsChannel);

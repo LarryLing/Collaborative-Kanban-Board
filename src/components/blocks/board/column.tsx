@@ -78,14 +78,25 @@ export default function Column({
 						renameColumn={renameColumn}
 						deleteCardsByColumnId={deleteCardsByColumnId}
 					/>
-					<MemoizedNewCard size="icon" columnId={id} createCard={createCard} />
+					<MemoizedNewCard
+						size="icon"
+						columnId={id}
+						columnTitle={title}
+						columnColor={color}
+						createCard={createCard}
+					/>
 				</div>
 			</div>
 			<SortableContext items={filteredCards} strategy={verticalListSortingStrategy}>
 				<div ref={droppableNodeRef} className="space-y-2">
 					{filteredCards.map((card) => (
 						<div key={card.id} className="relative">
-							<MemoizedCard {...card} editCard={editCard} />
+							<MemoizedCard
+								{...card}
+								columnTitle={title}
+								columnColor={color}
+								editCard={editCard}
+							/>
 							<CardOptionsDropdown
 								card={card}
 								columns={columns}
@@ -98,6 +109,8 @@ export default function Column({
 					<MemoizedNewCard
 						size="default"
 						columnId={id}
+						columnTitle={title}
+						columnColor={color}
 						createCard={createCard}
 					/>
 				</div>

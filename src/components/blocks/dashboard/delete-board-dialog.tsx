@@ -8,24 +8,19 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { deleteBoard } from "@/lib/actions";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { Trash2 } from "lucide-react";
+import { ReactNode } from "react";
 
 type DeleteDialogProps = {
 	boardId: string;
+	children: ReactNode;
 };
 
-export default function DeleteBoardDialog({ boardId }: DeleteDialogProps) {
+export default function DeleteBoardDialog({ boardId, children }: DeleteDialogProps) {
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-					<Trash2 className="size-4" />
-					<span>Delete</span>
-				</DropdownMenuItem>
-			</DialogTrigger>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Confirm Delete</DialogTitle>

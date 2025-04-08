@@ -1,78 +1,66 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import useBoardCover from "@/hooks/use-board-cover";
-import useBoardTitle from "@/hooks/use-board-title";
-import { createClient } from "@/lib/supabase/client";
-import { Pencil } from "lucide-react";
-import Image from "next/image";
+import { Toggle } from "@/components/ui/toggle";
+import { bookmarkBoard } from "@/lib/actions";
+import { Board, UserProfile } from "@/lib/types";
+import { Bookmark, PenLine, Trash2 } from "lucide-react";
 import React from "react";
+import RenameBoardDialog from "../dashboard/rename-board-dialog";
+import DeleteBoardDialog from "../dashboard/delete-board-dialog";
+import InviteUsersDialog from "./invite-users-dialog";
 
 type BoardHeaderProps = {
 	boardId: string;
-	boardTitle: string;
-	boardCover: string | null;
-};
+	viewerId: string;
+	fetchedCollaborators: UserProfile[];
+} & Board;
 
 export default function BoardHeader({
+	id,
+	profile_id: ownerId,
+	title,
+	bookmarked,
+	has_invite_permissions,
 	boardId,
-	boardTitle,
-	boardCover,
+	viewerId,
+	fetchedCollaborators,
 }: BoardHeaderProps) {
-	const supabase = createClient();
-
-	const { coverPreview, uploading, handleChange, coverPathRef } = useBoardCover(
-		boardId,
-		boardCover,
-	);
-	const { editTitle, boardTitleRef } = useBoardTitle(supabase, boardId);
-
-	function openCoverPathInput() {
-		if (coverPathRef.current) coverPathRef.current.click();
-	}
-
 	return (
-		<>
-			<div className="w-full h-[225px] bg-accent/30 group-hover:bg-accent/50 rounded-md relative overflow-hidden">
-				{coverPreview && (
-					<Image src={coverPreview} alt="" objectFit="cover" layout="fill" />
-				)}
-				<div className="absolute top-2 right-2">
-					<div className="relative">
-						<Input
-							ref={coverPathRef}
-							id="coverPath"
-							name="coverPath"
-							type="file"
-							accept="image/*"
-							onChange={(e) => handleChange(e)}
-							disabled={uploading}
-							className="size-9 opacity-0"
-						/>
-						<Button
-							size="icon"
-							className="absolute inset-0 z-5"
-							onClick={openCoverPathInput}
-						>
-							<Pencil />
+		<div className="space-y-4">
+			<h3 className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl">
+				{title}
+			</h3>
+			<div className="flex justify-between">
+				<InviteUsersDialog
+					ownerId={ownerId}
+					viewerId={viewerId}
+					hasInvitePermissions={has_invite_permissions}
+					boardId={boardId}
+					fetchedCollaborators={fetchedCollaborators}
+				/>
+				<div className="space-x-2">
+					<RenameBoardDialog title={title} boardId={id}>
+						<Button variant="outline" size="icon">
+							<PenLine />
 						</Button>
-					</div>
+					</RenameBoardDialog>
+					<Toggle
+						variant="outline"
+						pressed={bookmarked}
+						onPressedChange={() => bookmarkBoard(id, viewerId, bookmarked)}
+					>
+						<Bookmark />
+					</Toggle>
+					{ownerId === viewerId && (
+						<DeleteBoardDialog boardId={id}>
+							<Button variant="outline" size="icon">
+								<Trash2 />
+							</Button>
+						</DeleteBoardDialog>
+					)}
 				</div>
 			</div>
-			<Input
-				ref={boardTitleRef}
-				id="title"
-				name="title"
-				className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl"
-				defaultValue={boardTitle}
-				onChange={() =>
-					editTitle(
-						boardTitle,
-						boardTitleRef.current?.value || "Untitled Board",
-					)
-				}
-			/>
-		</>
+		</div>
 	);
 }

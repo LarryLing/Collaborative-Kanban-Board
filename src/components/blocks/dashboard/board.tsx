@@ -9,16 +9,18 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 type BoardProps = {
+	viewerId: string;
 	view: ViewOptions;
 } & BoardType;
 
 export default function Board({
+	viewerId,
 	view,
 	id,
+    profile_id: ownerId,
 	title,
 	cover_path,
 	bookmarked,
-	collaborators,
 	last_opened,
 }: BoardProps) {
 	const supabase = createClient();
@@ -51,9 +53,9 @@ export default function Board({
 								{title}
 							</span>
 							<div className="flex justify-start items-center gap-2 basis-[40px]">
-								{collaborators > 1 && (
+								{/* {collaborators > 1 && (
 									<Users className="size-4 inline-block" />
-								)}
+								)} */}
 								{bookmarked && (
 									<Bookmark className="size-4 inline-block" />
 								)}
@@ -71,9 +73,9 @@ export default function Board({
 								Opened {lastOpenedDateString}
 							</span>
 							<div className="space-x-2">
-								{collaborators > 1 && (
+								{/* {collaborators > 1 && (
 									<Users className="size-4 inline-block" />
-								)}
+								)} */}
 								{bookmarked && (
 									<Bookmark className="size-4 inline-block" />
 								)}
@@ -88,6 +90,8 @@ export default function Board({
 				<MemoizedBoardOptionsDropdown
 					side={view === "gallery" ? "top" : "left"}
 					boardId={id}
+					ownerId={ownerId}
+					viewerId={viewerId}
 					boardTitle={title}
 					bookmarked={bookmarked}
 				/>

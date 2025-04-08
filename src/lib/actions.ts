@@ -591,46 +591,33 @@ export async function deleteBoard(boardId: string) {
     if (deleteError) throw deleteError;
 
     revalidatePath("/")
+    redirect("/dashboard")
 }
 
-export async function bookmarkBoard(boardId: string, currentlyBookmarked: boolean) {
+export async function bookmarkBoard(boardId: string, profileId: string, currentlyBookmarked: boolean) {
     const supabase = await createClient();
 
     const { error: bookmarkError } = await supabase
-        .from("boards")
+        .from("profiles_boards_bridge")
         .update({bookmarked: !currentlyBookmarked})
-        .eq("id", boardId);
+        .match({profile_id: profileId, board_id: boardId});
 
     if (bookmarkError) throw bookmarkError;
 
     revalidatePath("/")
 }
 
-export async function renameBoard(formState: BoardFormState, formData: FormData) {
-    const validatedFields = RenameBoardSchema.safeParse({
-        title: formData.get("title")
-    })
+export async function renameBoard(oldTitle: string, newTitle: string, boardId: string) {
+    if (oldTitle === newTitle) return;
 
-	if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-		};
-	}
+    const supabase = await createClient();
 
-    try {
-        const supabase = await createClient();
+    const { error: renameError } = await supabase
+        .from("boards")
+        .update({title: newTitle})
+        .eq("id", boardId);
 
-        const { error: renameError } = await supabase
-            .from("boards")
-            .update({title: validatedFields.data.title})
-            .eq("id", formState?.boardId!);
+    if (renameError) throw renameError;
 
-        if (renameError) throw renameError;
-
-        revalidatePath("/")
-    } catch {
-        return {
-            updatedTitle: validatedFields.data.title,
-        }
-    }
+    revalidatePath("/")
 }

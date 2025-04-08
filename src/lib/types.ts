@@ -4,7 +4,7 @@ import { Database, Tables } from "../../database.types";
 export type TypedSupabaseClient = SupabaseClient<Database>;
 
 export type UserProfile = Tables<"profiles"> & { socials: { url: string }[]; }
-export type Board = Tables<"boards">;
+export type Board = Tables<"boards"> & { bookmarked: boolean, has_invite_permissions: boolean };
 
 export type Card = {
     id: string;
