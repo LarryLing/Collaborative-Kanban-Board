@@ -84,7 +84,7 @@ export default function NewCard({
 								defaultValue="New Card"
 							/>
 						</DialogTitle>
-						<DialogDescription className={columnColor}>
+						<DialogDescription className={`${columnColor} text-left`}>
 							{columnTitle}
 						</DialogDescription>
 					</DialogHeader>

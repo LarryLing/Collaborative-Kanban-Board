@@ -8,19 +8,20 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { renameBoard } from "@/lib/actions";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { FormEvent, ReactNode, useRef, useState } from "react";
 
 type RenameDialogProps = {
 	boardId: string;
 	title: string;
+	renameBoard: (oldTitle: string, newTitle: string, boardId: string) => Promise<void>;
 	children: ReactNode;
 };
 
 export default function RenameBoardDialog({
 	boardId,
 	title,
+	renameBoard,
 	children,
 }: RenameDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);

@@ -11,8 +11,6 @@ import {
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
-    RenameBoardSchema,
-    BoardFormState,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
 
@@ -389,26 +387,21 @@ export async function updateUserProfile(
 
         if (socialsInsertError) throw socialsInsertError;
 
-        const { data: socialsSelectData, error: socialsSelectError } = await supabase
-            .from("socials")
-            .select("url")
-            .eq("profile_id", userData.user.id)
-
-        if (socialsSelectError) throw socialsSelectError;
-
         revalidatePath("/");
 
         return {
-            updatedProfile: {
-                displayName: validatedFields.data.displayName,
-                aboutMe: validatedFields.data.aboutMe,
-                socials: socialsSelectData,
+            toast: {
+                title: "Success!",
+                message: "Profile successfully updated.",
             },
-        };
+        }
     } catch {
         return {
-            errorMessage: "We could not update your profile. Please try again.",
-        };
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not update your profile. Please try again.",
+            },
+        }
     }
 }
 
@@ -435,60 +428,22 @@ export async function uploadAvatar(userId: string, file: File) {
         if (uploadAvatarResponse.error) throw uploadAvatarResponse.error;
         if (updateProfileResponse.error) throw updateProfileResponse.error;
 
-        const { data: publicUrl } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(filePath);
-
         revalidatePath("/settings");
 
         return {
-            publicUrl: publicUrl.publicUrl,
+            toast: {
+                title: "Success!",
+                message: "Your avatar has been successfully updated.",
+            },
         }
 
     } catch {
         return {
-            errorMessage: "We could not update your avatar. Please try again.",
-        };
-    }
-}
-
-export async function uploadCover(boardId: string, file: File) {
-    try {
-        const supabase = await createClient();
-
-        const fileExt = file.name.split(".").pop();
-        const filePath = `${boardId}/cover_${Date.now()}.${fileExt}`;
-
-        const uploadCoverPromise = supabase.storage
-            .from("covers")
-            .upload(filePath, file);
-
-        const updateBoardPromise = supabase
-            .from("boards")
-            .update({
-                cover_path: filePath,
-            })
-            .eq("id", boardId);
-
-        const [uploadCoverResponse, updateBoardResponse] = await Promise.all([uploadCoverPromise, updateBoardPromise])
-
-        if (uploadCoverResponse.error) throw uploadCoverResponse.error;
-        if (updateBoardResponse.error) throw updateBoardResponse.error;
-
-        const { data: publicUrl } = supabase.storage
-            .from("covers")
-            .getPublicUrl(filePath);
-
-        revalidatePath("/");
-
-        return {
-            publicUrl: publicUrl.publicUrl,
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not update your avatar. Please try again.",
+            },
         }
-
-    } catch {
-        return {
-            errorMessage: "We could not update this board's cover. Please try again.",
-        };
     }
 }
 
@@ -539,7 +494,10 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
         redirect("/");
     } catch {
         return {
-            errorMessage: "We could not delete your account. Please try again."
+            toast: {
+                title: "Something went wrong...",
+                message: "We could not delete your account. Please try again.",
+            },
         }
     }
 }
@@ -590,34 +548,6 @@ export async function deleteBoard(boardId: string) {
 
     if (deleteError) throw deleteError;
 
-    revalidatePath("/")
+    revalidatePath("/dashboard")
     redirect("/dashboard")
-}
-
-export async function bookmarkBoard(boardId: string, profileId: string, currentlyBookmarked: boolean) {
-    const supabase = await createClient();
-
-    const { error: bookmarkError } = await supabase
-        .from("profiles_boards_bridge")
-        .update({bookmarked: !currentlyBookmarked})
-        .match({profile_id: profileId, board_id: boardId});
-
-    if (bookmarkError) throw bookmarkError;
-
-    revalidatePath("/")
-}
-
-export async function renameBoard(oldTitle: string, newTitle: string, boardId: string) {
-    if (oldTitle === newTitle) return;
-
-    const supabase = await createClient();
-
-    const { error: renameError } = await supabase
-        .from("boards")
-        .update({title: newTitle})
-        .eq("id", boardId);
-
-    if (renameError) throw renameError;
-
-    revalidatePath("/")
 }

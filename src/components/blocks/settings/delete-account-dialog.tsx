@@ -9,11 +9,23 @@ import {
 	DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import { deleteAccount } from "@/lib/actions";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 
 export default function DeleteAccountDialog() {
+	const { toast } = useToast();
+
 	const [state, action, pending] = useActionState(deleteAccount, undefined);
+
+	useEffect(() => {
+		if (state?.toast !== undefined) {
+			toast({
+				title: state.toast.title,
+				description: state.toast.message,
+			});
+		}
+	}, [state?.toast]);
 
 	return (
 		<Dialog>

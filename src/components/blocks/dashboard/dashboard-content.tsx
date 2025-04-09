@@ -49,8 +49,8 @@ export default function DashboardContent({
 				return (
 					<Board
 						key={board.id}
-						{...board}
 						viewerId={viewerId}
+						fetchedBoard={board}
 						view={viewState}
 					/>
 				);

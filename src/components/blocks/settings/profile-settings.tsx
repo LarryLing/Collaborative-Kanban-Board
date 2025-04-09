@@ -35,23 +35,16 @@ export default function ProfileSettings({
 
 	const [state, action, pending] = useActionState(updateUserProfile, undefined);
 
-	const { preview, uploading, changeAvatar, avatarInputRef } = useAvatar(id, publicUrl);
+	const { uploading, changeAvatar, avatarInputRef } = useAvatar(id);
 
 	useEffect(() => {
-		if (state?.updatedProfile !== undefined) {
+		if (state?.toast !== undefined) {
 			toast({
-				title: "Success!",
-				description: "Your profile has been successfully updated.",
+				title: state.toast.title,
+				description: state.toast.message,
 			});
 		}
-
-		if (state?.errorMessage !== undefined) {
-			toast({
-				title: "Something went wrong...",
-				description: state.errorMessage,
-			});
-		}
-	}, [state?.updatedProfile, state?.errorMessage]);
+	}, [state?.toast]);
 
 	function openAvatarUploadInput() {
 		if (avatarInputRef.current) avatarInputRef.current.click();
@@ -72,7 +65,7 @@ export default function ProfileSettings({
 						<form className="space-y-2">
 							<Label htmlFor="avatar">Avatar</Label>
 							<Avatar className="size-[200px]">
-								<AvatarImage src={preview} />
+								<AvatarImage src={publicUrl} />
 								<AvatarFallback>
 									{display_name.substring(0, 2).toUpperCase()}
 								</AvatarFallback>
@@ -92,9 +85,7 @@ export default function ProfileSettings({
 									id="displayName"
 									name="displayName"
 									type="text"
-									defaultValue={
-										state?.updatedProfile?.displayName || display_name
-									}
+									defaultValue={display_name}
 								/>
 								{state?.errors?.displayName && (
 									<p className="text-sm text-destructive">
@@ -112,9 +103,7 @@ export default function ProfileSettings({
 									id="aboutMe"
 									name="aboutMe"
 									className="resize-none h-[100px]"
-									defaultValue={
-										state?.updatedProfile?.aboutMe || about_me
-									}
+									defaultValue={about_me}
 								/>
 								{state?.errors?.aboutMe && (
 									<p className="text-sm text-destructive">

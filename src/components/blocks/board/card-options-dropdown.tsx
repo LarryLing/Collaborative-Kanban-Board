@@ -56,7 +56,7 @@ export default function CardOptionsDropdown({
 				>
 					{columns.map((column) => (
 						<DropdownMenuRadioItem key={column.id} value={column.id}>
-							{column.title}
+							<span className={column.color}>{column.title}</span>
 						</DropdownMenuRadioItem>
 					))}
 				</DropdownMenuRadioGroup>

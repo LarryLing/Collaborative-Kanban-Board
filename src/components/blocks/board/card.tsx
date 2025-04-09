@@ -31,7 +31,7 @@ export default function Card({
 	description,
 	created_at,
 	columnTitle,
-    columnColor,
+	columnColor,
 	editCard,
 }: CardProps) {
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">("Saved");
@@ -92,7 +92,9 @@ export default function Card({
 							onChange={handleEdit}
 						/>
 					</DialogTitle>
-					<DialogDescription className={columnColor}>{columnTitle}</DialogDescription>
+					<DialogDescription className={`${columnColor} text-left`}>
+						{columnTitle}
+					</DialogDescription>
 				</DialogHeader>
 				<Textarea
 					ref={descriptionRef}

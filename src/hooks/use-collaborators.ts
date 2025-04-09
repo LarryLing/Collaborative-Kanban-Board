@@ -19,7 +19,6 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 'broadcast',
                 { event: 'INSERT' },
                 (payload) => {
-                    console.log(payload)
                     const updatedCollaborators = [
                         ...collaborators,
                         payload.payload as UserProfile,
@@ -31,7 +30,6 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 'broadcast',
                 { event: 'DELETE' },
                 (payload) => {
-                    console.log(payload)
                     const updatedCollaborators = collaborators.filter((collaborator) => collaborator.id !== payload.payload.profile_id)
 
                     setCollaborators(updatedCollaborators)
@@ -81,7 +79,14 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 .from("profiles_boards_bridge")
                 .insert({profile_id: profileData.id, board_id: boardId})
 
-            if (addCollaboratorError) throw addCollaboratorError
+            if (addCollaboratorError) throw addCollaboratorError;
+
+            return {
+                toast: {
+                    title: "Success!",
+                    message: "User has been invited to collaborate on this board.",
+                },
+            }
         } catch {
             return {
                 toast: {
