@@ -29,8 +29,8 @@ export default function ProfileSettings({
 	display_name,
 	about_me,
 	socials,
-	publicUrl,
-}: ProfileSettingsProps) {
+	avatar_url,
+}: UserProfile) {
 	const { toast } = useToast();
 
 	const [state, action, pending] = useActionState(updateUserProfile, undefined);
@@ -65,7 +65,7 @@ export default function ProfileSettings({
 						<form className="space-y-2">
 							<Label htmlFor="avatar">Avatar</Label>
 							<Avatar className="size-[200px]">
-								<AvatarImage src={publicUrl} />
+								<AvatarImage src={avatar_url} />
 								<AvatarFallback>
 									{display_name.substring(0, 2).toUpperCase()}
 								</AvatarFallback>

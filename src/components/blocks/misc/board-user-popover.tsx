@@ -12,24 +12,20 @@ import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
 import ProfileWidget from "./profile-widget";
 
-type AvatarPopoverProps = {
-	publicUrl: string;
-} & UserProfile;
-
-export default function AvatarPopover({
+export default function BoardUserCollaborator({
 	display_name,
 	email,
 	about_me,
 	socials,
-	publicUrl,
-}: AvatarPopoverProps) {
+	avatar_url,
+}: UserProfile) {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
 	return (
 		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={publicUrl} />
+					<AvatarImage src={avatar_url} />
 					<AvatarFallback>
 						{display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
@@ -42,7 +38,7 @@ export default function AvatarPopover({
 				<ProfileWidget
 					displayName={display_name}
 					email={email}
-					publicUrl={publicUrl}
+					avatarUrl={avatar_url}
 					className="w-[190px]"
 				/>
 				{about_me && (
@@ -78,39 +74,6 @@ export default function AvatarPopover({
 						</div>
 					</>
 				)}
-				<Separator className="w-full" />
-				<div className="flex flex-col justify-center items-center gap-2">
-					<Button
-						variant="ghost"
-						className="w-full justify-start"
-						asChild
-						onClick={() => setIsPopoverOpen(false)}
-					>
-						<Link href="/dashboard">
-							<LayoutGrid />
-							Dashboard
-						</Link>
-					</Button>
-					<Button
-						variant="ghost"
-						className="w-full justify-start"
-						asChild
-						onClick={() => setIsPopoverOpen(false)}
-					>
-						<Link href="/settings">
-							<Settings2 />
-							Settings
-						</Link>
-					</Button>
-					<Button
-						variant="ghost"
-						className="w-full justify-start"
-						onClick={signout}
-					>
-						<LogOut />
-						Sign Out
-					</Button>
-				</div>
 			</PopoverContent>
 		</Popover>
 	);

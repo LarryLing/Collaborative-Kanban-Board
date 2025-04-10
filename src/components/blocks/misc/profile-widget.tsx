@@ -4,20 +4,20 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 type ProfileWidget = {
 	displayName: string;
 	email: string;
-	publicUrl: string | undefined;
+	avatarUrl: string | undefined;
 	className: string;
 };
 
 export default function ProfileWidget({
 	displayName,
 	email,
-	publicUrl,
+	avatarUrl,
 	className,
 }: ProfileWidget) {
 	return (
 		<div className="flex justify-start items-center">
 			<Avatar>
-				<AvatarImage src={publicUrl} />
+				<AvatarImage src={avatarUrl} />
 				<AvatarFallback>
 					{displayName.substring(0, 2).toUpperCase()}
 				</AvatarFallback>

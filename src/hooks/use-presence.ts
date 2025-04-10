@@ -29,20 +29,14 @@ export default function usePresence(supabase: TypedSupabaseClient, boardId: stri
             .on('presence', { event: 'sync' }, () => {
                 const presentState = presenceChannel.presenceState()
 
-                // console.log('inside presence: ', presentState)
-
                 setUserState({ ...presentState })
             })
-            .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
-                // console.log('leave', key, leftPresences)
-
+            .on('presence', { event: 'leave' }, ({ key }) => {
                 setActiveProfiles((prev) => {
                     return prev.filter((activeProfile) => activeProfile.id !== key);
                 });
             })
-            .on('presence', { event: 'join' }, ({ key, newPresences }) => {
-                // console.log('join', key, newPresences)
-
+            .on('presence', { event: 'join' }, ({ key }) => {
                 addActiveProfile(key);
             })
             .subscribe(async (status) => {

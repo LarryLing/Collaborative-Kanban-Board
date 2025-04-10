@@ -24,16 +24,12 @@ export default async function SettingsPage(props: {
 
 	if (!userData.user) redirect("/login");
 
-	const { data: userProfile, error: profileError } = await selectProfileByProfileId(
+	const { data: userProfile, error: userProfileError } = await selectProfileByProfileId(
 		supabase,
 		userData.user.id,
 	);
 
-	if (profileError) throw profileError;
-
-	const { data: publicUrl } = supabase.storage
-		.from("avatars")
-		.getPublicUrl(userProfile.avatar_path || "");
+	if (userProfileError) throw userProfileError;
 
 	return (
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
@@ -64,9 +60,7 @@ export default async function SettingsPage(props: {
 						</Link>
 					</Button>
 				</div>
-				{tab === "" && (
-					<ProfileSettings {...userProfile} publicUrl={publicUrl.publicUrl} />
-				)}
+				{tab === "" && <ProfileSettings {...userProfile} />}
 				{tab === "account" && <AccountSettings email={userProfile.email} />}
 			</div>
 		</div>

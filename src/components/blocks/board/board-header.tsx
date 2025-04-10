@@ -14,6 +14,7 @@ import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import usePresence from "@/hooks/use-presence";
+import BoardUserPopover from "../misc/board-user-popover";
 
 type BoardHeaderProps = {
 	viewerId: string;
@@ -38,7 +39,7 @@ export default function BoardHeader({
 		coverPathRef,
 	} = useBoard(supabase, fetchedBoard);
 
-	const { userState, activeProfiles } = usePresence(supabase, board.id, viewerId);
+	const { activeProfiles } = usePresence(supabase, board.id, viewerId);
 
 	function openCoverPathInput() {
 		if (coverPathRef.current) coverPathRef.current.click();
@@ -113,6 +114,11 @@ export default function BoardHeader({
 						)}
 					</div>
 				</div>
+			</div>
+			<div className="flex gap-2">
+				{activeProfiles.map((activeProfile) => (
+					<BoardUserPopover key={activeProfile.id} {...activeProfile} />
+				))}
 			</div>
 		</div>
 	);

@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
-import { Collaborator, UserProfile } from "@/lib/types";
+import { Collaborator } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -80,7 +80,7 @@ export default function InviteUsersDialog({
 						<ProfileWidget
 							displayName={collaborator.display_name}
 							email={collaborator.email}
-							publicUrl={collaborator.avatar_path || undefined}
+							avatarUrl={collaborator.avatar_url}
 							className="w-full"
 						/>
 						{collaborator.profile_id !== ownerId && (

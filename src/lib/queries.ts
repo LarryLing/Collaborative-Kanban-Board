@@ -1,4 +1,4 @@
-import { Board, Card, Collaborator, Column, TypedSupabaseClient } from "./types";
+import { Board, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
 
 export async function selectCardsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: cardsData, error: cardsError } = await supabase
@@ -144,8 +144,10 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
     const fetchedCollaborators = collaboratorData.map(
         (collaborator) => {
             return {
-                ...collaborator.profiles,
-                profile_id: collaborator.profile_id,
+                profile_id: collaborator.profiles.id,
+                display_name: collaborator.profiles.display_name,
+                email: collaborator.profiles.email,
+                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path || "").data.publicUrl
             }
         },
     ) as Collaborator[];
@@ -157,21 +159,32 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
 }
 
 export async function selectProfileByProfileId(supabase: TypedSupabaseClient, profileId: string) {
-    const { data: userProfile, error: profileError } = await supabase
+    const { data: fetchData, error: fetchError } = await supabase
 		.from("profiles")
 		.select("*, socials(url)")
 		.eq("id", profileId)
 		.single();
 
-	if (profileError) {
+	if (fetchError) {
         return {
             data: null,
-            error: profileError,
+            error: fetchError,
         }
     }
 
+	const { data: publicUrl } = supabase.storage
+		.from("avatars")
+		.getPublicUrl(fetchData.avatar_path || "");
+
     return {
-        data: userProfile,
+        data: {
+            id: fetchData.id,
+            display_name: fetchData.display_name,
+            email: fetchData.email,
+            about_me: fetchData.about_me,
+            avatar_url: publicUrl.publicUrl,
+            socials: fetchData.socials,
+        } as UserProfile,
         error: null,
     }
 }
