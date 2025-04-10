@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Board, UserProfile } from "@/lib/types";
+import { Board, Collaborator } from "@/lib/types";
 import { Bookmark, Pencil, PenLine, Trash2 } from "lucide-react";
 import React from "react";
 import RenameBoardDialog from "../dashboard/rename-board-dialog";
@@ -13,11 +13,12 @@ import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import usePresence from "@/hooks/use-presence";
 
 type BoardHeaderProps = {
 	viewerId: string;
 	fetchedBoard: Board;
-	fetchedCollaborators: UserProfile[];
+	fetchedCollaborators: Collaborator[];
 };
 
 export default function BoardHeader({
@@ -36,6 +37,8 @@ export default function BoardHeader({
 		renameBoard,
 		coverPathRef,
 	} = useBoard(supabase, fetchedBoard);
+
+	const { userState, activeProfiles } = usePresence(supabase, board.id, viewerId);
 
 	function openCoverPathInput() {
 		if (coverPathRef.current) coverPathRef.current.click();
@@ -83,7 +86,11 @@ export default function BoardHeader({
 						fetchedCollaborators={fetchedCollaborators}
 					/>
 					<div className="space-x-2">
-						<RenameBoardDialog title={board.title} boardId={board.id} renameBoard={renameBoard}>
+						<RenameBoardDialog
+							title={board.title}
+							boardId={board.id}
+							renameBoard={renameBoard}
+						>
 							<Button variant="outline" size="icon">
 								<PenLine />
 							</Button>

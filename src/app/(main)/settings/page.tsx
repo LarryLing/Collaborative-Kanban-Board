@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import ProfileSettings from "@/components/blocks/settings/profile-settings";
 import AccountSettings from "@/components/blocks/settings/account-settings";
+import { selectProfileByProfileId } from "@/lib/queries";
 
 export default async function SettingsPage(props: {
 	searchParams?: Promise<{
@@ -23,11 +24,10 @@ export default async function SettingsPage(props: {
 
 	if (!userData.user) redirect("/login");
 
-	const { data: userProfile, error: profileError } = await supabase
-		.from("profiles")
-		.select("*, socials(url)")
-		.eq("id", userData.user.id)
-		.single();
+	const { data: userProfile, error: profileError } = await selectProfileByProfileId(
+		supabase,
+		userData.user.id,
+	);
 
 	if (profileError) throw profileError;
 

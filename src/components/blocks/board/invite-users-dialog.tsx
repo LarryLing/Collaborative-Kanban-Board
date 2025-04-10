@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
-import { UserProfile } from "@/lib/types";
+import { Collaborator, UserProfile } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +25,7 @@ type BoardHeaderProps = {
 	boardId: string;
 	viewerId: string;
 	hasInvitePermissions: boolean;
-	fetchedCollaborators: UserProfile[];
+	fetchedCollaborators: Collaborator[];
 };
 
 export default function InviteUsersDialog({
@@ -42,6 +42,7 @@ export default function InviteUsersDialog({
 	const { collaborators, addCollaborator, removeCollaborator } = useCollaborators(
 		supabase,
 		boardId,
+		viewerId,
 		fetchedCollaborators,
 	);
 
@@ -73,7 +74,7 @@ export default function InviteUsersDialog({
 				</DialogHeader>
 				{collaborators.map((collaborator) => (
 					<div
-						key={collaborator.id}
+						key={collaborator.profile_id}
 						className="flex justify-between items-center"
 					>
 						<ProfileWidget
@@ -82,18 +83,19 @@ export default function InviteUsersDialog({
 							publicUrl={collaborator.avatar_path || undefined}
 							className="w-full"
 						/>
-						{collaborator.id !== ownerId && (
+						{collaborator.profile_id !== ownerId && (
 							<Button
 								variant="destructive"
 								size="icon"
 								disabled={
-									!hasInvitePermissions && collaborator.id !== viewerId
+									!hasInvitePermissions &&
+									collaborator.profile_id !== viewerId
 								}
 								onClick={() =>
-									removeCollaborator(boardId, collaborator.id, viewerId)
+									removeCollaborator(boardId, collaborator.profile_id)
 								}
 							>
-								{collaborator.id === viewerId ? (
+								{collaborator.profile_id === viewerId ? (
 									<DoorOpen />
 								) : (
 									<UserMinus />

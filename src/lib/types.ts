@@ -20,6 +20,13 @@ export type Column = {
     color: ColumnColorOptions;
 }
 
+export type Collaborator = {
+    profile_id: string;
+    display_name: string;
+    email: string;
+    avatar_path: string;
+}
+
 export type OwnershipOptions = "me" | "not-me" | "anyone";
 export type SortOptions = "asc" | "des" | "last-opened";
 export type ViewOptions = "list" | "gallery";

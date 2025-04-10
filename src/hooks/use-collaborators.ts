@@ -1,10 +1,10 @@
-import { TypedSupabaseClient, UserProfile } from '@/lib/types';
+import { Collaborator, TypedSupabaseClient } from '@/lib/types';
 import { useCallback, useEffect, useState } from 'react'
 import { CollaboratorFormState, EmailFormSchema } from '@/lib/definitions';
 import { redirect } from 'next/navigation';
 
-export default function useCollaborators(supabase: TypedSupabaseClient, boardId: string, fetchedCollaborators: UserProfile[]) {
-    const [collaborators, setCollaborators] = useState<UserProfile[]>(fetchedCollaborators);
+export default function useCollaborators(supabase: TypedSupabaseClient, boardId: string, viewerId: string, fetchedCollaborators: Collaborator[]) {
+    const [collaborators, setCollaborators] = useState<Collaborator[]>(fetchedCollaborators);
 
     useEffect(() => {
         async function setSupabaseAuth() {
@@ -21,7 +21,7 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 (payload) => {
                     const updatedCollaborators = [
                         ...collaborators,
-                        payload.payload as UserProfile,
+                        payload.payload as Collaborator,
                     ]
 
                     setCollaborators(updatedCollaborators)
@@ -30,7 +30,9 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 'broadcast',
                 { event: 'DELETE' },
                 (payload) => {
-                    const updatedCollaborators = collaborators.filter((collaborator) => collaborator.id !== payload.payload.profile_id)
+                    if (payload.payload.profile_id === viewerId) redirect("/dashboard")
+
+                    const updatedCollaborators = collaborators.filter((collaborator) => collaborator.profile_id !== payload.payload.profile_id)
 
                     setCollaborators(updatedCollaborators)
                 })
@@ -97,15 +99,13 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
         }
     }, [collaborators])
 
-    const removeCollaborator = useCallback(async (boardId: string, removedId: string, removerId: string) => {
+    const removeCollaborator = useCallback(async (boardId: string, removedId: string) => {
         const { error: removeCollaboratorError } = await supabase
             .from("profiles_boards_bridge")
             .delete()
             .match({ profile_id: removedId, board_id: boardId })
 
         if (removeCollaboratorError) throw removeCollaboratorError;
-
-        if (removedId === removerId) redirect("/dashboard")
     }, [collaborators])
 
     return {collaborators, addCollaborator, removeCollaborator};

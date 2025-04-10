@@ -1,4 +1,4 @@
-import { Board, Card, Column, TypedSupabaseClient, UserProfile } from "./types";
+import { Board, Card, Collaborator, Column, TypedSupabaseClient } from "./types";
 
 export async function selectCardsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: cardsData, error: cardsError } = await supabase
@@ -131,7 +131,7 @@ export async function updateBoardLastOpenedColumn(supabase: TypedSupabaseClient,
 export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: collaboratorData, error: collaboratorError } = await supabase
         .from("profiles_boards_bridge")
-        .select("profile_id, profiles(*)")
+        .select("profile_id, profiles(id, display_name, email, avatar_path)")
         .eq("board_id", boardId);
 
     if (collaboratorError) {
@@ -142,11 +142,36 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
     }
 
     const fetchedCollaborators = collaboratorData.map(
-        (collaborator) => collaborator.profiles,
-    ) as UserProfile[];
+        (collaborator) => {
+            return {
+                ...collaborator.profiles,
+                profile_id: collaborator.profile_id,
+            }
+        },
+    ) as Collaborator[];
 
     return {
         data: fetchedCollaborators,
         error: null
+    }
+}
+
+export async function selectProfileByProfileId(supabase: TypedSupabaseClient, profileId: string) {
+    const { data: userProfile, error: profileError } = await supabase
+		.from("profiles")
+		.select("*, socials(url)")
+		.eq("id", profileId)
+		.single();
+
+	if (profileError) {
+        return {
+            data: null,
+            error: profileError,
+        }
+    }
+
+    return {
+        data: userProfile,
+        error: null,
     }
 }
