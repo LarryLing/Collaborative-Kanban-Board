@@ -18,7 +18,7 @@ export default function SignupPage() {
 		if (state?.toast) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.message,
+				description: state.toast.description,
 			});
 		}
 	}, [state?.toast]);

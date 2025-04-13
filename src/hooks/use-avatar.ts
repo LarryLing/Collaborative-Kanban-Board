@@ -30,7 +30,7 @@ export default function useAvatar(profileId: string) {
 
         toast({
             title: resultToast.title,
-            description: resultToast.message,
+            description: resultToast.description,
         });
 
         setUploading(false);

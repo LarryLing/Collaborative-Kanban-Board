@@ -6,26 +6,28 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
     const { toast } = useToast();
 
     const [board, setBoard] = useState<Board>(fetchedBoard);
-    const [coverPreview, setCoverPreview] = useState<string | undefined>(undefined);
-    const [uploadingPreview, setUploadingPreview] = useState(false);
+    const [coverUrl, setCoverUrl] = useState("");
+    const [uploading, setUploading] = useState(false);
 
     const coverPathRef = useRef<HTMLInputElement | null>(null);
 
     useEffect(() => {
-        if (board.cover_path) {
+        if (fetchedBoard.cover_path) {
             const { data: publicUrl } = supabase.storage
                 .from("covers")
-                .getPublicUrl(board.cover_path);
+                .getPublicUrl(fetchedBoard.cover_path);
 
-            setCoverPreview(publicUrl.publicUrl);
+            setCoverUrl(publicUrl.publicUrl);
         }
     }, [])
 
     const handleChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
-        setUploadingPreview(true);
+        if (!board) return;
+
+        setUploading(true);
 
         if (!e.target.files || e.target.files?.length === 0) {
-            setUploadingPreview(false);
+            setUploading(false);
             return;
         }
 
@@ -47,12 +49,13 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
         const [uploadCoverResponse, updateBoardResponse] = await Promise.all([uploadCoverPromise, updateBoardPromise])
 
         if (uploadCoverResponse.error || updateBoardResponse.error) {
+            setUploading(false);
+
             toast({
                 title: "Something went wrong...",
                 description: "We could not update this board's cover. Please try again.",
             });
 
-            setUploadingPreview(false);
             return;
         }
 
@@ -60,8 +63,8 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
             .from("covers")
             .getPublicUrl(filePath);
 
-        setCoverPreview(publicUrl.publicUrl);
-        setUploadingPreview(false);
+        setCoverUrl(publicUrl.publicUrl);
+        setUploading(false);
 
         toast({
             title: "Success!",
@@ -103,5 +106,5 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
         if (renameError) throw renameError;
     }, [board])
 
-  return { board, coverPreview, uploadingPreview, handleChange, bookmarkBoard, renameBoard, coverPathRef };
+  return { board, coverUrl, uploading, handleChange, bookmarkBoard, renameBoard, coverPathRef };
 }

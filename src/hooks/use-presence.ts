@@ -44,7 +44,6 @@ export default function usePresence(supabase: TypedSupabaseClient, boardId: stri
                     const status = await presenceChannel.track({
                         profile_id: profileId,
                     })
-                    // console.log('status: ', status)
                 }
             });
 

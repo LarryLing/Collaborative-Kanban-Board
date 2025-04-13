@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
 		if (state?.toast) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.message,
+				description: state.toast.description,
 			});
 		}
 	}, [state?.toast]);
@@ -33,9 +33,7 @@ export default function ForgotPasswordPage() {
 		<div className="flex justify-center items-center h-screen">
 			<Card className="w-[384px] ">
 				<CardHeader>
-					<CardTitle className="text-2xl">
-						Recover your account
-					</CardTitle>
+					<CardTitle className="text-2xl">Recover your account</CardTitle>
 					<CardDescription>
 						Enter your email to receive a one-time password.
 					</CardDescription>
@@ -57,19 +55,12 @@ export default function ForgotPasswordPage() {
 								</p>
 							)}
 						</div>
-						<Button
-							type="submit"
-							className="w-full"
-							disabled={pending}
-						>
+						<Button type="submit" className="w-full" disabled={pending}>
 							{pending ? "Sending..." : "Send"}
 						</Button>
 						<div className="text-center text-sm">
 							Remember your password?{" "}
-							<Link
-								href="/login"
-								className="underline underline-offset-4"
-							>
+							<Link href="/login" className="underline underline-offset-4">
 								Return to Login
 							</Link>
 						</div>

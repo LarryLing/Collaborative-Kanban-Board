@@ -71,11 +71,11 @@ export function processBoards(
 
 	if (ownership === "me") {
 		processedBoards = processedBoards.filter(
-			(board) => board.profile_id === id,
+			(board) => board.owner_id === id,
 		);
 	} else if (ownership === "not-me") {
 		processedBoards = processedBoards.filter(
-			(board) => board.profile_id !== id,
+			(board) => board.owner_id !== id,
 		);
 	}
 

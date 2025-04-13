@@ -22,7 +22,7 @@ export default function DeleteAccountDialog() {
 		if (state?.toast !== undefined) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.message,
+				description: state.toast.description,
 			});
 		}
 	}, [state?.toast]);

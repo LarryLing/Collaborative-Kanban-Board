@@ -26,7 +26,7 @@ export default function UpdateEmailDialog({ email }: UpdateEmailDialogProps) {
 		if (state?.toast !== undefined) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.message,
+				description: state.toast.description,
 			});
 		}
 	}, [state?.toast]);

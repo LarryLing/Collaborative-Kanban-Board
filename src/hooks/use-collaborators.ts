@@ -2,9 +2,22 @@ import { Collaborator, TypedSupabaseClient } from '@/lib/types';
 import { useCallback, useEffect, useState } from 'react'
 import { CollaboratorFormState, EmailFormSchema } from '@/lib/definitions';
 import { redirect } from 'next/navigation';
+import { selectCollaboratorsByBoardId } from '@/lib/queries';
 
-export default function useCollaborators(supabase: TypedSupabaseClient, boardId: string, viewerId: string, fetchedCollaborators: Collaborator[]) {
-    const [collaborators, setCollaborators] = useState<Collaborator[]>(fetchedCollaborators);
+export default function useCollaborators(supabase: TypedSupabaseClient, boardId: string, viewerId: string) {
+    const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
+
+    useEffect(() => {
+        async function fetchCollaborators() {
+	        const {data: collaboratorData, error: collaboratorError } = await selectCollaboratorsByBoardId(supabase, boardId);
+
+            if (collaboratorError) throw collaboratorError;
+
+            setCollaborators(collaboratorData)
+        }
+
+        fetchCollaborators();
+    }, [])
 
     useEffect(() => {
         async function setSupabaseAuth() {

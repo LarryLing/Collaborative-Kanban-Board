@@ -14,7 +14,16 @@ export type UserProfile = {
     }[]
 }
 
-export type Board = Tables<"boards"> & { bookmarked: boolean, has_invite_permissions: boolean };
+export type Board = {
+    id: string;
+    title: string;
+    owner_id: string;
+    cover_path: string | null;
+    last_opened: string;
+    bookmarked: boolean;
+    has_collaborators: boolean;
+    has_invite_permissions: boolean;
+}
 
 export type Card = {
     id: string;

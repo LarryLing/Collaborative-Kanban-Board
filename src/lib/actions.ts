@@ -69,14 +69,14 @@ export async function signup(formState: UserFormState, formData: FormData) {
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inbox to confirm your signup.",
+                description: "Please check your inbox to confirm your signup.",
             },
         };
     } catch {
         return {
 			toast: {
 				title: "Something went wrong...",
-				message:
+				description:
 					"We couldn't sign you up at this time. Please try again.",
 			},
 		};
@@ -127,7 +127,7 @@ export async function login(formState: UserFormState, formData: FormData) {
         return {
             toast: {
                 title: "Something went wrong...",
-                message:
+                description:
                     "We couldn't log you in at this time. Please try again.",
             },
         };
@@ -205,14 +205,14 @@ export async function sendOtpEmail(formState: unknown, formData: FormData) {
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inbox to see your one-time password.",
+                description: "Please check your inbox to see your one-time password.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not send you a one-time password. Please try again.",
+                description: "We could not send you a one-time password. Please try again.",
             },
         };
     }
@@ -252,14 +252,14 @@ export async function updatePassword(formState: UserFormState, formData: FormDat
         return {
             toast: {
                 title: "Success!",
-                message: "Your password has been successfully updated.",
+                description: "Your password has been successfully updated.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your password. Please try again.",
+                description: "We could not update your password. Please try again.",
             },
         }
     }
@@ -308,14 +308,14 @@ export async function updateEmail(formState: UserFormState, formData: FormData) 
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inboxes for confirmation emails.",
+                description: "Please check your inboxes for confirmation emails.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your email. Please try again.",
+                description: "We could not update your email. Please try again.",
             },
         }
     }
@@ -392,14 +392,14 @@ export async function updateUserProfile(
         return {
             toast: {
                 title: "Success!",
-                message: "Profile successfully updated.",
+                description: "Profile successfully updated.",
             },
         }
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your profile. Please try again.",
+                description: "We could not update your profile. Please try again.",
             },
         }
     }
@@ -433,7 +433,7 @@ export async function uploadAvatar(userId: string, file: File) {
         return {
             toast: {
                 title: "Success!",
-                message: "Your avatar has been successfully updated.",
+                description: "Your avatar has been successfully updated.",
             },
         }
 
@@ -441,7 +441,7 @@ export async function uploadAvatar(userId: string, file: File) {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your avatar. Please try again.",
+                description: "We could not update your avatar. Please try again.",
             },
         }
     }
@@ -496,7 +496,7 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not delete your account. Please try again.",
+                description: "We could not delete your account. Please try again.",
             },
         }
     }

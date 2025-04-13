@@ -1,18 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { LayoutGrid, LogOut, Settings2 } from "lucide-react";
 import { UserProfile } from "@/lib/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { signout } from "@/lib/actions";
 import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
-import ProfileWidget from "./profile-widget";
+import ProfileWidget from "../misc/profile-widget";
 
-export default function BoardUserCollaborator({
+export default function BoardUserPopover({
 	display_name,
 	email,
 	about_me,
@@ -31,10 +29,7 @@ export default function BoardUserCollaborator({
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
-			<PopoverContent
-				className="z-[9999] w-[312px] hidden md:block space-y-3"
-				hideWhenDetached
-			>
+			<PopoverContent className="w-[312px] space-y-3" hideWhenDetached>
 				<ProfileWidget
 					displayName={display_name}
 					email={email}
@@ -78,3 +73,5 @@ export default function BoardUserCollaborator({
 		</Popover>
 	);
 }
+
+export const MemoizedBoardUserPopover = memo(BoardUserPopover);

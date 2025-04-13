@@ -31,10 +31,7 @@ export default function UserPopover({
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
-			<PopoverContent
-				className="z-[9999] w-[312px] hidden md:block space-y-3"
-				hideWhenDetached
-			>
+			<PopoverContent className="w-[312px] space-y-3" hideWhenDetached>
 				<ProfileWidget
 					displayName={display_name}
 					email={email}

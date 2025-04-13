@@ -2,37 +2,33 @@
 
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Board, Collaborator } from "@/lib/types";
-import { Bookmark, Pencil, PenLine, Trash2 } from "lucide-react";
+import { Board } from "@/lib/types";
+import { Bookmark, ImageUp, PenLine, Trash2 } from "lucide-react";
 import React from "react";
 import RenameBoardDialog from "../dashboard/rename-board-dialog";
 import DeleteBoardDialog from "../dashboard/delete-board-dialog";
-import InviteUsersDialog from "./invite-users-dialog";
+import { MemoizedInviteUsersDialog } from "./invite-users-dialog";
 import useBoard from "@/hooks/use-board";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import usePresence from "@/hooks/use-presence";
-import BoardUserPopover from "../misc/board-user-popover";
+import BoardUserGroup from "./board-user-group";
+import { MemoizedMobileBoardOptions } from "./mobile-board-options";
 
 type BoardHeaderProps = {
 	viewerId: string;
 	fetchedBoard: Board;
-	fetchedCollaborators: Collaborator[];
 };
 
-export default function BoardHeader({
-	viewerId,
-	fetchedBoard,
-	fetchedCollaborators,
-}: BoardHeaderProps) {
+export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps) {
 	const supabase = createClient();
 
 	const {
 		board,
-		coverPreview,
-		uploadingPreview,
+		coverUrl,
+		uploading,
 		handleChange,
 		bookmarkBoard,
 		renameBoard,
@@ -48,10 +44,10 @@ export default function BoardHeader({
 	return (
 		<div className="space-y-6">
 			<div className="w-full h-[225px] bg-accent/30 group-hover:bg-accent/50 rounded-md relative overflow-hidden">
-				{coverPreview && (
-					<Image src={coverPreview} alt="" objectFit="cover" layout="fill" />
+				{coverUrl && (
+					<Image src={coverUrl} alt="" objectFit="cover" layout="fill" />
 				)}
-				{uploadingPreview && <Skeleton className="size-full" />}
+				{uploading && <Skeleton className="size-full" />}
 				<div className="absolute top-2 right-2">
 					<div className="relative">
 						<Input
@@ -61,7 +57,7 @@ export default function BoardHeader({
 							type="file"
 							accept="image/*"
 							onChange={(e) => handleChange(e)}
-							disabled={uploadingPreview}
+							disabled={uploading}
 							className="size-9 opacity-0"
 						/>
 						<Button
@@ -69,24 +65,26 @@ export default function BoardHeader({
 							className="absolute inset-0 z-5"
 							onClick={openCoverPathInput}
 						>
-							<Pencil />
+							<ImageUp />
 						</Button>
 					</div>
 				</div>
 			</div>
 			<div className="space-y-4">
-				<h3 className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl">
-					{board.title}
-				</h3>
+				<div className="flex justify-between items-center">
+					<h3 className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl">
+						{board.title}
+					</h3>
+					<BoardUserGroup boardUsers={activeProfiles} />
+				</div>
 				<div className="flex justify-between">
-					<InviteUsersDialog
+					<MemoizedInviteUsersDialog
 						boardId={board.id}
-						ownerId={board.profile_id}
+						ownerId={board.owner_id}
 						viewerId={viewerId}
 						hasInvitePermissions={board.has_invite_permissions}
-						fetchedCollaborators={fetchedCollaborators}
 					/>
-					<div className="space-x-2">
+					<div className="space-x-2 hidden md:block">
 						<RenameBoardDialog
 							title={board.title}
 							boardId={board.id}
@@ -105,7 +103,7 @@ export default function BoardHeader({
 						>
 							<Bookmark />
 						</Toggle>
-						{board.profile_id === viewerId && (
+						{board.owner_id === viewerId && (
 							<DeleteBoardDialog boardId={board.id}>
 								<Button variant="outline" size="icon">
 									<Trash2 />
@@ -113,12 +111,15 @@ export default function BoardHeader({
 							</DeleteBoardDialog>
 						)}
 					</div>
+					<div className="block md:hidden">
+						<MemoizedMobileBoardOptions
+							{...board}
+							viewerId={viewerId}
+							renameBoard={renameBoard}
+							bookmarkBoard={bookmarkBoard}
+						/>
+					</div>
 				</div>
-			</div>
-			<div className="flex gap-2">
-				{activeProfiles.map((activeProfile) => (
-					<BoardUserPopover key={activeProfile.id} {...activeProfile} />
-				))}
 			</div>
 		</div>
 	);

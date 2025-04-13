@@ -18,10 +18,7 @@ type BoardProps = {
 export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 	const supabase = createClient();
 
-	const { board, coverPreview, bookmarkBoard, renameBoard } = useBoard(
-		supabase,
-		fetchedBoard,
-	);
+	const { board, coverUrl, bookmarkBoard, renameBoard } = useBoard(supabase, fetchedBoard);
 
 	const lastOpenedDateString = getDateString(board.last_opened);
 
@@ -33,9 +30,9 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 				{view === "gallery" ? (
 					<>
 						<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
-							{coverPreview && (
+							{coverUrl && (
 								<Image
-									src={coverPreview}
+									src={coverUrl}
 									alt=""
 									objectFit="cover"
 									layout="fill"
@@ -47,9 +44,9 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 								{board.title}
 							</span>
 							<div className="flex justify-start items-center gap-2 basis-[40px]">
-								{/* {collaborators > 1 && (
+								{board.has_collaborators && (
 									<Users className="size-4 inline-block" />
-								)} */}
+								)}
 								{board.bookmarked && (
 									<Bookmark className="size-4 inline-block" />
 								)}
@@ -67,9 +64,9 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 								Opened {lastOpenedDateString}
 							</span>
 							<div className="space-x-2">
-								{/* {collaborators > 1 && (
+								{board.has_collaborators && (
 									<Users className="size-4 inline-block" />
-								)} */}
+								)}
 								{board.bookmarked && (
 									<Bookmark className="size-4 inline-block" />
 								)}

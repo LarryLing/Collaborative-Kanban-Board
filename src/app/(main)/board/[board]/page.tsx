@@ -65,23 +65,19 @@ export default async function BoardPage({
 	if (updateBoardResponse.error) throw updateBoardResponse.error;
 	if (selectBoardResponse.error) throw selectBoardResponse.error;
 
-	const selectCollaboratorsPromise = selectCollaboratorsByBoardId(supabase, boardId);
 	const selectColumnsPromise = selectColumnsByBoardId(supabase, boardId);
 	const selectCardsPromise = selectCardsByBoardId(supabase, boardId);
 
-	const [selectCollaboratorsResponse, selectColumnsResponse, selectCardsResponse] =
+	const [selectColumnsResponse, selectCardsResponse] =
 		await Promise.all([
-			selectCollaboratorsPromise,
 			selectColumnsPromise,
 			selectCardsPromise,
 		]);
 
-	if (selectCollaboratorsResponse.error) throw selectCollaboratorsResponse.error;
 	if (selectColumnsResponse.error) throw selectColumnsResponse.error;
 	if (selectCardsResponse.error) throw selectCardsResponse.error;
 
 	const fetchedBoard = selectBoardResponse.data;
-	const fetchedCollaborators = selectCollaboratorsResponse.data;
 	const fetchedColumns = selectColumnsResponse.data;
 	const fetchedCards = selectCardsResponse.data;
 
@@ -91,7 +87,6 @@ export default async function BoardPage({
 			<BoardHeader
 				viewerId={user.user.id}
 				fetchedBoard={fetchedBoard}
-				fetchedCollaborators={fetchedCollaborators}
 			/>
 			<Separator className="w-full" />
 			<BoardContent

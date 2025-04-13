@@ -5,15 +5,13 @@ import {
 	DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Bookmark, Ellipsis, PenLine, SquareArrowOutUpRight, Trash2 } from "lucide-react";
+import { Bookmark, PenLine, Trash2 } from "lucide-react";
 import React, { memo } from "react";
-import Link from "next/link";
-import RenameBoardDialog from "./rename-board-dialog";
-import DeleteBoardDialog from "./delete-board-dialog";
 import { Board } from "@/lib/types";
+import RenameBoardDialog from "../dashboard/rename-board-dialog";
+import DeleteBoardDialog from "../dashboard/delete-board-dialog";
 
-type OptionsDropdownProps = {
-	side: "top" | "right" | "bottom" | "left" | undefined;
+type MobileBoardOptionsProps = {
 	viewerId: string;
 	renameBoard: (oldTitle: string, newTitle: string, boardId: string) => Promise<void>;
 	bookmarkBoard: (
@@ -23,24 +21,21 @@ type OptionsDropdownProps = {
 	) => Promise<void>;
 } & Board;
 
-export default function BoardOptionsDropdown({
+export default function MobileBoardOptions({
 	id,
 	owner_id,
 	title,
 	bookmarked,
-	side,
 	viewerId,
 	renameBoard,
 	bookmarkBoard,
-}: OptionsDropdownProps) {
+}: MobileBoardOptionsProps) {
 	return (
 		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="ghost" size="icon">
-					<Ellipsis className="size-5" />
-				</Button>
+				<Button variant="outline">Options</Button>
 			</DropdownMenuTrigger>
-			<DropdownMenuContent side={side}>
+			<DropdownMenuContent align="end">
 				<RenameBoardDialog boardId={id} title={title} renameBoard={renameBoard}>
 					<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
 						<PenLine />
@@ -59,15 +54,9 @@ export default function BoardOptionsDropdown({
 						</DropdownMenuItem>
 					</DeleteBoardDialog>
 				)}
-				<Link href={`/board/${id}`} target="_blank" rel="noopener noreferrer">
-					<DropdownMenuItem>
-						<SquareArrowOutUpRight className="size-4" />
-						<span>Open in new tab</span>
-					</DropdownMenuItem>
-				</Link>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
 }
 
-export const MemoizedBoardOptionsDropdown = memo(BoardOptionsDropdown);
+export const MemoizedMobileBoardOptions = memo(MobileBoardOptions);

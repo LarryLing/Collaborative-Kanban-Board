@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
+import React, { memo, useActionState, useEffect } from "react";
 import {
 	Dialog,
 	DialogClose,
@@ -16,7 +16,6 @@ import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
-import { Collaborator } from "@/lib/types";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +24,6 @@ type BoardHeaderProps = {
 	boardId: string;
 	viewerId: string;
 	hasInvitePermissions: boolean;
-	fetchedCollaborators: Collaborator[];
 };
 
 export default function InviteUsersDialog({
@@ -33,7 +31,6 @@ export default function InviteUsersDialog({
 	boardId,
 	viewerId,
 	hasInvitePermissions,
-	fetchedCollaborators,
 }: BoardHeaderProps) {
 	const supabase = createClient();
 
@@ -43,7 +40,6 @@ export default function InviteUsersDialog({
 		supabase,
 		boardId,
 		viewerId,
-		fetchedCollaborators,
 	);
 
 	const [state, action, pending] = useActionState(addCollaborator, undefined);
@@ -62,7 +58,7 @@ export default function InviteUsersDialog({
 			<DialogTrigger asChild>
 				<Button>
 					<UserPlus />
-					Invite Collaborators
+					<span>Invite Collaborators</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
@@ -145,3 +141,5 @@ export default function InviteUsersDialog({
 		</Dialog>
 	);
 }
+
+export const MemoizedInviteUsersDialog = memo(InviteUsersDialog);

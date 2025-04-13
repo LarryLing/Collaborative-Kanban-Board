@@ -63,23 +63,42 @@ export async function updateColumnsByBoardId(supabase: TypedSupabaseClient, boar
 }
 
 export async function selectBoardByBoardAndProfileId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
-    const { data: boardData, error: boardError } = await supabase
+    const selectBoardsPromise = supabase
         .from("profiles_boards_bridge")
         .select("bookmarked, has_invite_permissions, boards(*)")
         .match({board_id: boardId, profile_id: profileId})
         .single()
 
-    if (boardError) {
+    const selectCollaboratorCountPromise = supabase
+        .from("profiles_boards_bridge")
+        .select('*', { count: 'exact', head: true })
+        .match({board_id: boardId, profile_id: profileId})
+
+    const [selectBoardsResponse, selectCollaboratorCountResponse] = await Promise.all([selectBoardsPromise, selectCollaboratorCountPromise]);
+
+    if (selectBoardsResponse.error) {
         return {
             data: null,
-            error: boardError,
+            error: selectBoardsResponse.error
+        }
+    }
+
+    if (selectCollaboratorCountResponse.error) {
+        return {
+            data: null,
+            error: selectCollaboratorCountResponse.error
         }
     }
 
     const board: Board = {
-        ...boardData.boards,
-        bookmarked: boardData.bookmarked,
-        has_invite_permissions: boardData.has_invite_permissions
+        id: selectBoardsResponse.data.boards.id,
+        title: selectBoardsResponse.data.boards.title,
+        owner_id: selectBoardsResponse.data.boards.profile_id,
+        cover_path: selectBoardsResponse.data.boards.cover_path,
+        last_opened: selectBoardsResponse.data.boards.last_opened,
+        bookmarked: selectBoardsResponse.data.bookmarked,
+        has_collaborators: (selectCollaboratorCountResponse.count || 1) > 1,
+        has_invite_permissions: selectBoardsResponse.data.has_invite_permissions,
     }
 
     return {
@@ -103,9 +122,14 @@ export async function selectBoardsByProfileId(supabase: TypedSupabaseClient, pro
 
     const boards: Board[] = boardsData.map((item) => {
         return {
-            ...item.boards,
-            bookmarked: item.bookmarked,
-            has_invite_permissions: item.has_invite_permissions,
+            id: item.boards.id,
+            title: item.boards.title,
+            owner_id: item.boards.profile_id,
+            cover_path: item.boards.cover_path,
+            last_opened: item.boards.last_opened,
+            bookmarked: false,
+            has_collaborators: false,
+            has_invite_permissions: false,
         };
     });
 
