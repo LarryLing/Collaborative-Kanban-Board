@@ -125,4 +125,16 @@ export type BoardFormState =
             title?: string[];
         }
         boardId?: string,
+        updatedTitle?: string,
+    };
+
+export type CollaboratorFormState =
+    | {
+        errors?: {
+            email?: string[];
+        }
+        toast?: {
+            title?: string;
+            message?: string;
+        }
     } | undefined;

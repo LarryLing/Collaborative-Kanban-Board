@@ -3,8 +3,27 @@ import { Database, Tables } from "../../database.types";
 
 export type TypedSupabaseClient = SupabaseClient<Database>;
 
-export type UserProfile = Tables<"profiles"> & { socials: { url: string }[]; }
-export type Board = Tables<"boards">;
+export type UserProfile = {
+    id: string;
+    display_name: string;
+    email: string;
+    about_me: string;
+    avatar_url: string;
+    socials: {
+        url: string
+    }[]
+}
+
+export type Board = {
+    id: string;
+    title: string;
+    owner_id: string;
+    cover_path: string | null;
+    last_opened: string;
+    bookmarked: boolean;
+    has_collaborators: boolean;
+    has_invite_permissions: boolean;
+}
 
 export type Card = {
     id: string;
@@ -18,6 +37,13 @@ export type Column = {
     id: string;
     title: string;
     color: ColumnColorOptions;
+}
+
+export type Collaborator = {
+    profile_id: string;
+    display_name: string;
+    email: string;
+    avatar_url: string;
 }
 
 export type OwnershipOptions = "me" | "not-me" | "anyone";

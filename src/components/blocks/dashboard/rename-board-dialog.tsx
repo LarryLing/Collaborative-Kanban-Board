@@ -7,41 +7,42 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@/components/ui/dialog";
-import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { renameBoard } from "@/lib/actions";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { PenLine } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { FormEvent, ReactNode, useRef, useState } from "react";
 
 type RenameDialogProps = {
 	boardId: string;
 	title: string;
+	renameBoard: (oldTitle: string, newTitle: string, boardId: string) => Promise<void>;
+	children: ReactNode;
 };
 
-export default function RenameBoardDialog({ boardId, title }: RenameDialogProps) {
-	const initialState = {
-		errors: undefined,
-		boardId: boardId,
-		updatedTitle: title,
-	};
-
+export default function RenameBoardDialog({
+	boardId,
+	title,
+	renameBoard,
+	children,
+}: RenameDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [pending, setPending] = useState(false);
 
-	const [state, action, pending] = useActionState(renameBoard, initialState);
+	const titleRef = useRef<HTMLInputElement>(null);
 
-	useEffect(() => {
-		if (state?.updatedTitle !== undefined) setIsDialogOpen(false);
-	}, [state?.updatedTitle]);
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+
+		setPending(true);
+
+		await renameBoard(title, titleRef.current?.value || "Untitled Board", boardId);
+
+		setPending(false);
+		setIsDialogOpen(false);
+	}
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-			<DialogTrigger asChild>
-				<DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-					<PenLine className="size-4" />
-					<span>Rename</span>
-				</DropdownMenuItem>
-			</DialogTrigger>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-[425px]">
 				<DialogHeader>
 					<DialogTitle>Rename Board</DialogTitle>
@@ -49,17 +50,13 @@ export default function RenameBoardDialog({ boardId, title }: RenameDialogProps)
 						Please enter a new name for this board
 					</DialogDescription>
 				</DialogHeader>
-				<form action={action}>
+				<form onSubmit={(e) => handleSubmit(e)}>
 					<Input
-						id="title"
-						name="title"
+						ref={titleRef}
 						placeholder={title}
-						defaultValue={state?.updatedTitle || title}
+						defaultValue={title}
 						className="col-span-3"
 					/>
-					{state?.errors?.title && (
-						<p className="text-sm text-destructive">{state.errors.title}</p>
-					)}
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
 							<Button type="button" variant="outline">

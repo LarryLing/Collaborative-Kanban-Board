@@ -2,14 +2,13 @@ import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import { uploadAvatar } from '@/lib/actions';
 import { useToast } from './use-toast';
 
-export default function useAvatar(userId: string, publicUrl: string) {
+export default function useAvatar(profileId: string) {
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
     const { toast } = useToast();
 
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
-    const [preview, setPreview] = useState(publicUrl);
     const [uploading, setUploading] = useState(false);
 
     const changeAvatar = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
@@ -27,27 +26,15 @@ export default function useAvatar(userId: string, publicUrl: string) {
 
         const file = e.target.files[0];
 
-        const { publicUrl, errorMessage } = await uploadAvatar(
-            userId,
-            file,
-        );
+        const { toast: resultToast } = await uploadAvatar(profileId, file);
 
-        if (publicUrl) {
-            setPreview(publicUrl);
-
-            toast({
-                title: "Success!",
-                description: "Your avatar has been successfully updated.",
-            });
-        } else if (errorMessage) {
-            toast({
-                title: "Something went wrong...!",
-                description: errorMessage,
-            });
-        }
+        toast({
+            title: resultToast.title,
+            description: resultToast.description,
+        });
 
         setUploading(false);
     }, [])
 
-  return { preview, uploading, changeAvatar, avatarInputRef };
+  return { uploading, changeAvatar, avatarInputRef };
 }

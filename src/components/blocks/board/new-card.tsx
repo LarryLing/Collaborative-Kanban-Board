@@ -5,6 +5,7 @@ import React, { FormEvent, useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -14,14 +15,23 @@ import { Plus } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { UseCardsType } from "@/hooks/use-cards";
+import { ColumnColorOptions } from "@/lib/types";
 
 type NewCardProps = {
 	size: "default" | "icon";
 	columnId: string;
+	columnTitle: string;
+	columnColor: ColumnColorOptions;
 	createCard: UseCardsType["createCard"];
 };
 
-export default function NewCard({ size, columnId, createCard }: NewCardProps) {
+export default function NewCard({
+	size,
+	columnId,
+	columnTitle,
+	columnColor,
+	createCard,
+}: NewCardProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [pending, setPending] = useState(false);
 
@@ -61,12 +71,9 @@ export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 					</Button>
 				)}
 			</DialogTrigger>
-			<DialogContent className="size-[500px] px-8">
+			<DialogContent className="h-[500px] px-8">
 				<form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-4">
-					<DialogHeader
-						className="hover:cursor-text"
-						aria-description="New Card"
-					>
+					<DialogHeader className="hover:cursor-text">
 						<DialogTitle>
 							<Input
 								ref={titleRef}
@@ -77,6 +84,9 @@ export default function NewCard({ size, columnId, createCard }: NewCardProps) {
 								defaultValue="New Card"
 							/>
 						</DialogTitle>
+						<DialogDescription className={`${columnColor} text-left`}>
+							{columnTitle}
+						</DialogDescription>
 					</DialogHeader>
 					<Textarea
 						ref={descriptionRef}

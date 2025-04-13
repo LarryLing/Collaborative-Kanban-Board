@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import DashboardContent from "@/components/blocks/dashboard/dashboard-content";
 import DashboardHeader from "@/components/blocks/dashboard/dashboard-header";
+import { selectBoardsByProfileId } from "@/lib/queries";
 
 export default async function DashboardPage(props: {
 	searchParams?: Promise<{
@@ -25,10 +26,10 @@ export default async function DashboardPage(props: {
 
 	if (!userData.user) redirect("/login");
 
-	const { data: boardsData, error: boardsError } = await supabase
-		.from("profiles_boards_bridge")
-		.select("board_id, boards(*)")
-		.eq("profile_id", userData.user.id);
+	const { data: boardsData, error: boardsError } = await selectBoardsByProfileId(
+		supabase,
+		userData.user.id,
+	);
 
 	if (boardsError) throw boardsError;
 
@@ -38,7 +39,8 @@ export default async function DashboardPage(props: {
 			<Separator className="w-full" />
 			<DashboardContent
 				id={userData.user.id}
-				boards={boardsData.map((item) => item.boards)}
+				boards={boardsData}
+				viewerId={userData.user.id}
 				query={query}
 			/>
 		</div>

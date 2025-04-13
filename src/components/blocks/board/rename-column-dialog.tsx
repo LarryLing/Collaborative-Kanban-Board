@@ -28,7 +28,6 @@ export default function RenameColumnDialog({
 	renameColumn,
 }: RenameColumnDialogProps) {
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
-
 	const [pending, setPending] = useState(false);
 
 	const titleRef = useRef<HTMLInputElement>(null);

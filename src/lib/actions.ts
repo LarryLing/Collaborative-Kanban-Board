@@ -11,8 +11,6 @@ import {
 	ResetPasswordFormSchema,
 	EditProfileFormSchema,
 	DeleteAccountFormSchema,
-    RenameBoardSchema,
-    BoardFormState,
 } from "@/lib/definitions";
 import { headers } from "next/headers";
 
@@ -71,14 +69,14 @@ export async function signup(formState: UserFormState, formData: FormData) {
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inbox to confirm your signup.",
+                description: "Please check your inbox to confirm your signup.",
             },
         };
     } catch {
         return {
 			toast: {
 				title: "Something went wrong...",
-				message:
+				description:
 					"We couldn't sign you up at this time. Please try again.",
 			},
 		};
@@ -129,7 +127,7 @@ export async function login(formState: UserFormState, formData: FormData) {
         return {
             toast: {
                 title: "Something went wrong...",
-                message:
+                description:
                     "We couldn't log you in at this time. Please try again.",
             },
         };
@@ -207,14 +205,14 @@ export async function sendOtpEmail(formState: unknown, formData: FormData) {
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inbox to see your one-time password.",
+                description: "Please check your inbox to see your one-time password.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not send you a one-time password. Please try again.",
+                description: "We could not send you a one-time password. Please try again.",
             },
         };
     }
@@ -254,14 +252,14 @@ export async function updatePassword(formState: UserFormState, formData: FormDat
         return {
             toast: {
                 title: "Success!",
-                message: "Your password has been successfully updated.",
+                description: "Your password has been successfully updated.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your password. Please try again.",
+                description: "We could not update your password. Please try again.",
             },
         }
     }
@@ -310,14 +308,14 @@ export async function updateEmail(formState: UserFormState, formData: FormData) 
         return {
             toast: {
                 title: "Success!",
-                message: "Please check your inboxes for confirmation emails.",
+                description: "Please check your inboxes for confirmation emails.",
             },
         };
     } catch {
         return {
             toast: {
                 title: "Something went wrong...",
-                message: "We could not update your email. Please try again.",
+                description: "We could not update your email. Please try again.",
             },
         }
     }
@@ -389,26 +387,21 @@ export async function updateUserProfile(
 
         if (socialsInsertError) throw socialsInsertError;
 
-        const { data: socialsSelectData, error: socialsSelectError } = await supabase
-            .from("socials")
-            .select("url")
-            .eq("profile_id", userData.user.id)
-
-        if (socialsSelectError) throw socialsSelectError;
-
         revalidatePath("/");
 
         return {
-            updatedProfile: {
-                displayName: validatedFields.data.displayName,
-                aboutMe: validatedFields.data.aboutMe,
-                socials: socialsSelectData,
+            toast: {
+                title: "Success!",
+                description: "Profile successfully updated.",
             },
-        };
+        }
     } catch {
         return {
-            errorMessage: "We could not update your profile. Please try again.",
-        };
+            toast: {
+                title: "Something went wrong...",
+                description: "We could not update your profile. Please try again.",
+            },
+        }
     }
 }
 
@@ -435,60 +428,22 @@ export async function uploadAvatar(userId: string, file: File) {
         if (uploadAvatarResponse.error) throw uploadAvatarResponse.error;
         if (updateProfileResponse.error) throw updateProfileResponse.error;
 
-        const { data: publicUrl } = supabase.storage
-            .from("avatars")
-            .getPublicUrl(filePath);
-
         revalidatePath("/settings");
 
         return {
-            publicUrl: publicUrl.publicUrl,
+            toast: {
+                title: "Success!",
+                description: "Your avatar has been successfully updated.",
+            },
         }
 
     } catch {
         return {
-            errorMessage: "We could not update your avatar. Please try again.",
-        };
-    }
-}
-
-export async function uploadCover(boardId: string, file: File) {
-    try {
-        const supabase = await createClient();
-
-        const fileExt = file.name.split(".").pop();
-        const filePath = `${boardId}/cover_${Date.now()}.${fileExt}`;
-
-        const uploadCoverPromise = supabase.storage
-            .from("covers")
-            .upload(filePath, file);
-
-        const updateBoardPromise = supabase
-            .from("boards")
-            .update({
-                cover_path: filePath,
-            })
-            .eq("id", boardId);
-
-        const [uploadCoverResponse, updateBoardResponse] = await Promise.all([uploadCoverPromise, updateBoardPromise])
-
-        if (uploadCoverResponse.error) throw uploadCoverResponse.error;
-        if (updateBoardResponse.error) throw updateBoardResponse.error;
-
-        const { data: publicUrl } = supabase.storage
-            .from("covers")
-            .getPublicUrl(filePath);
-
-        revalidatePath("/");
-
-        return {
-            publicUrl: publicUrl.publicUrl,
+            toast: {
+                title: "Something went wrong...",
+                description: "We could not update your avatar. Please try again.",
+            },
         }
-
-    } catch {
-        return {
-            errorMessage: "We could not update this board's cover. Please try again.",
-        };
     }
 }
 
@@ -539,7 +494,10 @@ export async function deleteAccount(formState: UserFormState, formData: FormData
         redirect("/");
     } catch {
         return {
-            errorMessage: "We could not delete your account. Please try again."
+            toast: {
+                title: "Something went wrong...",
+                description: "We could not delete your account. Please try again.",
+            },
         }
     }
 }
@@ -590,47 +548,6 @@ export async function deleteBoard(boardId: string) {
 
     if (deleteError) throw deleteError;
 
-    revalidatePath("/")
-}
-
-export async function bookmarkBoard(boardId: string, currentlyBookmarked: boolean) {
-    const supabase = await createClient();
-
-    const { error: bookmarkError } = await supabase
-        .from("boards")
-        .update({bookmarked: !currentlyBookmarked})
-        .eq("id", boardId);
-
-    if (bookmarkError) throw bookmarkError;
-
-    revalidatePath("/")
-}
-
-export async function renameBoard(formState: BoardFormState, formData: FormData) {
-    const validatedFields = RenameBoardSchema.safeParse({
-        title: formData.get("title")
-    })
-
-	if (!validatedFields.success) {
-        return {
-            errors: validatedFields.error.flatten().fieldErrors,
-		};
-	}
-
-    try {
-        const supabase = await createClient();
-
-        const { error: renameError } = await supabase
-            .from("boards")
-            .update({title: validatedFields.data.title})
-            .eq("id", formState?.boardId!);
-
-        if (renameError) throw renameError;
-
-        revalidatePath("/")
-    } catch {
-        return {
-            updatedTitle: validatedFields.data.title,
-        }
-    }
+    revalidatePath("/dashboard")
+    redirect("/dashboard")
 }

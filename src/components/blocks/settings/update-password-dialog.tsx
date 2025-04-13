@@ -22,7 +22,7 @@ export default function UpdatePasswordDialog() {
 		if (state?.toast !== undefined) {
 			toast({
 				title: state.toast.title,
-				description: state.toast.message,
+				description: state.toast.description,
 			});
 		}
 	}, [state?.toast]);
@@ -49,9 +49,14 @@ export default function UpdatePasswordDialog() {
 						className="max-w-[400px]"
 					/>
 					{state?.errors?.newPassword && (
-						<p className="text-sm text-destructive">
-							{state.errors.newPassword}
-						</p>
+						<div className="text-sm text-destructive">
+							<p>Password must:</p>
+							<ul>
+								{state.errors.newPassword.map((error) => (
+									<li key={error}>- {error}</li>
+								))}
+							</ul>
+						</div>
 					)}
 					<Input
 						id="confirmPassword"

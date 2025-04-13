@@ -10,48 +10,34 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { signout } from "@/lib/actions";
 import Link from "next/link";
 import { getSocialIcon } from "@/lib/utils";
+import ProfileWidget from "./profile-widget";
 
-type AvatarPopoverProps = {
-	publicUrl: string;
-} & UserProfile;
-
-export default function AvatarPopover({
+export default function UserPopover({
 	display_name,
 	email,
 	about_me,
 	socials,
-	publicUrl,
-}: AvatarPopoverProps) {
+	avatar_url,
+}: UserProfile) {
 	const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
 	return (
 		<Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen}>
 			<PopoverTrigger>
 				<Avatar>
-					<AvatarImage src={publicUrl} />
+					<AvatarImage src={avatar_url} />
 					<AvatarFallback>
 						{display_name.substring(0, 2).toUpperCase()}
 					</AvatarFallback>
 				</Avatar>
 			</PopoverTrigger>
-			<PopoverContent
-				className="z-[9999] w-[312px] hidden md:block space-y-3"
-				hideWhenDetached
-			>
-				<div className="flex justify-start items-center">
-					<Avatar>
-						<AvatarImage src={publicUrl} />
-						<AvatarFallback>
-							{display_name.substring(0, 2).toUpperCase()}
-						</AvatarFallback>
-					</Avatar>
-					<div className="ml-2">
-						<h3 className="font-bold">{display_name}</h3>
-						<p className="text-sm text-zinc-500 w-[190px] overflow-hidden whitespace-nowrap text-ellipsis">
-							{email}
-						</p>
-					</div>
-				</div>
+			<PopoverContent className="w-[312px] space-y-3" hideWhenDetached>
+				<ProfileWidget
+					displayName={display_name}
+					email={email}
+					avatarUrl={avatar_url}
+					className="w-[190px]"
+				/>
 				{about_me && (
 					<>
 						<Separator className="w-full" />

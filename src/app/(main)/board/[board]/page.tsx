@@ -2,9 +2,16 @@ import BoardContent from "@/components/blocks/board/board-content";
 import BoardHeader from "@/components/blocks/board/board-header";
 import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { Separator } from "@/components/ui/separator";
+import {
+	selectBoardByBoardAndProfileId,
+	selectCardsByBoardId,
+	selectCollaboratorsByBoardId,
+	selectColumnsByBoardId,
+	updateBoardLastOpenedColumn,
+} from "@/lib/queries";
 import { createClient as createClientClient } from "@/lib/supabase/client";
 import { createClient as createServerClient } from "@/lib/supabase/server";
-import { Card, Column } from "@/lib/types";
+import { redirect } from "next/navigation";
 
 export const dynamicParams = true;
 
@@ -31,62 +38,55 @@ export default async function BoardPage({
 
 	const supabase = await createServerClient();
 
-	const updateDateOpenedPromise = supabase
-		.from("boards")
-		.update({
-			last_opened: new Date().toISOString().toLocaleString(),
-		})
-		.eq("id", boardId)
-		.select()
+	const { data: user } = await supabase.auth.getUser();
+
+	if (!user.user) redirect("/login");
+
+	const { data: boardMember } = await supabase
+		.from("profiles_boards_bridge")
+		.select("*")
+		.match({ profile_id: user.user.id, board_id: boardId })
 		.single();
 
-	const selectColumnsPromise = supabase
-		.from("columns")
-		.select("columns")
-		.eq("board_id", boardId)
-		.single();
+	if (!boardMember) redirect("/dashboard");
 
-	const selectCardsPromise = supabase
-		.from("cards")
-		.select("cards")
-		.eq("board_id", boardId)
-		.single();
+	const updateBoardPromise = updateBoardLastOpenedColumn(supabase, boardId);
+	const selectBoardPromise = selectBoardByBoardAndProfileId(
+		supabase,
+		boardId,
+		user.user.id,
+	);
 
-	const [
-		updateDateOpenedResponse,
-		selectColumnsResponse,
-		selectCardsResponse,
-	] = await Promise.all([
-		updateDateOpenedPromise,
-		selectColumnsPromise,
-		selectCardsPromise,
+	const [updateBoardResponse, selectBoardResponse] = await Promise.all([
+		updateBoardPromise,
+		selectBoardPromise,
 	]);
 
-	if (updateDateOpenedResponse.error) throw updateDateOpenedResponse.error;
+	if (updateBoardResponse.error) throw updateBoardResponse.error;
+	if (selectBoardResponse.error) throw selectBoardResponse.error;
+
+	const selectColumnsPromise = selectColumnsByBoardId(supabase, boardId);
+	const selectCardsPromise = selectCardsByBoardId(supabase, boardId);
+
+	const [selectColumnsResponse, selectCardsResponse] =
+		await Promise.all([
+			selectColumnsPromise,
+			selectCardsPromise,
+		]);
+
 	if (selectColumnsResponse.error) throw selectColumnsResponse.error;
 	if (selectCardsResponse.error) throw selectCardsResponse.error;
 
-	const board = updateDateOpenedResponse.data;
-	const fetchedColumns = selectColumnsResponse.data.columns as Column[];
-	const fetchedCards = selectCardsResponse.data.cards as Card[];
-
-	let boardCover = null;
-
-	if (board.cover_path) {
-		const { data: publicUrl } = supabase.storage
-			.from("covers")
-			.getPublicUrl(board.cover_path);
-
-		boardCover = publicUrl.publicUrl;
-	}
+	const fetchedBoard = selectBoardResponse.data;
+	const fetchedColumns = selectColumnsResponse.data;
+	const fetchedCards = selectCardsResponse.data;
 
 	return (
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-				boardId={boardId}
-				boardTitle={board.title}
-				boardCover={boardCover}
+				viewerId={user.user.id}
+				fetchedBoard={fetchedBoard}
 			/>
 			<Separator className="w-full" />
 			<BoardContent

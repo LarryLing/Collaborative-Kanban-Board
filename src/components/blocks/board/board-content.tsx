@@ -62,6 +62,8 @@ export default function BoardContent({
 			if (activeIndex !== -1 && overIndex !== -1) {
 				await moveColumn(activeIndex, overIndex);
 			}
+
+			return;
 		}
 
 		const activeColumnId = findColumnId(activeId);
@@ -69,7 +71,7 @@ export default function BoardContent({
 
 		if (!activeColumnId || !overColumnId) return;
 
-		if (activeColumnId === overColumnId && activeId !== overId) {
+		if (activeColumnId === overColumnId) {
 			const activeIndex = cards.findIndex((card) => card.id === activeId);
 			const overIndex = cards.findIndex((card) => card.id === overId);
 

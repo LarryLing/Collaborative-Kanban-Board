@@ -1,10 +1,11 @@
 "use client";
 
-import { Card as CardType } from "@/lib/types";
+import { Card as CardType, ColumnColorOptions } from "@/lib/types";
 import React, { memo, useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -19,6 +20,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 type CardProps = {
+	columnTitle: string;
+	columnColor: ColumnColorOptions;
 	editCard: UseCardsType["editCard"];
 } & CardType;
 
@@ -27,6 +30,8 @@ export default function Card({
 	title,
 	description,
 	created_at,
+	columnTitle,
+	columnColor,
 	editCard,
 }: CardProps) {
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">("Saved");
@@ -74,8 +79,8 @@ export default function Card({
 					<span>{title}</span>
 				</div>
 			</DialogTrigger>
-			<DialogContent className="flex flex-col size-[500px] px-8">
-				<DialogHeader className="hover:cursor-text" aria-description={title}>
+			<DialogContent className="flex flex-col h-[500px] px-8">
+				<DialogHeader className="hover:cursor-text">
 					<DialogTitle>
 						<Input
 							ref={titleRef}
@@ -87,6 +92,9 @@ export default function Card({
 							onChange={handleEdit}
 						/>
 					</DialogTitle>
+					<DialogDescription className={`${columnColor} text-left`}>
+						{columnTitle}
+					</DialogDescription>
 				</DialogHeader>
 				<Textarea
 					ref={descriptionRef}
