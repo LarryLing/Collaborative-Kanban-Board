@@ -2,12 +2,11 @@
 
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Board } from "@/lib/types";
+import { Board, BoardMember, Collaborator } from "@/lib/types";
 import { Bookmark, ImageUp, PenLine, Trash2 } from "lucide-react";
 import React from "react";
 import RenameBoardDialog from "../dashboard/rename-board-dialog";
 import DeleteBoardDialog from "../dashboard/delete-board-dialog";
-import { MemoizedInviteUsersDialog } from "./invite-users-dialog";
 import useBoard from "@/hooks/use-board";
 import { createClient } from "@/lib/supabase/client";
 import Image from "next/image";
@@ -16,13 +15,19 @@ import { Input } from "@/components/ui/input";
 import usePresence from "@/hooks/use-presence";
 import BoardUserGroup from "./board-user-group";
 import { MemoizedMobileBoardOptions } from "./mobile-board-options";
+import InviteUsersDialog from "./invite-users-dialog";
 
 type BoardHeaderProps = {
-	viewerId: string;
+	boardMember: BoardMember;
 	fetchedBoard: Board;
+	fetchedCollaborators: Collaborator[];
 };
 
-export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps) {
+export default function BoardHeader({
+	boardMember,
+	fetchedBoard,
+	fetchedCollaborators,
+}: BoardHeaderProps) {
 	const supabase = createClient();
 
 	const {
@@ -35,7 +40,7 @@ export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps
 		coverPathRef,
 	} = useBoard(supabase, fetchedBoard);
 
-	const { activeProfiles } = usePresence(supabase, board.id, viewerId);
+	const { activeProfiles } = usePresence(supabase, board.id, boardMember.member_id);
 
 	function openCoverPathInput() {
 		if (coverPathRef.current) coverPathRef.current.click();
@@ -78,11 +83,11 @@ export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps
 					<BoardUserGroup boardUsers={activeProfiles} />
 				</div>
 				<div className="flex justify-between">
-					<MemoizedInviteUsersDialog
+					<InviteUsersDialog
 						boardId={board.id}
 						ownerId={board.owner_id}
-						viewerId={viewerId}
-						hasInvitePermissions={board.has_invite_permissions}
+						fetchedCollaborators={fetchedCollaborators}
+						{...boardMember}
 					/>
 					<div className="space-x-2 hidden md:block">
 						<RenameBoardDialog
@@ -98,12 +103,16 @@ export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps
 							variant="outline"
 							pressed={board.bookmarked}
 							onPressedChange={() =>
-								bookmarkBoard(board.id, viewerId, board.bookmarked)
+								bookmarkBoard(
+									board.id,
+									boardMember.member_id,
+									board.bookmarked,
+								)
 							}
 						>
 							<Bookmark />
 						</Toggle>
-						{board.owner_id === viewerId && (
+						{board.owner_id === boardMember.member_id && (
 							<DeleteBoardDialog boardId={board.id}>
 								<Button variant="outline" size="icon">
 									<Trash2 />
@@ -114,7 +123,7 @@ export default function BoardHeader({ viewerId, fetchedBoard }: BoardHeaderProps
 					<div className="block md:hidden">
 						<MemoizedMobileBoardOptions
 							{...board}
-							viewerId={viewerId}
+							viewerId={boardMember.member_id}
 							renameBoard={renameBoard}
 							bookmarkBoard={bookmarkBoard}
 						/>

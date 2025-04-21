@@ -14,15 +14,14 @@ export type UserProfile = {
     }[]
 }
 
-export type Board = {
-    id: string;
-    title: string;
-    owner_id: string;
-    cover_path: string | null;
-    last_opened: string;
-    bookmarked: boolean;
-    has_collaborators: boolean;
+export type BoardMember = {
+    member_id: string;
+    is_owner: boolean;
     has_invite_permissions: boolean;
+}
+
+export type Board = Tables<"boards"> & {
+    bookmarked: boolean;
 }
 
 export type Card = {

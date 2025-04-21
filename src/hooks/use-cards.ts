@@ -9,7 +9,7 @@ export type UseCardsType = {
     deleteCard: (deletedCardId: string) => Promise<void>
     deleteCardsByColumnId: (columnId: string) => Promise<void>
     duplicateCard: (card: Card) => Promise<void>
-    moveCardToColumn: (cardId: string, oldColumnId: string, newColumnId: string) => Promise<void>
+    moveCardToColumn: (cardId: string, oldColumnId: string, newColumnId: string, updateDatabase: boolean) => Promise<void>
     moveCard: (from: number, to: number) => Promise<void>
     editCard: (cardId: string, oldTitle: string, newTitle: string, oldDescription: string, newDescription: string) => Promise<void>
 }
@@ -83,7 +83,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
         await updateCardsByBoardId(supabase, boardId, updatedCards);
     }, [cards])
 
-    const moveCardToColumn = useCallback((cardId: string, oldColumnId: string, newColumnId: string) => {
+    const moveCardToColumn = useCallback((cardId: string, oldColumnId: string, newColumnId: string, updateDatabase: boolean) => {
         if (oldColumnId === newColumnId) return;
 
         const updatedCards = cards.map((card) =>
@@ -96,6 +96,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
 		);
 
         setCards(updatedCards);
+        if (updateDatabase) updateCardsByBoardId(supabase, boardId, updatedCards);
     }, [cards])
 
     const moveCard = useCallback(async (from: number, to: number) => {

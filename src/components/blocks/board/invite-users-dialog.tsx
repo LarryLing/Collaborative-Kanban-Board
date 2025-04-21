@@ -18,19 +18,20 @@ import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { BoardMember, Collaborator } from "@/lib/types";
 
 type BoardHeaderProps = {
 	ownerId: string;
 	boardId: string;
-	viewerId: string;
-	hasInvitePermissions: boolean;
-};
+	fetchedCollaborators: Collaborator[];
+} & BoardMember;
 
 export default function InviteUsersDialog({
 	ownerId,
 	boardId,
-	viewerId,
-	hasInvitePermissions,
+	member_id,
+	has_invite_permissions,
+    fetchedCollaborators,
 }: BoardHeaderProps) {
 	const supabase = createClient();
 
@@ -39,7 +40,8 @@ export default function InviteUsersDialog({
 	const { collaborators, addCollaborator, removeCollaborator } = useCollaborators(
 		supabase,
 		boardId,
-		viewerId,
+		member_id,
+        fetchedCollaborators,
 	);
 
 	const [state, action, pending] = useActionState(addCollaborator, undefined);
@@ -84,14 +86,14 @@ export default function InviteUsersDialog({
 								variant="destructive"
 								size="icon"
 								disabled={
-									!hasInvitePermissions &&
-									collaborator.profile_id !== viewerId
+									!has_invite_permissions &&
+									collaborator.profile_id !== member_id
 								}
 								onClick={() =>
 									removeCollaborator(boardId, collaborator.profile_id)
 								}
 							>
-								{collaborator.profile_id === viewerId ? (
+								{collaborator.profile_id === member_id ? (
 									<DoorOpen />
 								) : (
 									<UserMinus />
@@ -100,7 +102,7 @@ export default function InviteUsersDialog({
 						)}
 					</div>
 				))}
-				{hasInvitePermissions ? (
+				{has_invite_permissions ? (
 					<form action={action} className="">
 						<div className="flex flex-col justify-start">
 							<Input
@@ -141,5 +143,3 @@ export default function InviteUsersDialog({
 		</Dialog>
 	);
 }
-
-export const MemoizedInviteUsersDialog = memo(InviteUsersDialog);

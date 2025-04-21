@@ -1,4 +1,4 @@
-import { Board, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
+import { Board, BoardMember, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
 
 export async function selectCardsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: cardsData, error: cardsError } = await supabase
@@ -91,14 +91,8 @@ export async function selectBoardByBoardAndProfileId(supabase: TypedSupabaseClie
     }
 
     const board: Board = {
-        id: selectBoardsResponse.data.boards.id,
-        title: selectBoardsResponse.data.boards.title,
-        owner_id: selectBoardsResponse.data.boards.profile_id,
-        cover_path: selectBoardsResponse.data.boards.cover_path,
-        last_opened: selectBoardsResponse.data.boards.last_opened,
+        ...selectBoardsResponse.data.boards,
         bookmarked: selectBoardsResponse.data.bookmarked,
-        has_collaborators: (selectCollaboratorCountResponse.count || 1) > 1,
-        has_invite_permissions: selectBoardsResponse.data.has_invite_permissions,
     }
 
     return {
@@ -122,14 +116,8 @@ export async function selectBoardsByProfileId(supabase: TypedSupabaseClient, pro
 
     const boards: Board[] = boardsData.map((item) => {
         return {
-            id: item.boards.id,
-            title: item.boards.title,
-            owner_id: item.boards.profile_id,
-            cover_path: item.boards.cover_path,
-            last_opened: item.boards.last_opened,
-            bookmarked: false,
-            has_collaborators: false,
-            has_invite_permissions: false,
+            ...item.boards,
+            bookmarked: item.bookmarked,
         };
     });
 
@@ -171,7 +159,7 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
                 profile_id: collaborator.profiles.id,
                 display_name: collaborator.profiles.display_name,
                 email: collaborator.profiles.email,
-                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path || "").data.publicUrl
+                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path).data.publicUrl
             }
         },
     ) as Collaborator[];
@@ -198,7 +186,7 @@ export async function selectProfileByProfileId(supabase: TypedSupabaseClient, pr
 
 	const { data: publicUrl } = supabase.storage
 		.from("avatars")
-		.getPublicUrl(fetchData.avatar_path || "");
+		.getPublicUrl(fetchData.avatar_path);
 
     return {
         data: {
@@ -209,6 +197,30 @@ export async function selectProfileByProfileId(supabase: TypedSupabaseClient, pr
             avatar_url: publicUrl.publicUrl,
             socials: fetchData.socials,
         } as UserProfile,
+        error: null,
+    }
+}
+
+export async function selectBoardMemberByProfileIdAndBoardId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
+	const { data: boardMember, error: boardMemberError } = await supabase
+        .from("profiles_boards_bridge")
+        .select("has_invite_permissions, boards(owner_id)")
+        .match({board_id: boardId, profile_id: profileId})
+        .single();
+
+    if (boardMemberError) {
+        return {
+            data: null,
+            error: boardMemberError
+        }
+    }
+
+    return {
+        data: {
+            member_id: profileId,
+            is_owner: boardMember.boards.owner_id === profileId,
+            has_invite_permissions: boardMember.has_invite_permissions,
+        } as BoardMember,
         error: null,
     }
 }

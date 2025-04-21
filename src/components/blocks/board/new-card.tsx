@@ -45,7 +45,7 @@ export default function NewCard({
 
 		await createCard(
 			columnId,
-			titleRef.current?.value || "New Card",
+			titleRef.current?.value || "Untitled Card",
 			descriptionRef.current?.value || "",
 		);
 
@@ -80,8 +80,8 @@ export default function NewCard({
 								id="title"
 								name="title"
 								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
-								placeholder="New Card"
-								defaultValue="New Card"
+								placeholder="Untitled Card"
+								defaultValue="Untitled Card"
 							/>
 						</DialogTitle>
 						<DialogDescription className={`${columnColor} text-left`}>

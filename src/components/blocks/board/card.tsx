@@ -87,7 +87,7 @@ export default function Card({
 							id="title"
 							name="title"
 							className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
-							placeholder="New Card"
+							placeholder="Untitled Card"
 							defaultValue={title}
 							onChange={handleEdit}
 						/>

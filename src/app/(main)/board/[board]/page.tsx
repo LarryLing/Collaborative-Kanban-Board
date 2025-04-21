@@ -4,6 +4,7 @@ import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { Separator } from "@/components/ui/separator";
 import {
 	selectBoardByBoardAndProfileId,
+	selectBoardMemberByProfileIdAndBoardId,
 	selectCardsByBoardId,
 	selectCollaboratorsByBoardId,
 	selectColumnsByBoardId,
@@ -42,11 +43,11 @@ export default async function BoardPage({
 
 	if (!user.user) redirect("/login");
 
-	const { data: boardMember } = await supabase
-		.from("profiles_boards_bridge")
-		.select("*")
-		.match({ profile_id: user.user.id, board_id: boardId })
-		.single();
+	const { data: boardMember } = await selectBoardMemberByProfileIdAndBoardId(
+		supabase,
+		boardId,
+		user.user.id,
+	);
 
 	if (!boardMember) redirect("/dashboard");
 
@@ -56,37 +57,42 @@ export default async function BoardPage({
 		boardId,
 		user.user.id,
 	);
+	const selectColumnsPromise = selectColumnsByBoardId(supabase, boardId);
+	const selectCardsPromise = selectCardsByBoardId(supabase, boardId);
+	const selectCollaboratorsPromise = selectCollaboratorsByBoardId(supabase, boardId);
 
-	const [updateBoardResponse, selectBoardResponse] = await Promise.all([
+	const [
+		updateBoardResponse,
+		selectBoardResponse,
+		selectColumnsResponse,
+		selectCardsResponse,
+		selectCollaboratorsResponse,
+	] = await Promise.all([
 		updateBoardPromise,
 		selectBoardPromise,
+		selectColumnsPromise,
+		selectCardsPromise,
+		selectCollaboratorsPromise,
 	]);
 
 	if (updateBoardResponse.error) throw updateBoardResponse.error;
 	if (selectBoardResponse.error) throw selectBoardResponse.error;
-
-	const selectColumnsPromise = selectColumnsByBoardId(supabase, boardId);
-	const selectCardsPromise = selectCardsByBoardId(supabase, boardId);
-
-	const [selectColumnsResponse, selectCardsResponse] =
-		await Promise.all([
-			selectColumnsPromise,
-			selectCardsPromise,
-		]);
-
 	if (selectColumnsResponse.error) throw selectColumnsResponse.error;
 	if (selectCardsResponse.error) throw selectCardsResponse.error;
+	if (selectCollaboratorsResponse.error) throw selectCollaboratorsResponse.error;
 
 	const fetchedBoard = selectBoardResponse.data;
 	const fetchedColumns = selectColumnsResponse.data;
 	const fetchedCards = selectCardsResponse.data;
+	const fetchedCollaborators = selectCollaboratorsResponse.data;
 
 	return (
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-				viewerId={user.user.id}
+				boardMember={boardMember}
 				fetchedBoard={fetchedBoard}
+				fetchedCollaborators={fetchedCollaborators}
 			/>
 			<Separator className="w-full" />
 			<BoardContent

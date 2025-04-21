@@ -44,7 +44,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
             ...columns,
             {
                 id: newColumnId,
-                title: "New Column",
+                title: "Untitled Column",
                 color: "text-primary",
             },
         ] as Column[];

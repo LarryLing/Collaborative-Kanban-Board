@@ -18,7 +18,10 @@ type BoardProps = {
 export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 	const supabase = createClient();
 
-	const { board, coverUrl, bookmarkBoard, renameBoard } = useBoard(supabase, fetchedBoard);
+	const { board, coverUrl, bookmarkBoard, renameBoard } = useBoard(
+		supabase,
+		fetchedBoard,
+	);
 
 	const lastOpenedDateString = getDateString(board.last_opened);
 

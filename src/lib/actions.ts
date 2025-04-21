@@ -514,7 +514,7 @@ export async function createBoard() {
 
     const { error: boardError } = await supabase.from("boards").insert({
         id: newBoardId,
-        profile_id: userData.user.id,
+        owner_id: userData.user.id,
     })
 
     if (boardError) throw boardError;

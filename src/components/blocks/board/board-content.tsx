@@ -96,7 +96,7 @@ export default function BoardContent({
 		if (activeColumnId === overColumnId && activeId !== overId) return;
 		if (activeColumnId === overColumnId) return;
 
-		await moveCardToColumn(activeId, activeColumnId, overColumnId);
+		await moveCardToColumn(activeId, activeColumnId, overColumnId, false);
 	}
 
 	const sensors = useSensors(
