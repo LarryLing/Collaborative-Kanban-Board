@@ -143,7 +143,7 @@ export async function updateBoardLastOpenedColumn(supabase: TypedSupabaseClient,
 export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: collaboratorData, error: collaboratorError } = await supabase
         .from("profiles_boards_bridge")
-        .select("profile_id, profiles(id, display_name, email, avatar_path)")
+        .select("profile_id, has_invite_permissions, profiles(id, display_name, email, avatar_path)")
         .eq("board_id", boardId);
 
     if (collaboratorError) {
@@ -159,7 +159,8 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
                 profile_id: collaborator.profiles.id,
                 display_name: collaborator.profiles.display_name,
                 email: collaborator.profiles.email,
-                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path).data.publicUrl
+                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path).data.publicUrl,
+                has_invite_permissions: collaborator.has_invite_permissions
             }
         },
     ) as Collaborator[];

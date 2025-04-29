@@ -43,6 +43,7 @@ export type Collaborator = {
     display_name: string;
     email: string;
     avatar_url: string;
+    has_invite_permissions: boolean;
 }
 
 export type OwnershipOptions = "me" | "not-me" | "anyone";

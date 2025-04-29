@@ -39,6 +39,23 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
 
                     setCollaborators(updatedCollaborators)
                 })
+            .on(
+                'broadcast',
+                { event: 'UPDATE' },
+                (payload) => {
+                    const updatedCollaborators = collaborators.map((collaborator) => {
+                        if (collaborator.profile_id === payload.payload.profile_id) {
+                            return {
+                                ...collaborator,
+                                has_invite_permissions: payload.payload.has_invite_permissions,
+                            };
+                        }
+                        return collaborator;
+                    });
+
+                    setCollaborators(updatedCollaborators);
+                }
+            )
             .subscribe()
 
         return () => {
@@ -111,5 +128,14 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
         if (removeCollaboratorError) throw removeCollaboratorError;
     }, [collaborators])
 
-    return {collaborators, addCollaborator, removeCollaborator};
+    const updateInvitePermissions = useCallback(async (boardId: string, profileId: string, previousInvitePermissions: boolean) => {
+        const { error: grantPermissionsError } = await supabase
+            .from("profiles_boards_bridge")
+            .update({ has_invite_permissions: !previousInvitePermissions })
+            .match({ profile_id: profileId, board_id: boardId });
+
+        if (grantPermissionsError) throw grantPermissionsError;
+    }, [collaborators])
+
+    return {collaborators, addCollaborator, removeCollaborator, updateInvitePermissions};
 }

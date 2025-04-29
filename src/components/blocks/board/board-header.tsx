@@ -76,7 +76,7 @@ export default function BoardHeader({
 				</div>
 			</div>
 			<div className="space-y-4">
-				<div className="flex justify-between items-center">
+				<div className="flex justify-between items-center h-[40px]">
 					<h3 className="resize-none border-none focus-visible:ring-0 p-0 shadow-none font-semibold md:text-3xl">
 						{board.title}
 					</h3>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useActionState, useEffect } from "react";
+import React, { useActionState, useEffect } from "react";
 import {
 	Dialog,
 	DialogClose,
@@ -11,7 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { DoorOpen, UserMinus, UserPlus } from "lucide-react";
+import { MailCheck, MailX, UserMinus, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
@@ -31,18 +31,18 @@ export default function InviteUsersDialog({
 	boardId,
 	member_id,
 	has_invite_permissions,
-    fetchedCollaborators,
+	fetchedCollaborators,
 }: BoardHeaderProps) {
 	const supabase = createClient();
 
 	const { toast } = useToast();
 
-	const { collaborators, addCollaborator, removeCollaborator } = useCollaborators(
-		supabase,
-		boardId,
-		member_id,
-        fetchedCollaborators,
-	);
+	const {
+		collaborators,
+		addCollaborator,
+		removeCollaborator,
+		updateInvitePermissions,
+	} = useCollaborators(supabase, boardId, member_id, fetchedCollaborators);
 
 	const [state, action, pending] = useActionState(addCollaborator, undefined);
 
@@ -67,7 +67,7 @@ export default function InviteUsersDialog({
 				<DialogHeader>
 					<DialogTitle>Invite Collaborators</DialogTitle>
 					<DialogDescription>
-						Share this board with some friends or project partners.
+						Share this board with project partners.
 					</DialogDescription>
 				</DialogHeader>
 				{collaborators.map((collaborator) => (
@@ -79,26 +79,44 @@ export default function InviteUsersDialog({
 							displayName={collaborator.display_name}
 							email={collaborator.email}
 							avatarUrl={collaborator.avatar_url}
-							className="w-full"
+							className="w-full sm:max-w-[300px] max-w-[180px] overflow-hidden whitespace-nowrap text-ellipsis"
 						/>
-						{collaborator.profile_id !== ownerId && (
-							<Button
-								variant="destructive"
-								size="icon"
-								disabled={
-									!has_invite_permissions &&
-									collaborator.profile_id !== member_id
-								}
-								onClick={() =>
-									removeCollaborator(boardId, collaborator.profile_id)
-								}
-							>
-								{collaborator.profile_id === member_id ? (
-									<DoorOpen />
-								) : (
-									<UserMinus />
+						{collaborator.profile_id !== ownerId ? (
+							<div className="space-x-2 flex items-center">
+								{member_id === ownerId && (
+									<Button
+										variant="outline"
+										size="icon"
+										onClick={() =>
+											updateInvitePermissions(
+												boardId,
+												collaborator.profile_id,
+												collaborator.has_invite_permissions,
+											)
+										}
+									>
+										{collaborator.has_invite_permissions ? (
+											<MailCheck />
+										) : (
+											<MailX />
+										)}
+									</Button>
 								)}
-							</Button>
+								<Button
+									variant="destructive"
+									size="icon"
+									onClick={() =>
+										removeCollaborator(
+											boardId,
+											collaborator.profile_id,
+										)
+									}
+								>
+									<UserMinus />
+								</Button>
+							</div>
+						) : (
+							<p className="text-sm text-muted-foreground">Owner</p>
 						)}
 					</div>
 				))}
@@ -135,7 +153,7 @@ export default function InviteUsersDialog({
 				) : (
 					<DialogFooter>
 						<p className="text-sm text-muted-foreground">
-							You do not have permission to invite or remove collaborators
+							You do not have permission to edit collaborators
 						</p>
 					</DialogFooter>
 				)}
