@@ -1,48 +1,34 @@
 import { TypedSupabaseClient, UserProfile } from '@/lib/types';
 import { useEffect, useState } from 'react'
-import { RealtimePresenceState } from '@supabase/supabase-js';
-import { selectProfileByProfileId } from '@/lib/queries';
 
-export default function usePresence(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
-    const [userState, setUserState] = useState<RealtimePresenceState>({});
+export default function usePresence(supabase: TypedSupabaseClient, boardId: string, userProfile: UserProfile) {
     const [activeProfiles, setActiveProfiles] = useState<UserProfile[]>([]);
 
     useEffect(() => {
-        async function addActiveProfile(profileId: string) {
-            const { data: profileData, error: profileError } = await selectProfileByProfileId(supabase, profileId)
-
-            if (profileError) throw profileError;
-
-            setActiveProfiles((prev) => {
-                return [...prev, profileData]
-            })
-        }
-
         const presenceChannel = supabase
             .channel(`presence:${boardId}`, {
                 config: {
                     presence: {
-                        key: profileId,
+                        key: userProfile.id,
                     },
                 },
             })
             .on('presence', { event: 'sync' }, () => {
-                const presentState = presenceChannel.presenceState()
-
-                setUserState({ ...presentState })
+                const presentState = presenceChannel.presenceState<UserProfile>()
+                setActiveProfiles(Object.values(presentState).flat() as UserProfile[]);
             })
-            .on('presence', { event: 'leave' }, ({ key }) => {
-                setActiveProfiles((prev) => {
-                    return prev.filter((activeProfile) => activeProfile.id !== key);
-                });
+            .on('presence', { event: 'leave' }, () => {
+                const presentState = presenceChannel.presenceState<UserProfile>()
+                setActiveProfiles(Object.values(presentState).flat() as UserProfile[]);
             })
-            .on('presence', { event: 'join' }, ({ key }) => {
-                addActiveProfile(key);
+            .on('presence', { event: 'join' }, () => {
+                const presentState = presenceChannel.presenceState<UserProfile>()
+                setActiveProfiles(Object.values(presentState).flat() as UserProfile[]);
             })
             .subscribe(async (status) => {
                 if (status === 'SUBSCRIBED') {
-                    const status = await presenceChannel.track({
-                        profile_id: profileId,
+                    await presenceChannel.track({
+                        ...userProfile as UserProfile,
                     })
                 }
             });
@@ -50,7 +36,7 @@ export default function usePresence(supabase: TypedSupabaseClient, boardId: stri
         return () => {
             supabase.removeChannel(presenceChannel);
         };
-    }, [])
+    }, [userProfile])
 
-    return { userState, activeProfiles };
+    return { activeProfiles };
 }

@@ -1,4 +1,4 @@
-import { Board, BoardMember, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
+import { Board, UserPermissions, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
 
 export async function selectCardsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: cardsData, error: cardsError } = await supabase
@@ -202,7 +202,7 @@ export async function selectProfileByProfileId(supabase: TypedSupabaseClient, pr
     }
 }
 
-export async function selectBoardMemberByProfileIdAndBoardId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
+export async function selectPermissionsByProfileIdAndBoardId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
 	const { data: boardMember, error: boardMemberError } = await supabase
         .from("profiles_boards_bridge")
         .select("has_invite_permissions, boards(owner_id)")
@@ -218,10 +218,9 @@ export async function selectBoardMemberByProfileIdAndBoardId(supabase: TypedSupa
 
     return {
         data: {
-            member_id: profileId,
             is_owner: boardMember.boards.owner_id === profileId,
             has_invite_permissions: boardMember.has_invite_permissions,
-        } as BoardMember,
+        } as UserPermissions,
         error: null,
     }
 }

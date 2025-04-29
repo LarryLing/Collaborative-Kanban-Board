@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
-import { Board, BoardMember, Collaborator } from "@/lib/types";
+import { Board, UserPermissions, Collaborator, UserProfile } from "@/lib/types";
 import { Bookmark, ImageUp, PenLine, Trash2 } from "lucide-react";
 import React from "react";
 import RenameBoardDialog from "../dashboard/rename-board-dialog";
@@ -18,13 +18,15 @@ import { MemoizedMobileBoardOptions } from "./mobile-board-options";
 import InviteUsersDialog from "./invite-users-dialog";
 
 type BoardHeaderProps = {
-	boardMember: BoardMember;
+	fetchedProfile: UserProfile;
+	fetchedPermissions: UserPermissions;
 	fetchedBoard: Board;
 	fetchedCollaborators: Collaborator[];
 };
 
 export default function BoardHeader({
-	boardMember,
+	fetchedProfile,
+	fetchedPermissions,
 	fetchedBoard,
 	fetchedCollaborators,
 }: BoardHeaderProps) {
@@ -40,7 +42,7 @@ export default function BoardHeader({
 		coverPathRef,
 	} = useBoard(supabase, fetchedBoard);
 
-	const { activeProfiles } = usePresence(supabase, board.id, boardMember.member_id);
+	const { activeProfiles } = usePresence(supabase, board.id, fetchedProfile);
 
 	function openCoverPathInput() {
 		if (coverPathRef.current) coverPathRef.current.click();
@@ -84,10 +86,11 @@ export default function BoardHeader({
 				</div>
 				<div className="flex justify-between">
 					<InviteUsersDialog
+						viewerId={fetchedProfile.id}
 						boardId={board.id}
 						ownerId={board.owner_id}
 						fetchedCollaborators={fetchedCollaborators}
-						{...boardMember}
+						{...fetchedPermissions}
 					/>
 					<div className="space-x-2 hidden md:block">
 						<RenameBoardDialog
@@ -105,14 +108,14 @@ export default function BoardHeader({
 							onPressedChange={() =>
 								bookmarkBoard(
 									board.id,
-									boardMember.member_id,
+									fetchedProfile.id,
 									board.bookmarked,
 								)
 							}
 						>
 							<Bookmark />
 						</Toggle>
-						{board.owner_id === boardMember.member_id && (
+						{board.owner_id === fetchedProfile.id && (
 							<DeleteBoardDialog boardId={board.id}>
 								<Button variant="outline" size="icon">
 									<Trash2 />
@@ -123,7 +126,7 @@ export default function BoardHeader({
 					<div className="block md:hidden">
 						<MemoizedMobileBoardOptions
 							{...board}
-							viewerId={boardMember.member_id}
+							viewerId={fetchedProfile.id}
 							renameBoard={renameBoard}
 							bookmarkBoard={bookmarkBoard}
 						/>

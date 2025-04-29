@@ -18,18 +18,19 @@ import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { BoardMember, Collaborator } from "@/lib/types";
+import { UserPermissions, Collaborator } from "@/lib/types";
 
 type BoardHeaderProps = {
+	viewerId: string;
 	ownerId: string;
 	boardId: string;
 	fetchedCollaborators: Collaborator[];
-} & BoardMember;
+} & UserPermissions;
 
 export default function InviteUsersDialog({
+	viewerId,
 	ownerId,
 	boardId,
-	member_id,
 	has_invite_permissions,
 	fetchedCollaborators,
 }: BoardHeaderProps) {
@@ -42,7 +43,7 @@ export default function InviteUsersDialog({
 		addCollaborator,
 		removeCollaborator,
 		updateInvitePermissions,
-	} = useCollaborators(supabase, boardId, member_id, fetchedCollaborators);
+	} = useCollaborators(supabase, boardId, viewerId, fetchedCollaborators);
 
 	const [state, action, pending] = useActionState(addCollaborator, undefined);
 
@@ -60,7 +61,7 @@ export default function InviteUsersDialog({
 			<DialogTrigger asChild>
 				<Button>
 					<UserPlus />
-					<span>Invite Collaborators</span>
+					<span>Collaborators</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
@@ -83,7 +84,7 @@ export default function InviteUsersDialog({
 						/>
 						{collaborator.profile_id !== ownerId ? (
 							<div className="space-x-2 flex items-center">
-								{member_id === ownerId && (
+								{viewerId === ownerId && (
 									<Button
 										variant="outline"
 										size="icon"

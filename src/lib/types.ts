@@ -14,8 +14,7 @@ export type UserProfile = {
     }[]
 }
 
-export type BoardMember = {
-    member_id: string;
+export type UserPermissions = {
     is_owner: boolean;
     has_invite_permissions: boolean;
 }

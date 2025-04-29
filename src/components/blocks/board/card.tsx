@@ -105,7 +105,7 @@ export default function Card({
 					defaultValue={description}
 					onChange={handleEdit}
 				/>
-				<DialogFooter className="flex-row sm:justify-between text-sm text-muted-foreground">
+				<DialogFooter className="flex-row justify-between sm:justify-between text-sm text-muted-foreground">
 					<div>{saveStatus}</div>
 					<span>Created {getDateString(created_at)}</span>
 				</DialogFooter>
