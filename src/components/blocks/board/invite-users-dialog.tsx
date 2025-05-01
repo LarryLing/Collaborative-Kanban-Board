@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo, useActionState, useEffect } from "react";
+import React, { useActionState, useEffect } from "react";
 import {
 	Dialog,
 	DialogClose,
@@ -11,38 +11,43 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { DoorOpen, UserMinus, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
 import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { BoardMember, Collaborator } from "@/lib/types";
+import { UserPermissions, Collaborator } from "@/lib/types";
+import RemoveCollaboratorButton from "./remove-collaborator-button";
+import UpdateInvitePermissionsButton from "./update-invite-permissions-button";
+import { Label } from "@/components/ui/label";
+import { sortCollaborators } from "@/lib/utils";
 
 type BoardHeaderProps = {
+	viewerId: string;
 	ownerId: string;
 	boardId: string;
 	fetchedCollaborators: Collaborator[];
-} & BoardMember;
+} & UserPermissions;
 
 export default function InviteUsersDialog({
+	viewerId,
 	ownerId,
 	boardId,
-	member_id,
 	has_invite_permissions,
-    fetchedCollaborators,
+	fetchedCollaborators,
 }: BoardHeaderProps) {
 	const supabase = createClient();
 
 	const { toast } = useToast();
 
-	const { collaborators, addCollaborator, removeCollaborator } = useCollaborators(
-		supabase,
-		boardId,
-		member_id,
-        fetchedCollaborators,
-	);
+	const {
+		collaborators,
+		addCollaborator,
+		removeCollaborator,
+		updateInvitePermissions,
+	} = useCollaborators(supabase, boardId, viewerId, fetchedCollaborators);
 
 	const [state, action, pending] = useActionState(addCollaborator, undefined);
 
@@ -55,56 +60,67 @@ export default function InviteUsersDialog({
 		}
 	}, [state?.toast]);
 
+	const sortedCollaborators = sortCollaborators(collaborators, ownerId);
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
 				<Button>
 					<UserPlus />
-					<span>Invite Collaborators</span>
+					<span>Collaborators</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Invite Collaborators</DialogTitle>
 					<DialogDescription>
-						Share this board with some friends or project partners.
+						Share this board with project partners.
 					</DialogDescription>
 				</DialogHeader>
-				{collaborators.map((collaborator) => (
+				{sortedCollaborators.map((collaborator) => (
 					<div
 						key={collaborator.profile_id}
-						className="flex justify-between items-center"
+						className="flex justify-center items-center gap-2"
 					>
 						<ProfileWidget
 							displayName={collaborator.display_name}
 							email={collaborator.email}
 							avatarUrl={collaborator.avatar_url}
-							className="w-full"
+							className="max-w-[135px] xs:max-w-none "
 						/>
-						{collaborator.profile_id !== ownerId && (
-							<Button
-								variant="destructive"
-								size="icon"
-								disabled={
-									!has_invite_permissions &&
-									collaborator.profile_id !== member_id
-								}
-								onClick={() =>
-									removeCollaborator(boardId, collaborator.profile_id)
-								}
+						{collaborator.profile_id !== ownerId ? (
+							<div
+								className="space-x-2 flex items-center"
+								onFocusCapture={(e) => {
+									e.stopPropagation();
+								}}
 							>
-								{collaborator.profile_id === member_id ? (
-									<DoorOpen />
-								) : (
-									<UserMinus />
+								{viewerId === ownerId && (
+									<UpdateInvitePermissionsButton
+										boardId={boardId}
+										collaboratorId={collaborator.profile_id}
+										collaboratorHasInvitePermissions={
+											collaborator.has_invite_permissions
+										}
+										updateInvitePermissions={updateInvitePermissions}
+									/>
 								)}
-							</Button>
+								<RemoveCollaboratorButton
+									boardId={boardId}
+									collaboratorId={collaborator.profile_id}
+									viewerId={viewerId}
+									removeCollaborator={removeCollaborator}
+								/>
+							</div>
+						) : (
+							<p className="text-sm text-muted-foreground">Owner</p>
 						)}
 					</div>
 				))}
 				{has_invite_permissions ? (
 					<form action={action} className="">
-						<div className="flex flex-col justify-start">
+						<div className="flex flex-col justify-start space-y-1">
+							<Label htmlFor="email">Collaborator email</Label>
 							<Input
 								id="email"
 								name="email"
@@ -135,7 +151,7 @@ export default function InviteUsersDialog({
 				) : (
 					<DialogFooter>
 						<p className="text-sm text-muted-foreground">
-							You do not have permission to invite or remove collaborators
+							You do not have permission to edit collaborators
 						</p>
 					</DialogFooter>
 				)}

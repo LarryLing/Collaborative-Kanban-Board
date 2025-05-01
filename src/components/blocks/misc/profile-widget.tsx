@@ -5,7 +5,7 @@ type ProfileWidget = {
 	displayName: string;
 	email: string;
 	avatarUrl: string | undefined;
-	className: string;
+	className?: string;
 };
 
 export default function ProfileWidget({
@@ -15,7 +15,7 @@ export default function ProfileWidget({
 	className,
 }: ProfileWidget) {
 	return (
-		<div className="flex justify-start items-center">
+		<div className="flex justify-start items-center w-full">
 			<Avatar>
 				<AvatarImage src={avatarUrl} />
 				<AvatarFallback>
@@ -24,9 +24,7 @@ export default function ProfileWidget({
 			</Avatar>
 			<div className="ml-2">
 				<h3 className="font-bold">{displayName}</h3>
-				<p
-					className={`text-sm text-muted-foreground ${className} overflow-hidden whitespace-nowrap text-ellipsis`}
-				>
+				<p className={`text-sm text-muted-foreground ${className} truncate`}>
 					{email}
 				</p>
 			</div>

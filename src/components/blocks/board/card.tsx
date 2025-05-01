@@ -1,7 +1,7 @@
 "use client";
 
 import { Card as CardType, ColumnColorOptions } from "@/lib/types";
-import React, { memo, useRef, useState } from "react";
+import React, { ReactNode, useRef, useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -23,6 +23,7 @@ type CardProps = {
 	columnTitle: string;
 	columnColor: ColumnColorOptions;
 	editCard: UseCardsType["editCard"];
+	children: ReactNode;
 } & CardType;
 
 export default function Card({
@@ -33,6 +34,7 @@ export default function Card({
 	columnTitle,
 	columnColor,
 	editCard,
+	children,
 }: CardProps) {
 	const [saveStatus, setSaveStatus] = useState<"Saving..." | "Saved">("Saved");
 
@@ -67,51 +69,52 @@ export default function Card({
 	};
 
 	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<div
-					ref={setNodeRef}
-					{...attributes}
-					{...listeners}
-					style={style}
-					className="text-sm font-semibold w-full h-[50px] border border-border rounded-md overflow-hidden flex justify-start items-center px-4 py-2 hover:cursor-pointer hover:bg-accent/60 hover:text-accent-foreground transition-colors active:cursor-grabbing"
-				>
-					<span>{title}</span>
-				</div>
-			</DialogTrigger>
-			<DialogContent className="flex flex-col h-[500px] px-8">
-				<DialogHeader className="hover:cursor-text">
-					<DialogTitle>
-						<Input
-							ref={titleRef}
-							id="title"
-							name="title"
-							className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
-							placeholder="Untitled Card"
-							defaultValue={title}
-							onChange={handleEdit}
-						/>
-					</DialogTitle>
-					<DialogDescription className={`${columnColor} text-left`}>
-						{columnTitle}
-					</DialogDescription>
-				</DialogHeader>
-				<Textarea
-					ref={descriptionRef}
-					id="description"
-					name="description"
-					className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
-					placeholder="Enter some description text..."
-					defaultValue={description}
-					onChange={handleEdit}
-				/>
-				<DialogFooter className="flex-row sm:justify-between text-sm text-muted-foreground">
-					<div>{saveStatus}</div>
-					<span>Created {getDateString(created_at)}</span>
-				</DialogFooter>
-			</DialogContent>
-		</Dialog>
+		<div
+			ref={setNodeRef}
+			{...attributes}
+			{...listeners}
+			style={style}
+			className="relative hover:bg-accent/60 hover:text-accent-foreground transition-colors"
+		>
+			<Dialog>
+				<DialogTrigger asChild>
+					<div className="text-sm font-semibold w-full h-[50px] border border-border rounded-md overflow-hidden flex justify-start items-center px-4 py-2 hover:cursor-pointer active:cursor-grabbing">
+						<p className="truncate w-[175px]">{title}</p>
+					</div>
+				</DialogTrigger>
+				<DialogContent className="flex flex-col h-[500px] px-8">
+					<DialogHeader className="hover:cursor-text">
+						<DialogTitle>
+							<Input
+								ref={titleRef}
+								id="title"
+								name="title"
+								className="resize-none border-none focus-visible:ring-0 p-0 md:text-lg shadow-none"
+								placeholder="Untitled Card"
+								defaultValue={title}
+								onChange={handleEdit}
+							/>
+						</DialogTitle>
+						<DialogDescription className={`${columnColor} text-left`}>
+							{columnTitle}
+						</DialogDescription>
+					</DialogHeader>
+					<Textarea
+						ref={descriptionRef}
+						id="description"
+						name="description"
+						className="h-full resize-none border-none focus-visible:ring-0 p-0 shadow-none"
+						placeholder="Enter some description text..."
+						defaultValue={description}
+						onChange={handleEdit}
+					/>
+					<DialogFooter className="flex-row justify-between sm:justify-between text-sm text-muted-foreground">
+						<div>{saveStatus}</div>
+						<span>Created {getDateString(created_at)}</span>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			{children}
+		</div>
 	);
 }
-
-export const MemoizedCard = memo(Card);

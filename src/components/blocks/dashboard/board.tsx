@@ -8,6 +8,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import useBoard from "@/hooks/use-board";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 type BoardProps = {
 	viewerId: string;
@@ -32,7 +38,7 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 			<Link href={`/board/${board.id}`}>
 				{view === "gallery" ? (
 					<>
-						<div className="h-[188px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
+						<div className="h-[198px] bg-accent/30 group-hover:bg-accent/50 relative transition-colors">
 							{coverUrl && (
 								<Image
 									src={coverUrl}
@@ -42,11 +48,20 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 								/>
 							)}
 						</div>
-						<div className="h-[92px] p-4 flex flex-col justify-start items-between bg-inherit group-hover:bg-accent/60 transition-colors">
-							<span className="font-semibold text-md text-left">
-								{board.title}
-							</span>
-							<div className="flex justify-start items-center gap-2 basis-[40px]">
+						<div className="p-4 bg-inherit group-hover:bg-accent/60 transition-colors">
+							<TooltipProvider>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<p className="font-semibold text-md inline-block max-w-[calc(100%-52px)] truncate">
+											{board.title}
+										</p>
+									</TooltipTrigger>
+									<TooltipContent>
+										<p>{board.title}</p>
+									</TooltipContent>
+								</Tooltip>
+							</TooltipProvider>
+							<div className="flex justify-start items-center gap-2">
 								{board.has_collaborators && (
 									<Users className="size-4 inline-block" />
 								)}
@@ -60,13 +75,24 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 						</div>
 					</>
 				) : (
-					<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
-						<span className="font-semibold text-md">{board.title}</span>
-						<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
-							<span className="w-[150px]">
+					<div className="max-w-[calc(100%-52px)] lg:max-w-[calc(100%-200px)] flex justify-between items-center gap-8 p-4">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<p className="font-semibold text-md max-w-[225px] md:max-w-none truncate">
+										{board.title}
+									</p>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>{board.title}</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+						<div className="flex flex-row-reverse md:flex-row items-start gap-4 text-left font-normal text-sm">
+							<p className="w-[150px] hidden md:block">
 								Opened {lastOpenedDateString}
-							</span>
-							<div className="space-x-2">
+							</p>
+							<div className="space-x-2 min-w-10">
 								{board.has_collaborators && (
 									<Users className="size-4 inline-block" />
 								)}
@@ -79,7 +105,7 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 				)}
 			</Link>
 			<div
-				className={`absolute ${view === "gallery" ? "bottom-4 right-4" : "bottom-2.5 right-2"}`}
+				className={`absolute ${view === "gallery" ? "bottom-5 right-4" : "bottom-2.5 right-2"}`}
 			>
 				<MemoizedBoardOptionsDropdown
 					{...board}

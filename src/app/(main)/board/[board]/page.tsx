@@ -4,10 +4,11 @@ import RefreshComponent from "@/components/blocks/board/refresh-component";
 import { Separator } from "@/components/ui/separator";
 import {
 	selectBoardByBoardAndProfileId,
-	selectBoardMemberByProfileIdAndBoardId,
 	selectCardsByBoardId,
 	selectCollaboratorsByBoardId,
 	selectColumnsByBoardId,
+	selectPermissionsByProfileIdAndBoardId,
+	selectProfileByProfileId,
 	updateBoardLastOpenedColumn,
 } from "@/lib/queries";
 import { createClient as createClientClient } from "@/lib/supabase/client";
@@ -43,13 +44,20 @@ export default async function BoardPage({
 
 	if (!user.user) redirect("/login");
 
-	const { data: boardMember } = await selectBoardMemberByProfileIdAndBoardId(
+	const selectProfilePromise = selectProfileByProfileId(supabase, user.user.id);
+	const selectPermissionsPromise = selectPermissionsByProfileIdAndBoardId(
 		supabase,
 		boardId,
 		user.user.id,
 	);
 
-	if (!boardMember) redirect("/dashboard");
+	const [selectProfileResponse, selectPermissionsResponse] = await Promise.all([
+		selectProfilePromise,
+		selectPermissionsPromise,
+	]);
+
+	if (selectProfileResponse.error || selectPermissionsResponse.error)
+		redirect("/dashboard");
 
 	const updateBoardPromise = updateBoardLastOpenedColumn(supabase, boardId);
 	const selectBoardPromise = selectBoardByBoardAndProfileId(
@@ -81,6 +89,8 @@ export default async function BoardPage({
 	if (selectCardsResponse.error) throw selectCardsResponse.error;
 	if (selectCollaboratorsResponse.error) throw selectCollaboratorsResponse.error;
 
+	const fetchedProfile = selectProfileResponse.data;
+	const fetchedPermissions = selectPermissionsResponse.data;
 	const fetchedBoard = selectBoardResponse.data;
 	const fetchedColumns = selectColumnsResponse.data;
 	const fetchedCards = selectCardsResponse.data;
@@ -90,7 +100,8 @@ export default async function BoardPage({
 		<div className="px-8 py-6 w-full max-w-[450px] md:max-w-[736px] lg:max-w-[1112px] space-y-6">
 			<RefreshComponent />
 			<BoardHeader
-				boardMember={boardMember}
+				fetchedProfile={fetchedProfile}
+				fetchedPermissions={fetchedPermissions}
 				fetchedBoard={fetchedBoard}
 				fetchedCollaborators={fetchedCollaborators}
 			/>

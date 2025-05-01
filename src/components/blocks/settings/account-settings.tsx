@@ -30,21 +30,27 @@ export default function AccountSettings({ email }: AccountSettingsProps) {
 			<CardContent className="space-y-6">
 				<Separator className="w-full" />
 				<div className="space-y-1">
-					<Label>Email</Label>
+					<p className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Email
+					</p>
 					<p className="text-sm text-muted-foreground font-normal">
 						This is the email you will use to login and receive emails for.
 					</p>
 					<UpdateEmailDialog email={email} />
 				</div>
 				<div className="space-y-1">
-					<Label>Password</Label>
+					<p className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Password
+					</p>
 					<p className="text-sm text-muted-foreground font-normal">
 						This will be the password you use for future logins.
 					</p>
 					<UpdatePasswordDialog />
 				</div>
 				<div className="space-y-1">
-					<Label>Delete Account</Label>
+					<p className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+						Delete Account
+					</p>
 					<p className="text-sm text-muted-foreground font-normal">
 						This action cannot be undone. Please be certain
 					</p>

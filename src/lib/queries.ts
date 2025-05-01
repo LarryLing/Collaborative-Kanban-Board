@@ -1,4 +1,4 @@
-import { Board, BoardMember, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
+import { Board, UserPermissions, Card, Collaborator, Column, TypedSupabaseClient, UserProfile } from "./types";
 
 export async function selectCardsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: cardsData, error: cardsError } = await supabase
@@ -143,7 +143,7 @@ export async function updateBoardLastOpenedColumn(supabase: TypedSupabaseClient,
 export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient, boardId: string) {
     const {data: collaboratorData, error: collaboratorError } = await supabase
         .from("profiles_boards_bridge")
-        .select("profile_id, profiles(id, display_name, email, avatar_path)")
+        .select("profile_id, has_invite_permissions, profiles(id, display_name, email, avatar_path)")
         .eq("board_id", boardId);
 
     if (collaboratorError) {
@@ -159,7 +159,8 @@ export async function selectCollaboratorsByBoardId(supabase: TypedSupabaseClient
                 profile_id: collaborator.profiles.id,
                 display_name: collaborator.profiles.display_name,
                 email: collaborator.profiles.email,
-                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path).data.publicUrl
+                avatar_url: supabase.storage.from("avatars").getPublicUrl(collaborator.profiles.avatar_path).data.publicUrl,
+                has_invite_permissions: collaborator.has_invite_permissions
             }
         },
     ) as Collaborator[];
@@ -201,7 +202,7 @@ export async function selectProfileByProfileId(supabase: TypedSupabaseClient, pr
     }
 }
 
-export async function selectBoardMemberByProfileIdAndBoardId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
+export async function selectPermissionsByProfileIdAndBoardId(supabase: TypedSupabaseClient, boardId: string, profileId: string) {
 	const { data: boardMember, error: boardMemberError } = await supabase
         .from("profiles_boards_bridge")
         .select("has_invite_permissions, boards(owner_id)")
@@ -217,10 +218,9 @@ export async function selectBoardMemberByProfileIdAndBoardId(supabase: TypedSupa
 
     return {
         data: {
-            member_id: profileId,
             is_owner: boardMember.boards.owner_id === profileId,
             has_invite_permissions: boardMember.has_invite_permissions,
-        } as BoardMember,
+        } as UserPermissions,
         error: null,
     }
 }
