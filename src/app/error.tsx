@@ -21,8 +21,8 @@ export default function ErrorPage({ error, reset }: { error: Error; reset: () =>
 				</CardHeader>
 				<CardContent>
 					<p>
-						Looks like something went wrong on our end. We'll try to do better
-						next time. Thank you for your patience!
+						Looks like something went wrong on our end. We&apos;ll try to do
+						better next time. Thank you for your patience!
 					</p>
 				</CardContent>
 				<CardFooter className="flex justify-between">

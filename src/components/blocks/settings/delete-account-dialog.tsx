@@ -26,7 +26,7 @@ export default function DeleteAccountDialog() {
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	return (
 		<Dialog>

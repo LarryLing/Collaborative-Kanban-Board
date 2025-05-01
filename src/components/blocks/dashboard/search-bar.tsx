@@ -21,7 +21,11 @@ export default function SearchBar() {
 	const handleSearch = useDebouncedCallback((query) => {
 		const params = new URLSearchParams(searchParams);
 
-		query ? params.set("query", query) : params.delete("query");
+		if (query) {
+			params.set("query", query);
+		} else {
+			params.delete("query");
+		}
 
 		replace(`${pathname}?${params.toString()}`);
 	}, 500);

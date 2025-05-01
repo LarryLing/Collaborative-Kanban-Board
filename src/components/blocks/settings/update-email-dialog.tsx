@@ -30,7 +30,7 @@ export default function UpdateEmailDialog({ email }: UpdateEmailDialogProps) {
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	return (
 		<Dialog>

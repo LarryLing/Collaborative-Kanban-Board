@@ -19,7 +19,7 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
 
             setCoverUrl(publicUrl.publicUrl);
         }
-    }, [])
+    }, [fetchedBoard.cover_path, supabase.storage])
 
     const handleChange = useCallback(async (e: ChangeEvent<HTMLInputElement>) => {
         if (!board) return;
@@ -70,7 +70,7 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
             title: "Success!",
             description: "The cover has been successfully updated.",
         });
-    }, [board])
+    }, [board, supabase, toast])
 
     const bookmarkBoard = useCallback(async (boardId: string, profileId: string, currentlyBookmarked: boolean) => {
         setBoard((prevBoard) => {
@@ -86,7 +86,7 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
             .match({profile_id: profileId, board_id: boardId});
 
         if (bookmarkError) throw bookmarkError;
-    }, [board])
+    }, [supabase])
 
     const renameBoard = useCallback(async (oldTitle: string, newTitle: string, boardId: string) => {
         if (oldTitle === newTitle) return;
@@ -104,7 +104,7 @@ export default function useBoard(supabase: TypedSupabaseClient, fetchedBoard: Bo
             .eq("id", boardId);
 
         if (renameError) throw renameError;
-    }, [board])
+    }, [supabase])
 
   return { board, coverUrl, uploading, handleChange, bookmarkBoard, renameBoard, coverPathRef };
 }

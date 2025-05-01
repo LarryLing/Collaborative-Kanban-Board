@@ -8,7 +8,7 @@ export default function RefreshComponent() {
 
 	useEffect(() => {
 		router.refresh();
-	}, []);
+	}, [router]);
 
 	return null;
 }

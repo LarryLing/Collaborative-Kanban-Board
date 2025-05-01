@@ -35,7 +35,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
         return () => {
             supabase.removeChannel(columnsChannel);
         };
-    }, [supabase, columns, setColumns]);
+    }, [supabase, columns, setColumns, boardId]);
 
     const createColumn = useCallback(async () => {
         const newColumnId = crypto.randomUUID();
@@ -50,7 +50,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
         ] as Column[];
 
         await updateColumnsByBoardId(supabase, boardId, updatedColumns);
-    }, [columns])
+    }, [boardId, columns, supabase])
 
     const deleteColumn = useCallback(async (columnId: string) => {
 		const updatedColumns = columns.filter(
@@ -58,7 +58,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 		);
 
         await updateColumnsByBoardId(supabase, boardId, updatedColumns);
-	}, [columns])
+	}, [boardId, columns, supabase])
 
     const changeColumnColor = useCallback(async (oldTextColor: ColumnColorOptions, newTextColor: ColumnColorOptions, columnId: string) => {
         if (oldTextColor === newTextColor) return;
@@ -73,7 +73,7 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
         )
 
         await updateColumnsByBoardId(supabase, boardId, updatedColumns);
-    }, [columns])
+    }, [boardId, columns, supabase])
 
     const renameColumn = useCallback(async (oldTitle: string, newTitle: string, columnId: string) => {
         if (oldTitle === newTitle) return;
@@ -88,14 +88,14 @@ export default function useColumns(supabase: TypedSupabaseClient, boardId: strin
 		);
 
         await updateColumnsByBoardId(supabase, boardId, updatedColumns);
-    }, [columns])
+    }, [boardId, columns, supabase])
 
     const moveColumn = useCallback(async (from: number, to: number) => {
         const updatedColumns = arrayMove(columns, from, to);
 
         setColumns(updatedColumns);
         await updateColumnsByBoardId(supabase, boardId, updatedColumns);
-    }, [columns])
+    }, [boardId, columns, supabase])
 
     return {columns, createColumn, deleteColumn, changeColumnColor, renameColumn, moveColumn} as UseColumnsType;
 }
