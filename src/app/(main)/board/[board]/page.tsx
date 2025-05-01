@@ -11,25 +11,11 @@ import {
 	selectProfileByProfileId,
 	updateBoardLastOpenedColumn,
 } from "@/lib/queries";
-import { createClient as createClientClient } from "@/lib/supabase/client";
-import { createClient as createServerClient } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export const dynamicParams = true;
-
-export async function generateStaticParams() {
-	const supabase = createClientClient();
-
-	const { data: boardsData, error: boardsError } = await supabase
-		.from("profiles_boards_bridge")
-		.select("board_id, boards(*)");
-
-	if (boardsError) throw boardsError;
-
-	return boardsData.map((boardData) => ({
-		params: { board: String(boardData.board_id) },
-	}));
-}
+export const dynamic = "force-dynamic";
 
 export default async function BoardPage({
 	params,
@@ -38,7 +24,7 @@ export default async function BoardPage({
 }) {
 	const { board: boardId } = await params;
 
-	const supabase = await createServerClient();
+	const supabase = await createClient();
 
 	const { data: user } = await supabase.auth.getUser();
 
