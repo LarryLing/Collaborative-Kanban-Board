@@ -10,6 +10,12 @@ import {
 	useSortable,
 	verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import CardOptionsDropdown from "./card-options-dropdown";
 import { useDroppable } from "@dnd-kit/core";
 import { UseCardsType } from "@/hooks/use-cards";
@@ -59,12 +65,21 @@ export default function Column({
 				<div
 					{...attributes}
 					{...listeners}
-					className="rounded-md font-semibold active:cursor-grabbing"
+					className="flex items-center rounded-md font-semibold hover:cursor-grab"
 				>
-					<span className={`mr-3 ${color} w-[125px] text-ellipsis text-nowrap`}>
-						{title}
-					</span>
-					<span className="text-sm">{filteredCards.length}</span>
+					<TooltipProvider>
+						<Tooltip>
+							<TooltipTrigger asChild>
+								<p className={`mr-3 ${color} max-w-[150px] truncate`}>
+									{title}
+								</p>
+							</TooltipTrigger>
+							<TooltipContent>
+								<p>{title}</p>
+							</TooltipContent>
+						</Tooltip>
+					</TooltipProvider>
+					<p className="text-sm">{filteredCards.length}</p>
 				</div>
 				<div className="space-x-2">
 					<MemoizedColumnOptionsDropdown

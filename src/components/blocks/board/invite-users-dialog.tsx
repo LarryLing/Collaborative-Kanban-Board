@@ -11,7 +11,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { MailCheck, MailX, UserMinus, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileWidget from "../misc/profile-widget";
 import useCollaborators from "@/hooks/use-collaborators";
@@ -19,6 +19,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { UserPermissions, Collaborator } from "@/lib/types";
+import RemoveCollaboratorButton from "./remove-collaborator-button";
+import UpdateInvitePermissionsButton from "./update-invite-permissions-button";
 
 type BoardHeaderProps = {
 	viewerId: string;
@@ -85,36 +87,21 @@ export default function InviteUsersDialog({
 						{collaborator.profile_id !== ownerId ? (
 							<div className="space-x-2 flex items-center">
 								{viewerId === ownerId && (
-									<Button
-										variant="outline"
-										size="icon"
-										onClick={() =>
-											updateInvitePermissions(
-												boardId,
-												collaborator.profile_id,
-												collaborator.has_invite_permissions,
-											)
+									<UpdateInvitePermissionsButton
+										boardId={boardId}
+										collaboratorId={collaborator.profile_id}
+										collaboratorHasInvitePermissions={
+											collaborator.has_invite_permissions
 										}
-									>
-										{collaborator.has_invite_permissions ? (
-											<MailCheck />
-										) : (
-											<MailX />
-										)}
-									</Button>
+										updateInvitePermissions={updateInvitePermissions}
+									/>
 								)}
-								<Button
-									variant="destructive"
-									size="icon"
-									onClick={() =>
-										removeCollaborator(
-											boardId,
-											collaborator.profile_id,
-										)
-									}
-								>
-									<UserMinus />
-								</Button>
+								<RemoveCollaboratorButton
+									boardId={boardId}
+									collaboratorId={collaborator.profile_id}
+                                    viewerId={viewerId}
+									removeCollaborator={removeCollaborator}
+								/>
 							</div>
 						) : (
 							<p className="text-sm text-muted-foreground">Owner</p>

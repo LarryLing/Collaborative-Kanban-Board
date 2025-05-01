@@ -79,7 +79,7 @@ export default function Card({
 			<Dialog>
 				<DialogTrigger asChild>
 					<div className="text-sm font-semibold w-full h-[50px] border border-border rounded-md overflow-hidden flex justify-start items-center px-4 py-2 hover:cursor-pointer active:cursor-grabbing">
-						<span>{title}</span>
+						<p className="truncate w-[175px]">{title}</p>
 					</div>
 				</DialogTrigger>
 				<DialogContent className="flex flex-col h-[500px] px-8">
