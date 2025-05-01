@@ -66,7 +66,7 @@ export default function NewCard({
 						<span className="font-semibold text-md">New Card</span>
 					</Button>
 				) : (
-					<Button size="icon">
+					<Button size="icon" aria-label="New card">
 						<Plus />
 					</Button>
 				)}

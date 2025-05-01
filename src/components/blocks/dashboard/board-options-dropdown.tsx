@@ -36,7 +36,7 @@ export default function BoardOptionsDropdown({
 	return (
 		<DropdownMenu modal={false}>
 			<DropdownMenuTrigger asChild>
-				<Button variant="ghost" size="icon">
+				<Button variant="ghost" size="icon" aria-label="Board options DropdownMenu">
 					<Ellipsis className="size-5" />
 				</Button>
 			</DropdownMenuTrigger>
