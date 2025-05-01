@@ -21,7 +21,7 @@ export default function SignupPage() {
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	return (
 		<div className="flex justify-center md:justify-start items-center h-screen">

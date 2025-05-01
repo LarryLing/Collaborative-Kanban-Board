@@ -20,10 +20,6 @@ import { getSocialIcon } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import useAvatar from "@/hooks/use-avatar";
 
-type ProfileSettingsProps = {
-	publicUrl: string;
-} & UserProfile;
-
 export default function ProfileSettings({
 	id,
 	display_name,
@@ -44,7 +40,7 @@ export default function ProfileSettings({
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	function openAvatarUploadInput() {
 		if (avatarInputRef.current) avatarInputRef.current.click();

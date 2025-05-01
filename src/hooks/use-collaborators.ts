@@ -61,7 +61,7 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
         return () => {
             supabase.removeChannel(collaboratorsChannel);
         };
-    }, [supabase, collaborators, setCollaborators]);
+    }, [supabase, collaborators, setCollaborators, boardId, viewerId]);
 
    const addCollaborator = useCallback(async (formState: CollaboratorFormState, formData: FormData) => {
         const validatedFields = EmailFormSchema.safeParse({
@@ -125,7 +125,7 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 },
             }
         }
-    }, [collaborators])
+    }, [boardId, supabase])
 
     const removeCollaborator = useCallback(async (boardId: string, removedId: string) => {
         const removeCollaboratorPromise = supabase
@@ -142,7 +142,7 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
 
         if (removeCollaboratorResponse.error) throw removeCollaboratorResponse.error;
         if (updateHasCollaboratorsResponse.error) throw updateHasCollaboratorsResponse.error;
-    }, [collaborators])
+    }, [collaborators.length, supabase])
 
     const updateInvitePermissions = useCallback(async (boardId: string, profileId: string, previousInvitePermissions: boolean) => {
         const { error: grantPermissionsError } = await supabase
@@ -151,7 +151,7 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
             .match({ profile_id: profileId, board_id: boardId });
 
         if (grantPermissionsError) throw grantPermissionsError;
-    }, [collaborators])
+    }, [supabase])
 
     return {collaborators, addCollaborator, removeCollaborator, updateInvitePermissions};
 }

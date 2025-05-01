@@ -8,7 +8,7 @@ import {
 	DropdownMenuContent,
 	DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { Ellipsis, PenLine, Trash2 } from "lucide-react";
+import { Ellipsis, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "next-themes";
 import { Column as ColumnType } from "@/lib/types";

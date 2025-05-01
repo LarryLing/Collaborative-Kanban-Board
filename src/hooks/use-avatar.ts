@@ -34,7 +34,7 @@ export default function useAvatar(profileId: string) {
         });
 
         setUploading(false);
-    }, [])
+    }, [MAX_FILE_SIZE, profileId, toast])
 
   return { uploading, changeAvatar, avatarInputRef };
 }
