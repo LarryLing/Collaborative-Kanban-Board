@@ -58,7 +58,7 @@ export default function InviteUsersDialog({
 				description: state.toast.message,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	const sortedCollaborators = sortCollaborators(collaborators, ownerId);
 

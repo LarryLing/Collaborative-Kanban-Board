@@ -37,7 +37,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
         return () => {
             supabase.removeChannel(cardsChannel);
         };
-    }, [supabase, cards, setCards]);
+    }, [supabase, cards, setCards, boardId]);
 
     const createCard = useCallback(async (columnId: string, title: string, description: string) => {
         const updatedCards = [
@@ -52,7 +52,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
         ] as Card[];
 
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const deleteCard = useCallback(async (deletedCardId: string) => {
         const updatedCards = cards.filter(
@@ -60,7 +60,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
 		);
 
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const deleteCardsByColumnId = useCallback(async (columnId: string) => {
         const updatedCards = cards.filter(
@@ -68,7 +68,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
         );
 
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const duplicateCard = useCallback(async (card: Card) => {
         const duplicatedCard = {
@@ -77,11 +77,11 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
         } as Card;
 
         const index = cards.findIndex((idxCard) => idxCard.id === card.id);
-        let updatedCards = [...cards];
+        const updatedCards = [...cards];
         updatedCards.splice(index, 0, duplicatedCard);
 
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const moveCardToColumn = useCallback((cardId: string, oldColumnId: string, newColumnId: string, updateDatabase: boolean) => {
         if (oldColumnId === newColumnId) return;
@@ -97,14 +97,14 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
 
         setCards(updatedCards);
         if (updateDatabase) updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const moveCard = useCallback(async (from: number, to: number) => {
         const updatedCards = arrayMove(cards, from, to);
 
         setCards(updatedCards);
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     const editCard = useCallback(async (cardId: string, oldTitle: string, newTitle: string, oldDescription: string, newDescription: string) => {
         if (oldTitle === newTitle && oldDescription === newDescription) return;
@@ -120,7 +120,7 @@ export default function useCards(supabase: TypedSupabaseClient, boardId: string,
 		);
 
         await updateCardsByBoardId(supabase, boardId, updatedCards);
-    }, [cards])
+    }, [boardId, cards, supabase])
 
     return {cards, createCard, deleteCard, deleteCardsByColumnId, duplicateCard, moveCardToColumn, moveCard, editCard} as UseCardsType;
 }

@@ -21,7 +21,7 @@ export default function LoginPage() {
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	return (
 		<div className="flex justify-center md:justify-start items-center h-screen">
@@ -74,7 +74,7 @@ export default function LoginPage() {
 						{pending ? "Logging in..." : "Login"}
 					</Button>
 					<div className="text-center text-sm">
-						Don't have an account?{" "}
+						Don&apos;t have an account?{" "}
 						<Link href="/signup" className="underline underline-offset-4">
 							Sign Up
 						</Link>

@@ -27,7 +27,7 @@ export default function ForgotPasswordPage() {
 				description: state.toast.description,
 			});
 		}
-	}, [state?.toast]);
+	}, [state?.toast, toast]);
 
 	return (
 		<div className="flex justify-center items-center h-screen">

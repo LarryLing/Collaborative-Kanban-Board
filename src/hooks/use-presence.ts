@@ -36,7 +36,7 @@ export default function usePresence(supabase: TypedSupabaseClient, boardId: stri
         return () => {
             supabase.removeChannel(presenceChannel);
         };
-    }, [userProfile])
+    }, [boardId, supabase, userProfile])
 
     return { activeProfiles };
 }

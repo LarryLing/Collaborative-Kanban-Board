@@ -362,7 +362,7 @@ export async function updateUserProfile(
             .delete()
             .eq("profile_id", userData.user.id);
 
-        if (socialsDeleteError) socialsDeleteError;
+        if (socialsDeleteError) throw socialsDeleteError;
 
         const { error: socialsInsertError } = await supabase
             .from("socials")
