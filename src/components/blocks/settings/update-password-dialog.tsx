@@ -9,6 +9,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { updatePassword } from "@/lib/actions";
 import { useActionState, useEffect } from "react";
@@ -41,35 +42,41 @@ export default function UpdatePasswordDialog() {
 					</DialogDescription>
 				</DialogHeader>
 				<form>
-					<Input
-						id="newPassword"
-						name="newPassword"
-						type="password"
-						placeholder="New Password"
-						className="max-w-[400px]"
-					/>
-					{state?.errors?.newPassword && (
-						<div className="text-sm text-destructive">
-							<p>Password must:</p>
-							<ul>
-								{state.errors.newPassword.map((error) => (
-									<li key={error}>- {error}</li>
-								))}
-							</ul>
-						</div>
-					)}
-					<Input
-						id="confirmPassword"
-						name="confirmPassword"
-						type="password"
-						placeholder="Confirm Password"
-						className="max-w-[400px] mt-2"
-					/>
-					{state?.errors?.confirmPassword && (
-						<p className="text-sm text-destructive">
-							{state.errors.confirmPassword}
-						</p>
-					)}
+					<div className="space-y-1">
+						<Label htmlFor="newPassword">New Password</Label>
+						<Input
+							id="newPassword"
+							name="newPassword"
+							type="password"
+							placeholder="••••••••"
+							className="max-w-[400px]"
+						/>
+						{state?.errors?.newPassword && (
+							<div className="text-sm text-destructive">
+								<p>Password must:</p>
+								<ul>
+									{state.errors.newPassword.map((error) => (
+										<li key={error}>- {error}</li>
+									))}
+								</ul>
+							</div>
+						)}
+					</div>
+					<div className="space-y-1 mt-3">
+						<Label htmlFor="confirmPassword">Confirm Password</Label>
+						<Input
+							id="confirmPassword"
+							name="confirmPassword"
+							type="password"
+							placeholder="••••••••"
+							className="max-w-[400px] mt-2"
+						/>
+						{state?.errors?.confirmPassword && (
+							<p className="text-sm text-destructive">
+								{state.errors.confirmPassword}
+							</p>
+						)}
+					</div>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
 							<Button

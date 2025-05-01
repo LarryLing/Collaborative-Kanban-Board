@@ -9,6 +9,7 @@ import {
 	DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { deleteAccount } from "@/lib/actions";
 import { useActionState, useEffect } from "react";
@@ -36,20 +37,25 @@ export default function DeleteAccountDialog() {
 				<DialogHeader>
 					<DialogTitle>Delete Account</DialogTitle>
 					<DialogDescription>
-						Please type your email below to confirm this action.
+						Please match the prompt below to confirm this action.
 					</DialogDescription>
 				</DialogHeader>
 				<form>
-					<Input
-						id="prompt"
-						name="prompt"
-						type="text"
-						placeholder="delete my account"
-						className="max-w-[400px]"
-					/>
-					{state?.errors?.prompt && (
-						<p className="text-sm text-destructive">{state.errors.prompt}</p>
-					)}
+					<div className="space-y-1">
+						<Label htmlFor="prompt">Enter Prompt</Label>
+						<Input
+							id="prompt"
+							name="prompt"
+							type="text"
+							placeholder="delete my account"
+							className="max-w-[400px]"
+						/>
+						{state?.errors?.prompt && (
+							<p className="text-sm text-destructive">
+								{state.errors.prompt}
+							</p>
+						)}
+					</div>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
 							<Button

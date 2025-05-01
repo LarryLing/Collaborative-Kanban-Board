@@ -9,6 +9,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { updateEmail } from "@/lib/actions";
 import { useActionState, useEffect } from "react";
@@ -45,13 +46,17 @@ export default function UpdateEmailDialog({ email }: UpdateEmailDialogProps) {
 					</DialogDescription>
 				</DialogHeader>
 				<form>
-					<Input
-						id="email"
-						name="email"
-						type="text"
-						defaultValue={email}
-						className="max-w-[400px]"
-					/>
+					<div className="space-y-1">
+						<Label htmlFor="email">New Email</Label>
+						<Input
+							id="email"
+							name="email"
+							type="text"
+							autoComplete="on"
+							defaultValue={email}
+							className="max-w-[400px]"
+						/>
+					</div>
 					{state?.errors?.email && (
 						<p className="text-sm text-destructive">{state.errors.email}</p>
 					)}
