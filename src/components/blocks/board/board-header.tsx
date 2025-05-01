@@ -71,6 +71,7 @@ export default function BoardHeader({
 							size="icon"
 							className="absolute inset-0 z-5"
 							onClick={openCoverPathInput}
+							aria-label="Upload board cover image"
 						>
 							<ImageUp />
 						</Button>
@@ -98,7 +99,11 @@ export default function BoardHeader({
 							boardId={board.id}
 							renameBoard={renameBoard}
 						>
-							<Button variant="outline" size="icon">
+							<Button
+								variant="outline"
+								size="icon"
+								aria-label="Rename board"
+							>
 								<PenLine />
 							</Button>
 						</RenameBoardDialog>
@@ -112,12 +117,17 @@ export default function BoardHeader({
 									board.bookmarked,
 								)
 							}
+							aria-label="Bookmark board"
 						>
 							<Bookmark />
 						</Toggle>
 						{board.owner_id === fetchedProfile.id && (
 							<DeleteBoardDialog boardId={board.id}>
-								<Button variant="outline" size="icon">
+								<Button
+									variant="outline"
+									size="icon"
+									aria-label="Delete board"
+								>
 									<Trash2 />
 								</Button>
 							</DeleteBoardDialog>
