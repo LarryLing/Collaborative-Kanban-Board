@@ -8,6 +8,7 @@ import {
 	DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { FormEvent, ReactNode, useRef, useState } from "react";
 
@@ -51,12 +52,17 @@ export default function RenameBoardDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={(e) => handleSubmit(e)}>
-					<Input
-						ref={titleRef}
-						placeholder={title}
-						defaultValue={title}
-						className="col-span-3"
-					/>
+					<div className="space-y-1">
+						<Label htmlFor="title">New Name</Label>
+						<Input
+							id="title"
+							name="title"
+							ref={titleRef}
+							placeholder={title}
+							defaultValue={title}
+							className="col-span-3"
+						/>
+					</div>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
 							<Button type="button" variant="outline">

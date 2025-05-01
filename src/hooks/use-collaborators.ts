@@ -97,11 +97,19 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
                 }
             }
 
-            const { error: addCollaboratorError } = await supabase
+            const insertCollaboratorPromise = supabase
                 .from("profiles_boards_bridge")
                 .insert({profile_id: profileData.id, board_id: boardId})
 
-            if (addCollaboratorError) throw addCollaboratorError;
+            const updateHasCollaboratorsPromise = supabase
+                .from("boards")
+                .update({has_collaborators: true})
+                .eq("id", boardId)
+
+            const [insertCollaboratorResponse, updateHasCollaboratorsResponse] = await Promise.all([insertCollaboratorPromise, updateHasCollaboratorsPromise]);
+
+            if (insertCollaboratorResponse.error) throw insertCollaboratorResponse.error;
+            if (updateHasCollaboratorsResponse.error) throw updateHasCollaboratorsResponse.error;
 
             return {
                 toast: {
@@ -120,12 +128,20 @@ export default function useCollaborators(supabase: TypedSupabaseClient, boardId:
     }, [collaborators])
 
     const removeCollaborator = useCallback(async (boardId: string, removedId: string) => {
-        const { error: removeCollaboratorError } = await supabase
+        const removeCollaboratorPromise = supabase
             .from("profiles_boards_bridge")
             .delete()
             .match({ profile_id: removedId, board_id: boardId })
 
-        if (removeCollaboratorError) throw removeCollaboratorError;
+        const updateHasCollaboratorsPromise = supabase
+            .from("boards")
+            .update({has_collaborators: collaborators.length > 2})
+            .eq("id", boardId)
+
+        const [removeCollaboratorResponse, updateHasCollaboratorsResponse] = await Promise.all([removeCollaboratorPromise, updateHasCollaboratorsPromise]);
+
+        if (removeCollaboratorResponse.error) throw removeCollaboratorResponse.error;
+        if (updateHasCollaboratorsResponse.error) throw updateHasCollaboratorsResponse.error;
     }, [collaborators])
 
     const updateInvitePermissions = useCallback(async (boardId: string, profileId: string, previousInvitePermissions: boolean) => {

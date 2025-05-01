@@ -15,6 +15,7 @@ import { UseColumnsType } from "@/hooks/use-columns";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { PenLine } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 type RenameColumnDialogProps = {
 	columnId: string;
@@ -63,14 +64,17 @@ export default function RenameColumnDialog({
 					</DialogDescription>
 				</DialogHeader>
 				<form onSubmit={(e) => handleSubmit(e)}>
-					<Input
-						ref={titleRef}
-						id="title"
-						name="title"
-						placeholder="Column Title"
-						defaultValue={columnTitle}
-						className="col-span-3"
-					/>
+					<div className="space-y-1">
+						<Label htmlFor="title">New Name</Label>
+						<Input
+							ref={titleRef}
+							id="title"
+							name="title"
+							placeholder="Column Title"
+							defaultValue={columnTitle}
+							className="col-span-3"
+						/>
+					</div>
 					<div className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 mt-4">
 						<DialogClose asChild>
 							<Button type="button" variant="outline" disabled={pending}>

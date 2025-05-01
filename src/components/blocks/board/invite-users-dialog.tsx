@@ -21,6 +21,8 @@ import { useToast } from "@/hooks/use-toast";
 import { UserPermissions, Collaborator } from "@/lib/types";
 import RemoveCollaboratorButton from "./remove-collaborator-button";
 import UpdateInvitePermissionsButton from "./update-invite-permissions-button";
+import { Label } from "@/components/ui/label";
+import { sortCollaborators } from "@/lib/utils";
 
 type BoardHeaderProps = {
 	viewerId: string;
@@ -58,6 +60,8 @@ export default function InviteUsersDialog({
 		}
 	}, [state?.toast]);
 
+	const sortedCollaborators = sortCollaborators(collaborators, ownerId);
+
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
@@ -73,19 +77,24 @@ export default function InviteUsersDialog({
 						Share this board with project partners.
 					</DialogDescription>
 				</DialogHeader>
-				{collaborators.map((collaborator) => (
+				{sortedCollaborators.map((collaborator) => (
 					<div
 						key={collaborator.profile_id}
-						className="flex justify-between items-center"
+						className="flex justify-center items-center gap-2"
 					>
 						<ProfileWidget
 							displayName={collaborator.display_name}
 							email={collaborator.email}
 							avatarUrl={collaborator.avatar_url}
-							className="w-full sm:max-w-[300px] max-w-[180px] overflow-hidden whitespace-nowrap text-ellipsis"
+							className="max-w-[135px] xs:max-w-none "
 						/>
 						{collaborator.profile_id !== ownerId ? (
-							<div className="space-x-2 flex items-center">
+							<div
+								className="space-x-2 flex items-center"
+								onFocusCapture={(e) => {
+									e.stopPropagation();
+								}}
+							>
 								{viewerId === ownerId && (
 									<UpdateInvitePermissionsButton
 										boardId={boardId}
@@ -99,7 +108,7 @@ export default function InviteUsersDialog({
 								<RemoveCollaboratorButton
 									boardId={boardId}
 									collaboratorId={collaborator.profile_id}
-                                    viewerId={viewerId}
+									viewerId={viewerId}
 									removeCollaborator={removeCollaborator}
 								/>
 							</div>
@@ -110,7 +119,8 @@ export default function InviteUsersDialog({
 				))}
 				{has_invite_permissions ? (
 					<form action={action} className="">
-						<div className="flex flex-col justify-start">
+						<div className="flex flex-col justify-start space-y-1">
+							<Label htmlFor="email">Collaborator email</Label>
 							<Input
 								id="email"
 								name="email"

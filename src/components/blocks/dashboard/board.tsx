@@ -75,15 +75,24 @@ export default function Board({ viewerId, fetchedBoard, view }: BoardProps) {
 						</div>
 					</>
 				) : (
-					<div className="md:max-w-[500px] lg:max-w-[700px] flex justify-between items-center p-4">
-						<p className="font-semibold text-md w-full max-w-[250px] truncate">
-							{board.title}
-						</p>
-						<div className="hidden md:flex items-start gap-4 w-[210px] text-left font-normal text-sm">
-							<span className="w-[150px]">
+					<div className="max-w-[calc(100%-52px)] lg:max-w-[calc(100%-200px)] flex justify-between items-center gap-8 p-4">
+						<TooltipProvider>
+							<Tooltip>
+								<TooltipTrigger asChild>
+									<p className="font-semibold text-md max-w-[225px] md:max-w-none truncate">
+										{board.title}
+									</p>
+								</TooltipTrigger>
+								<TooltipContent>
+									<p>{board.title}</p>
+								</TooltipContent>
+							</Tooltip>
+						</TooltipProvider>
+						<div className="flex flex-row-reverse md:flex-row items-start gap-4 text-left font-normal text-sm">
+							<p className="w-[150px] hidden md:block">
 								Opened {lastOpenedDateString}
-							</span>
-							<div className="space-x-2">
+							</p>
+							<div className="space-x-2 min-w-10">
 								{board.has_collaborators && (
 									<Users className="size-4 inline-block" />
 								)}

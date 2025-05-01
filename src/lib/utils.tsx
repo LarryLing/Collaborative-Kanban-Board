@@ -12,6 +12,7 @@ import { LinkIcon } from "lucide-react";
 import {
 	Board,
 	BookmarkedOptions,
+	Collaborator,
 	OwnershipOptions,
 	SortOptions,
 } from "./types";
@@ -46,13 +47,7 @@ export function getDateString(datetime: string) {
 		return shortTime.format(date);
 	}
 
-	return (
-		months[date.getMonth()] +
-		" " +
-		date.getDate() +
-		", " +
-		date.getFullYear()
-	);
+	return months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear();
 }
 
 export function processBoards(
@@ -70,20 +65,15 @@ export function processBoards(
 	}
 
 	if (ownership === "me") {
-		processedBoards = processedBoards.filter(
-			(board) => board.owner_id === id,
-		);
+		processedBoards = processedBoards.filter((board) => board.owner_id === id);
 	} else if (ownership === "not-me") {
-		processedBoards = processedBoards.filter(
-			(board) => board.owner_id !== id,
-		);
+		processedBoards = processedBoards.filter((board) => board.owner_id !== id);
 	}
 
 	if (sortMethod === "last-opened") {
 		processedBoards.sort(
 			(a, b) =>
-				new Date(b.last_opened).getTime() -
-				new Date(a.last_opened).getTime(),
+				new Date(b.last_opened).getTime() - new Date(a.last_opened).getTime(),
 		);
 	} else if (sortMethod === "asc") {
 		processedBoards.sort((a, b) => a.title.localeCompare(b.title));
@@ -108,16 +98,10 @@ export function getSocialIcon(socialUrl: string) {
 	}
 
 	const socialIconMap = {
-		"www.linkedin.com": (
-			<LinkedInIcon className="size-4" fill="currentColor" />
-		),
+		"www.linkedin.com": <LinkedInIcon className="size-4" fill="currentColor" />,
 		"github.com": <GithubIcon className="size-4" fill="currentColor" />,
-		"www.instagram.com": (
-			<InstagramIcon className="size-4" fill="currentColor" />
-		),
-		"www.facebook.com": (
-			<FacebookIcon className="size-4" fill="currentColor" />
-		),
+		"www.instagram.com": <InstagramIcon className="size-4" fill="currentColor" />,
+		"www.facebook.com": <FacebookIcon className="size-4" fill="currentColor" />,
 		"x.com": <TwitterXIcon className="size-4" fill="currentColor" />,
 	};
 
@@ -132,4 +116,20 @@ export function getSocialIcon(socialUrl: string) {
 	}
 
 	return <>{socialIconMap[url.hostname]}</>;
+}
+
+export function sortCollaborators(collaborators: Collaborator[], ownerId: string) {
+	const sortedCollaborators = [...collaborators];
+
+	sortedCollaborators.sort((a, b) => {
+		if (a.profile_id === ownerId) {
+			return -1; // 'a' comes first
+		} else if (b.profile_id === ownerId) {
+			return 1; // 'b' comes first
+		} else {
+			return 0; // Maintain original order for other elements
+		}
+	});
+
+    return sortedCollaborators
 }
