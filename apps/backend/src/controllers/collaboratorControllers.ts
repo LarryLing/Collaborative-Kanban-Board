@@ -15,12 +15,10 @@ export const createCollaborator = async (req: Request, res: Response) => {
   try {
     const collaboratorData = req.body;
     // TODO: Implement database query to create collaborator
-    res
-      .status(201)
-      .json({
-        message: "Collaborator created",
-        collaborator: collaboratorData,
-      });
+    res.status(201).json({
+      message: "Collaborator created",
+      collaborator: collaboratorData,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error creating collaborator", error });
   }
