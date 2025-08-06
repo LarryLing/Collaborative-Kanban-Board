@@ -1,14 +1,21 @@
 import { Router } from "express";
 import {
   getAllCollaborators,
-  createCollaborator,
-  deleteCollaborator,
+  addCollaborator,
+  removeCollaborator,
 } from "../controllers/collaboratorControllers";
+import { verifyAuth } from "../middlewares/authMiddleware";
+import { verifyRole } from "../middlewares/collaboratorMiddleware";
 
 const collaboratorRouter: Router = Router();
 
-collaboratorRouter.get("/:boardId", getAllCollaborators);
-collaboratorRouter.post("/:boardId", createCollaborator);
-collaboratorRouter.delete("/:boardId/:collaboratorId", deleteCollaborator);
+collaboratorRouter.get("/:boardId", verifyAuth, getAllCollaborators);
+collaboratorRouter.post("/:boardId", verifyAuth, verifyRole, addCollaborator);
+collaboratorRouter.delete(
+  "/:boardId/:collaboratorId",
+  verifyAuth,
+  verifyRole,
+  removeCollaborator,
+);
 
 export default collaboratorRouter;

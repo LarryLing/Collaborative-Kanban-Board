@@ -4,6 +4,7 @@ import type {
   AuthRequest,
   Board,
   BoardCollaborator,
+  CollaboratorRequest,
   UpdateBoardBody,
 } from "../types";
 import db from "../config/db";
@@ -25,9 +26,10 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
       [sub],
     );
 
-    res
-      .status(200)
-      .json({ message: "Successfully retrieved boards", boards: rows });
+    res.status(200).json({
+      message: "Successfully retrieved boards",
+      boards: rows as Board[],
+    });
   } catch (error) {
     console.error("Error retrieving boards:", error);
 
@@ -165,33 +167,21 @@ export async function updateBoard(
 }
 
 export async function deleteBoard(
-  req: AuthRequest<{ boardId: string }>,
+  req: CollaboratorRequest<{ boardId: string }>,
   res: Response,
 ) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.role) {
+    return res.status(401).json({ error: "Role not assigned" });
   }
 
-  const { sub } = req.user;
+  const role = req.role;
   const { boardId } = req.params;
 
+  if (role === "Collaborator") {
+    return res.status(403).json({ message: "Invalid permissions" });
+  }
+
   try {
-    const [rows] = await db.execute(
-      `SELECT role
-      FROM boards_collaborators
-      WHERE user_id = ? AND board_id = ?
-      LIMIT 1`,
-      [sub, boardId],
-    );
-
-    if (!rows || (rows as BoardCollaborator[]).length === 0) {
-      return res.status(404).json({ message: "Board collaborator not found" });
-    }
-
-    if ((rows as BoardCollaborator[])[0].role === "Collaborator") {
-      return res.status(403).json({ message: "Invalid permissions" });
-    }
-
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM boards
       WHERE id = ?`,
