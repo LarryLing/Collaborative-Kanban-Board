@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
 
-export const getAllCards = async (req: Request, res: Response) => {
+export async function getAllCards(req: Request, res: Response) {
   try {
     // TODO: Implement database query to get all cards
     res.status(200).json({ message: "Get all cards", cards: [] });
   } catch (error) {
     res.status(500).json({ message: "Error getting cards", error });
   }
-};
+}
 
-export const createCard = async (req: Request, res: Response) => {
+export async function createCard(req: Request, res: Response) {
   try {
     const cardData = req.body;
     // TODO: Implement database query to create card
@@ -17,9 +17,9 @@ export const createCard = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error creating card", error });
   }
-};
+}
 
-export const updateCard = async (req: Request, res: Response) => {
+export async function updateCard(req: Request, res: Response) {
   try {
     const { cardId } = req.params;
     const updateData = req.body;
@@ -28,9 +28,9 @@ export const updateCard = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error updating card", error });
   }
-};
+}
 
-export const deleteCard = async (req: Request, res: Response) => {
+export async function deleteCard(req: Request, res: Response) {
   try {
     const { cardId } = req.params;
     // TODO: Implement database query to delete card
@@ -38,4 +38,4 @@ export const deleteCard = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error deleting card", error });
   }
-};
+}

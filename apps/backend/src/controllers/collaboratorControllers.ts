@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-export const getAllCollaborators = async (req: Request, res: Response) => {
+export async function getAllCollaborators(req: Request, res: Response) {
   try {
     // TODO: Implement database query to get all collaborators
     res
@@ -9,9 +9,9 @@ export const getAllCollaborators = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error getting collaborators", error });
   }
-};
+}
 
-export const createCollaborator = async (req: Request, res: Response) => {
+export async function createCollaborator(req: Request, res: Response) {
   try {
     const collaboratorData = req.body;
     // TODO: Implement database query to create collaborator
@@ -22,9 +22,9 @@ export const createCollaborator = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error creating collaborator", error });
   }
-};
+}
 
-export const deleteCollaborator = async (req: Request, res: Response) => {
+export async function deleteCollaborator(req: Request, res: Response) {
   try {
     const { collaboratorId } = req.params;
     // TODO: Implement database query to delete collaborator
@@ -32,4 +32,4 @@ export const deleteCollaborator = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Error deleting collaborator", error });
   }
-};
+}

@@ -1,54 +1,194 @@
-import { Request, Response } from "express";
+import kanbanDB from "../services/kanbanDB";
+import type { Response } from "express";
+import type { ResultSetHeader } from "mysql2/promise";
+import type {
+  AuthRequest,
+  Board,
+  BoardCollaborator,
+  UpdateBoardBody,
+} from "../types";
 
-export const getAllBoards = async (req: Request, res: Response) => {
+export async function getAllBoards(req: AuthRequest, res: Response) {
   try {
-    // TODO: Implement database query to get all boards
-    res.status(200).json({ message: "Get all boards", boards: [] });
-  } catch (error) {
-    res.status(500).json({ message: "Error getting boards", error });
-  }
-};
+    const { sub } = req.user!;
 
-export const getBoardById = async (req: Request, res: Response) => {
-  try {
-    const { boardId } = req.params;
-    // TODO: Implement database query to get board by ID
-    res.status(200).json({ message: "Get board by ID", boardId, board: null });
-  } catch (error) {
-    res.status(500).json({ message: "Error getting board", error });
-  }
-};
+    const [rows] = await kanbanDB.execute(
+      `SELECT b.*
+      FROM boards b
+      INNER JOIN boards_collaborators bc ON b.id = bc.board_id
+      WHERE bc.user_id = ?
+      ORDER BY b.created_at`,
+      [sub],
+    );
 
-export const createBoard = async (req: Request, res: Response) => {
-  try {
-    const boardData = req.body;
-    // TODO: Implement database query to create board
-    res.status(201).json({ message: "Board created", board: boardData });
-  } catch (error) {
-    res.status(500).json({ message: "Error creating board", error });
-  }
-};
-
-export const updateBoard = async (req: Request, res: Response) => {
-  try {
-    const { boardId } = req.params;
-    const updateData = req.body;
-    // TODO: Implement database query to update board
     res
       .status(200)
-      .json({ message: "Board updated", boardId, board: updateData });
+      .json({ message: "Successfully retrieved boards", boards: rows });
   } catch (error) {
-    res.status(500).json({ message: "Error updating board", error });
-  }
-};
+    console.error("Error retrieving boards:", error);
 
-// Delete board
-export const deleteBoard = async (req: Request, res: Response) => {
-  try {
-    const { boardId } = req.params;
-    // TODO: Implement database query to delete board
-    res.status(200).json({ message: "Board deleted", boardId });
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting board", error });
+    res.status(500).json({
+      message: "Error getting boards",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
-};
+}
+
+export async function getBoardById(
+  req: AuthRequest<{ boardId: Board["id"] }>,
+  res: Response,
+) {
+  try {
+    const { sub } = req.user!;
+    const { boardId } = req.params;
+
+    const [rows] = await kanbanDB.execute(
+      `SELECT b.*
+      FROM boards b
+      INNER JOIN boards_collaborators bc ON b.id = bc.board_id
+      WHERE bc.user_id = ? AND bc.board_id = ?
+      ORDER BY b.created_at
+      LIMIT 1`,
+      [sub, boardId],
+    );
+
+    if (!rows || (rows as Board[]).length === 0) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    res.status(200).json({
+      message: "Successfully retrieved board",
+      board: (rows as Board[])[0],
+    });
+  } catch (error) {
+    console.error("Error getting board:", error);
+
+    res.status(500).json({
+      message: "Error getting board",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function createBoard(req: AuthRequest, res: Response) {
+  const connection = await kanbanDB.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const { sub } = req.user!;
+
+    const now = new Date();
+    const currentTimestamp = now.toISOString().slice(0, 19).replace("T", " ");
+    const boardId = crypto.randomUUID();
+
+    const board: Board = {
+      id: boardId,
+      title: "Untitled Board",
+      createdAt: currentTimestamp,
+    };
+
+    await kanbanDB.execute(
+      `INSERT INTO boards (id, title, created_at)
+      VALUES (?, ?, ?)`,
+      [board.id, board.title, board.createdAt],
+    );
+
+    await kanbanDB.execute(
+      `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
+      VALUES (?, ?, ?, ?)`,
+      [sub, boardId, "Owner", currentTimestamp],
+    );
+
+    await connection.commit();
+    res.status(201).json({ message: "Successfully created board", board });
+  } catch (error) {
+    await connection.rollback();
+
+    console.error("Error creating board:", error);
+
+    res.status(500).json({
+      message: "Error creating board",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  } finally {
+    connection.release();
+  }
+}
+
+export async function updateBoard(
+  req: AuthRequest<{ boardId: Board["id"] }, object, UpdateBoardBody>,
+  res: Response,
+) {
+  try {
+    const { sub } = req.user!;
+    const { boardId } = req.params;
+    const updateData = req.body;
+
+    const [result] = await kanbanDB.execute<ResultSetHeader>(
+      `UPDATE boards b
+      INNER JOIN boards_collaborators bc ON b.id = bc.board_id
+      SET b.title = ?
+      WHERE bc.user_id = ? AND bc.board_id = ?`,
+      [updateData.title, sub, boardId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    res.status(200).json({ message: "Successfully updated board" });
+  } catch (error) {
+    console.error("Error updating board:", error);
+
+    res.status(500).json({
+      message: "Error updating board",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function deleteBoard(
+  req: AuthRequest<{ boardId: string }>,
+  res: Response,
+) {
+  try {
+    const { sub } = req.user!;
+    const { boardId } = req.params;
+
+    const [rows] = await kanbanDB.execute(
+      `SELECT role
+      FROM boards_collaborators
+      WHERE user_id = ? AND board_id = ?
+      LIMIT 1`,
+      [sub, boardId],
+    );
+
+    if (!rows || (rows as BoardCollaborator[]).length === 0) {
+      return res.status(404).json({ message: "Board collaborator not found" });
+    }
+
+    if ((rows as BoardCollaborator[])[0].role === "Collaborator") {
+      return res.status(403).json({ message: "Invalid permissions" });
+    }
+
+    const [result] = await kanbanDB.execute<ResultSetHeader>(
+      `DELETE FROM boards
+      WHERE id = ?`,
+      [boardId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    res.status(200).json({ message: "Successfully deleted board" });
+  } catch (error) {
+    console.error("Error deleting board:", error);
+
+    res.status(500).json({
+      message: "Error deleting board",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
