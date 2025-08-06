@@ -1,4 +1,3 @@
-import kanbanDB from "../services/kanbanDB";
 import type { Response } from "express";
 import type { ResultSetHeader } from "mysql2/promise";
 import type {
@@ -7,12 +6,17 @@ import type {
   BoardCollaborator,
   UpdateBoardBody,
 } from "../types";
+import db from "../config/db";
 
 export async function getAllBoards(req: AuthRequest, res: Response) {
-  try {
-    const { sub } = req.user!;
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
 
-    const [rows] = await kanbanDB.execute(
+  const { sub } = req.user;
+
+  try {
+    const [rows] = await db.execute(
       `SELECT b.*
       FROM boards b
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
@@ -38,11 +42,15 @@ export async function getBoardById(
   req: AuthRequest<{ boardId: Board["id"] }>,
   res: Response,
 ) {
-  try {
-    const { sub } = req.user!;
-    const { boardId } = req.params;
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
 
-    const [rows] = await kanbanDB.execute(
+  const { sub } = req.user;
+  const { boardId } = req.params;
+
+  try {
+    const [rows] = await db.execute(
       `SELECT b.*
       FROM boards b
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
@@ -71,12 +79,16 @@ export async function getBoardById(
 }
 
 export async function createBoard(req: AuthRequest, res: Response) {
-  const connection = await kanbanDB.getConnection();
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  const { sub } = req.user;
+
+  const connection = await db.getConnection();
 
   try {
     await connection.beginTransaction();
-
-    const { sub } = req.user!;
 
     const now = new Date();
     const currentTimestamp = now.toISOString().slice(0, 19).replace("T", " ");
@@ -88,13 +100,13 @@ export async function createBoard(req: AuthRequest, res: Response) {
       createdAt: currentTimestamp,
     };
 
-    await kanbanDB.execute(
+    await db.execute(
       `INSERT INTO boards (id, title, created_at)
       VALUES (?, ?, ?)`,
       [board.id, board.title, board.createdAt],
     );
 
-    await kanbanDB.execute(
+    await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
       [sub, boardId, "Owner", currentTimestamp],
@@ -120,12 +132,16 @@ export async function updateBoard(
   req: AuthRequest<{ boardId: Board["id"] }, object, UpdateBoardBody>,
   res: Response,
 ) {
-  try {
-    const { sub } = req.user!;
-    const { boardId } = req.params;
-    const updateData = req.body;
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
 
-    const [result] = await kanbanDB.execute<ResultSetHeader>(
+  const { sub } = req.user;
+  const { boardId } = req.params;
+  const updateData = req.body;
+
+  try {
+    const [result] = await db.execute<ResultSetHeader>(
       `UPDATE boards b
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       SET b.title = ?
@@ -152,11 +168,15 @@ export async function deleteBoard(
   req: AuthRequest<{ boardId: string }>,
   res: Response,
 ) {
-  try {
-    const { sub } = req.user!;
-    const { boardId } = req.params;
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
 
-    const [rows] = await kanbanDB.execute(
+  const { sub } = req.user;
+  const { boardId } = req.params;
+
+  try {
+    const [rows] = await db.execute(
       `SELECT role
       FROM boards_collaborators
       WHERE user_id = ? AND board_id = ?
@@ -172,7 +192,7 @@ export async function deleteBoard(
       return res.status(403).json({ message: "Invalid permissions" });
     }
 
-    const [result] = await kanbanDB.execute<ResultSetHeader>(
+    const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM boards
       WHERE id = ?`,
       [boardId],

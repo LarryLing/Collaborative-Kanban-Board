@@ -1,5 +1,8 @@
-import express, { Application } from "express";
 import dotenv from "dotenv";
+
+dotenv.config();
+
+import express, { Application } from "express";
 import cors from "cors";
 import boardRoutes from "./routes/boardRoutes";
 import listRoutes from "./routes/listRoutes";
@@ -7,9 +10,7 @@ import cardRoutes from "./routes/cardRoutes";
 import collaboratorRoutes from "./routes/collaboratorRoutes";
 import authRouter from "./routes/authRoutes";
 import config from "./config/config";
-import kanbanDB from "./services/kanbanDB";
-
-dotenv.config();
+import db from "./config/db";
 
 const app: Application = express();
 
@@ -53,7 +54,7 @@ app.get("/api", async (_, res) => {
   try {
     let uptime = Math.round((Date.now() - startTime) / 1000);
 
-    const connection = await kanbanDB.getConnection();
+    const connection = await db.getConnection();
     connection.release();
 
     res.json({

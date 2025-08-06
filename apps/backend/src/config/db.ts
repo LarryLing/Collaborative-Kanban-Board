@@ -10,7 +10,7 @@ if (
   throw new Error("Missing RDS environment variables!");
 }
 
-const kanbanDB = mysql.createPool({
+const db = mysql.createPool({
   host: process.env.RDS_HOSTNAME,
   user: process.env.RDS_USERNAME,
   password: process.env.RDS_PASSWORD,
@@ -21,8 +21,7 @@ const kanbanDB = mysql.createPool({
   queueLimit: 0,
 });
 
-kanbanDB
-  .getConnection()
+db.getConnection()
   .then((connection) => {
     console.log("Connected to MySQL database");
     connection.release();
@@ -33,7 +32,7 @@ kanbanDB
 
 process.on("SIGINT", async () => {
   try {
-    await kanbanDB.end();
+    await db.end();
     console.log("MySQL Database connection closed gracefully");
     process.exit(0);
   } catch (err) {
@@ -44,7 +43,7 @@ process.on("SIGINT", async () => {
 
 process.on("SIGTERM", async () => {
   try {
-    await kanbanDB.end();
+    await db.end();
     console.log("MySQL Database connection closed gracefully");
     process.exit(0);
   } catch (err) {
@@ -53,4 +52,4 @@ process.on("SIGTERM", async () => {
   }
 });
 
-export default kanbanDB;
+export default db;

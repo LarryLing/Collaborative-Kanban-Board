@@ -2,13 +2,15 @@ import { Request } from "express";
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
   extends Request<P, ResBody, ReqBody> {
-  user?: {
-    sub: string;
-    email: string;
-    givenName: string;
-    familyName: string;
-  };
+  user?: User;
 }
+
+export type User = {
+  sub: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+};
 
 export type Board = {
   id: string;
