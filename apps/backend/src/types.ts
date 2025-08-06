@@ -33,3 +33,14 @@ export type BoardCollaborator = {
 };
 
 export type AddCollaboratorBody = Pick<User, "email">;
+
+export type List = {
+  id: string;
+  boardId: string;
+  title: string;
+  position: number;
+};
+
+export type CreateListBody = Pick<List, "position">;
+export type UpdateListBody = Pick<List, "title">;
+export type UpdateListPositionBody = Pick<List, "position">;

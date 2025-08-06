@@ -4,9 +4,13 @@ import type { ResultSetHeader } from "mysql2/promise";
 import db from "../config/db";
 
 export async function deleteUser(req: AuthRequest, res: Response) {
-  try {
-    const { sub } = req.user!;
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
 
+  const { sub } = req.user;
+
+  try {
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM users
       WHERE id = ?`,

@@ -3,7 +3,6 @@ import type { ResultSetHeader } from "mysql2/promise";
 import type {
   AuthRequest,
   Board,
-  BoardCollaborator,
   CollaboratorRequest,
   UpdateBoardBody,
 } from "../types";
@@ -131,16 +130,20 @@ export async function createBoard(req: AuthRequest, res: Response) {
 }
 
 export async function updateBoard(
-  req: AuthRequest<{ boardId: Board["id"] }, object, UpdateBoardBody>,
+  req: CollaboratorRequest<{ boardId: Board["id"] }, object, UpdateBoardBody>,
   res: Response,
 ) {
   if (!req.user) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
+  if (!req.role) {
+    return res.status(401).json({ error: "Role not assigned" });
+  }
+
   const { sub } = req.user;
   const { boardId } = req.params;
-  const updateData = req.body;
+  const { title } = req.body;
 
   try {
     const [result] = await db.execute<ResultSetHeader>(
@@ -148,7 +151,7 @@ export async function updateBoard(
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       SET b.title = ?
       WHERE bc.user_id = ? AND bc.board_id = ?`,
-      [updateData.title, sub, boardId],
+      [title, sub, boardId],
     );
 
     if (result.affectedRows === 0) {
@@ -170,6 +173,10 @@ export async function deleteBoard(
   req: CollaboratorRequest<{ boardId: string }>,
   res: Response,
 ) {
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
   if (!req.role) {
     return res.status(401).json({ error: "Role not assigned" });
   }

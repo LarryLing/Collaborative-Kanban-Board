@@ -1,7 +1,7 @@
 import type { Response } from "express";
 import type {
   AddCollaboratorBody,
-  AuthRequest,
+  Board,
   BoardCollaborator,
   CollaboratorRequest,
   User,
@@ -10,7 +10,7 @@ import db from "../config/db";
 import { ResultSetHeader } from "mysql2/promise";
 
 export async function getAllCollaborators(
-  req: CollaboratorRequest,
+  req: CollaboratorRequest<{ boardId: Board["id"] }>,
   res: Response,
 ) {
   const { boardId } = req.params;
@@ -38,14 +38,21 @@ export async function getAllCollaborators(
   }
 }
 
-export async function addCollaborator(req: CollaboratorRequest, res: Response) {
+export async function addCollaborator(
+  req: CollaboratorRequest<
+    { boardId: Board["id"] },
+    object,
+    AddCollaboratorBody
+  >,
+  res: Response,
+) {
   if (!req.role) {
     return res.status(401).json({ error: "Role not assigned" });
   }
 
   const role = req.role;
   const { boardId } = req.params;
-  const { email } = req.body as AddCollaboratorBody;
+  const { email } = req.body;
 
   if (role === "Collaborator") {
     return res.status(401).json({ error: "Invalid permissions" });
@@ -104,7 +111,10 @@ export async function addCollaborator(req: CollaboratorRequest, res: Response) {
 }
 
 export async function removeCollaborator(
-  req: CollaboratorRequest,
+  req: CollaboratorRequest<{
+    boardId: Board["id"];
+    collaboratorId: User["sub"];
+  }>,
   res: Response,
 ) {
   if (!req.user) {
