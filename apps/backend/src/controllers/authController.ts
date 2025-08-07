@@ -1,7 +1,43 @@
 import type { Response } from "express";
-import type { AuthRequest } from "../types";
+import type { AuthRequest, User } from "../types";
 import type { ResultSetHeader } from "mysql2/promise";
 import db from "../config/db";
+
+export async function getUser(req: AuthRequest, res: Response) {
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  const { sub, givenName, familyName, email } = req.user;
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT *
+      FROM users
+      WHERE id = ?`,
+      [sub],
+    );
+
+    if (!rows || (rows as User[]).length === 0) {
+      await db.execute(
+        `INSERT IGNORE INTO users (id, given_name, family_name, email)
+        VALUES (?, ?, ?, ?)`,
+        [sub, givenName, familyName, email],
+      );
+    }
+
+    res
+      .status(200)
+      .json({ message: "Successfully retrieved user", user: req.user });
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+
+    res.status(500).json({
+      message: "Error retrieving user",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
 
 export async function deleteUser(req: AuthRequest, res: Response) {
   if (!req.user) {

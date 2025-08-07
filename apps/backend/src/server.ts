@@ -50,7 +50,7 @@ app.use(cors(corsOptions));
 
 let startTime: number;
 
-app.get("/api", async (_, res) => {
+app.get("/api", async (_req, res) => {
   try {
     let uptime = Math.round((Date.now() - startTime) / 1000);
 

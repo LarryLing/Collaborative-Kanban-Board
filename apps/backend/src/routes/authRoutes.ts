@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { deleteUser } from "../controllers/authController";
-import { syncUser, verifyAuth } from "../middlewares/authMiddleware";
+import { deleteUser, getUser } from "../controllers/authController";
+import { verifyAuth } from "../middlewares/authMiddleware";
 
 const authRouter: Router = Router();
 
-authRouter.delete("/", verifyAuth, syncUser, deleteUser);
+authRouter.get("/", verifyAuth, getUser);
+authRouter.delete("/", verifyAuth, deleteUser);
 
 export default authRouter;
