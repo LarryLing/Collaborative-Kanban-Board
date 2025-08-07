@@ -4,6 +4,7 @@ import type {
   AuthRequest,
   Board,
   CollaboratorRequest,
+  CreateBoardBody,
   UpdateBoardBody,
 } from "../types";
 import db from "../config/db";
@@ -79,12 +80,16 @@ export async function getBoardById(
   }
 }
 
-export async function createBoard(req: AuthRequest, res: Response) {
+export async function createBoard(
+  req: AuthRequest<object, object, CreateBoardBody>,
+  res: Response,
+) {
   if (!req.user) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
   const { sub } = req.user;
+  const { title } = req.body;
 
   const connection = await db.getConnection();
 
@@ -97,7 +102,7 @@ export async function createBoard(req: AuthRequest, res: Response) {
 
     const board: Board = {
       id: boardId,
-      title: "Untitled Board",
+      title: title,
       createdAt: currentTimestamp,
     };
 

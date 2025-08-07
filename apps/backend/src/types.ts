@@ -23,6 +23,7 @@ export type Board = {
   createdAt: string;
 };
 
+export type CreateBoardBody = Pick<Board, "title">;
 export type UpdateBoardBody = Pick<Board, "title">;
 
 export type BoardCollaborator = {
