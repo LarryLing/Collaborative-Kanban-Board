@@ -11,7 +11,7 @@ export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
 }
 
 export type User = {
-  sub: string;
+  id: string;
   givenName: string;
   familyName: string;
   email: string;
@@ -19,6 +19,7 @@ export type User = {
 
 export type Board = {
   id: string;
+  ownerId: string;
   title: string;
   createdAt: string;
 };

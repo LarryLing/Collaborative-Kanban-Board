@@ -21,7 +21,8 @@ export async function getAllCards(
     const [rows] = await db.execute(
       `SELECT *
       FROM cards
-      WHERE board_id = ?`,
+      WHERE board_id = ?
+      ORDER BY list_id, position`,
       [boardId],
     );
 

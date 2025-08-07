@@ -14,7 +14,7 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
 
   try {
     const [rows] = await db.execute(
@@ -23,7 +23,7 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       WHERE bc.user_id = ?
       ORDER BY b.created_at`,
-      [sub],
+      [id],
     );
 
     res.status(200).json({
@@ -48,7 +48,7 @@ export async function getBoardById(
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
   const { boardId } = req.params;
 
   try {
@@ -57,9 +57,8 @@ export async function getBoardById(
       FROM boards b
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       WHERE bc.user_id = ? AND bc.board_id = ?
-      ORDER BY b.created_at
       LIMIT 1`,
-      [sub, boardId],
+      [id, boardId],
     );
 
     if (!rows || (rows as Board[]).length === 0) {
@@ -88,7 +87,7 @@ export async function createBoard(
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
   const { title } = req.body;
 
   const connection = await db.getConnection();
@@ -102,20 +101,21 @@ export async function createBoard(
 
     const board: Board = {
       id: boardId,
+      ownerId: id,
       title: title,
       createdAt: currentTimestamp,
     };
 
     await db.execute(
-      `INSERT INTO boards (id, title, created_at)
-      VALUES (?, ?, ?)`,
-      [board.id, board.title, board.createdAt],
+      `INSERT INTO boards (id, owner_id, title, created_at)
+      VALUES (?, ?, ?, ?)`,
+      [board.id, board.ownerId, board.title, board.createdAt],
     );
 
     await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
-      [sub, boardId, "Owner", currentTimestamp],
+      [id, boardId, "Owner", currentTimestamp],
     );
 
     await connection.commit();
@@ -142,7 +142,7 @@ export async function updateBoard(
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
   const { boardId } = req.params;
   const { title } = req.body;
 
@@ -152,7 +152,7 @@ export async function updateBoard(
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       SET b.title = ?
       WHERE bc.user_id = ? AND bc.board_id = ?`,
-      [title, sub, boardId],
+      [title, id, boardId],
     );
 
     if (result.affectedRows === 0) {
@@ -183,7 +183,7 @@ export async function deleteBoard(
   }
 
   const role = req.role;
-  const { sub } = req.user;
+  const { id } = req.user;
   const { boardId } = req.params;
 
   if (role === "Collaborator") {
@@ -193,12 +193,8 @@ export async function deleteBoard(
   try {
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM boards
-      WHERE id = ? AND EXISTS (
-        SELECT 1
-        FROM boards_collaborators
-        WHERE user_id = ? AND board_id = ?
-      )`,
-      [boardId, sub, boardId],
+      WHERE id = ? AND owner_id = ?`,
+      [boardId, id],
     );
 
     if (result.affectedRows === 0) {

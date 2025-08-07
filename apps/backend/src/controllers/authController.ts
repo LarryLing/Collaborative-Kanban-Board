@@ -1,6 +1,6 @@
 import type { Response } from "express";
-import type { AuthRequest, User } from "../types";
-import type { ResultSetHeader } from "mysql2/promise";
+import type { AuthRequest } from "../types";
+import { RowDataPacket, type ResultSetHeader } from "mysql2/promise";
 import db from "../config/db";
 
 export async function getUser(req: AuthRequest, res: Response) {
@@ -8,21 +8,21 @@ export async function getUser(req: AuthRequest, res: Response) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub, givenName, familyName, email } = req.user;
+  const { id, givenName, familyName, email } = req.user;
 
   try {
-    const [rows] = await db.execute(
-      `SELECT *
+    const [rows] = await db.execute<RowDataPacket[]>(
+      `SELECT 1
       FROM users
       WHERE id = ?`,
-      [sub],
+      [id],
     );
 
-    if (!rows || (rows as User[]).length === 0) {
+    if (!rows || rows.length === 0) {
       await db.execute(
         `INSERT IGNORE INTO users (id, given_name, family_name, email)
         VALUES (?, ?, ?, ?)`,
-        [sub, givenName, familyName, email],
+        [id, givenName, familyName, email],
       );
     }
 
@@ -44,13 +44,13 @@ export async function deleteUser(req: AuthRequest, res: Response) {
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
 
   try {
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM users
       WHERE id = ?`,
-      [sub],
+      [id],
     );
 
     if (result.affectedRows === 0) {

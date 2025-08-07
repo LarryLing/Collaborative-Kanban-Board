@@ -11,7 +11,7 @@ export async function verifyRole(
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  const { sub } = req.user;
+  const { id } = req.user;
   const { boardId } = req.params;
 
   try {
@@ -20,7 +20,7 @@ export async function verifyRole(
       FROM boards_collaborators
       WHERE user_id = ? AND board_id = ?
       LIMIT 1`,
-      [sub, boardId],
+      [id, boardId],
     );
 
     if (!rows || (rows as BoardCollaborator[]).length === 0) {

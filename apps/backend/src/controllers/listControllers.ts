@@ -20,7 +20,8 @@ export async function getAllLists(
     const [rows] = await db.execute(
       `SELECT *
       FROM lists
-      WHERE board_id = ?`,
+      WHERE board_id = ?
+      ORDER BY position`,
       [boardId],
     );
 

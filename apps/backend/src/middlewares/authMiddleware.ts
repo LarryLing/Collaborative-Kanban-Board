@@ -31,7 +31,7 @@ export async function verifyAuth(
     const payload = await verifier.verify(token);
 
     req.user = {
-      sub: payload.sub,
+      id: payload.sub,
       email: payload.email as string,
       givenName: payload.given_name as string,
       familyName: payload.family_name as string,
