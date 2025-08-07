@@ -42,7 +42,7 @@ export async function createList(
   res: Response,
 ) {
   const { boardId } = req.params;
-  const { position } = req.body;
+  const { title, position } = req.body;
 
   try {
     const listId = crypto.randomUUID();
@@ -50,7 +50,7 @@ export async function createList(
     const list: List = {
       id: listId,
       boardId: boardId,
-      title: "Untitled List",
+      title: title,
       position: position,
     };
 

@@ -41,7 +41,7 @@ export type List = {
   position: number;
 };
 
-export type CreateListBody = Pick<List, "position">;
+export type CreateListBody = Pick<List, "title" | "position">;
 export type UpdateListBody = Pick<List, "title">;
 export type UpdateListPositionBody = Pick<List, "position">;
 
