@@ -9,7 +9,12 @@ import { verifyRole } from "../middlewares/collaboratorMiddleware";
 
 const collaboratorRouter: Router = Router();
 
-collaboratorRouter.get("/:boardId", verifyAuth, getAllCollaborators);
+collaboratorRouter.get(
+  "/:boardId",
+  verifyAuth,
+  verifyRole,
+  getAllCollaborators,
+);
 collaboratorRouter.post("/:boardId", verifyAuth, verifyRole, addCollaborator);
 collaboratorRouter.delete(
   "/:boardId/:collaboratorId",

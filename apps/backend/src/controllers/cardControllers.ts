@@ -1,41 +1,186 @@
-import { Request, Response } from "express";
+import type { Response } from "express";
+import type {
+  Board,
+  Card,
+  CollaboratorRequest,
+  CreateCardBody,
+  List,
+  UpdateCardBody,
+  UpdateCardPositionBody,
+} from "../types";
+import type { ResultSetHeader } from "mysql2/promise";
+import db from "../config/db";
 
-export async function getAllCards(req: Request, res: Response) {
+export async function getAllCards(
+  req: CollaboratorRequest<{ boardId: Board["id"] }>,
+  res: Response,
+) {
+  const { boardId } = req.params;
+
   try {
-    // TODO: Implement database query to get all cards
-    res.status(200).json({ message: "Get all cards", cards: [] });
+    const [rows] = await db.execute(
+      `SELECT *
+      FROM cards
+      WHERE board_id = ?`,
+      [boardId],
+    );
+
+    res
+      .status(200)
+      .json({ message: "Successfully retrieved cards", cards: rows as Card[] });
   } catch (error) {
-    res.status(500).json({ message: "Error getting cards", error });
+    console.error("Error retrieving cards", error);
+
+    res.status(500).json({
+      message: "Error retrieving cards",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
 
-export async function createCard(req: Request, res: Response) {
+export async function createCard(
+  req: CollaboratorRequest<
+    { boardId: Board["id"]; listId: List["id"] },
+    object,
+    CreateCardBody
+  >,
+  res: Response,
+) {
+  const { boardId, listId } = req.params;
+  const { title, description, position } = req.body;
+
   try {
-    const cardData = req.body;
-    // TODO: Implement database query to create card
-    res.status(201).json({ message: "Card created", card: cardData });
+    const cardId = crypto.randomUUID();
+
+    const card: Card = {
+      id: cardId,
+      boardId: boardId,
+      listId: listId,
+      title: title,
+      description: description,
+      position: position,
+    };
+
+    await db.execute(
+      `INSERT INTO cards (id, board_id, list_id, title, description, position)
+      VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        card.id,
+        card.boardId,
+        card.listId,
+        card.title,
+        card.description,
+        card.position,
+      ],
+    );
+
+    res.status(201).json({ message: "Successfully created card", card });
   } catch (error) {
-    res.status(500).json({ message: "Error creating card", error });
+    console.error("Error creating card", error);
+
+    res.status(500).json({
+      message: "Error creating card",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
 
-export async function updateCard(req: Request, res: Response) {
+export async function updateCard(
+  req: CollaboratorRequest<
+    { boardId: Board["id"]; listId: List["id"]; cardId: Card["id"] },
+    object,
+    UpdateCardBody
+  >,
+  res: Response,
+) {
+  const { boardId, listId, cardId } = req.params;
+  const { title, description } = req.body;
+
   try {
-    const { cardId } = req.params;
-    const updateData = req.body;
-    // TODO: Implement database query to update card
-    res.status(200).json({ message: "Card updated", cardId, card: updateData });
+    const [result] = await db.execute<ResultSetHeader>(
+      `UPDATE cards
+      SET title = ?, description = ?
+      WHERE id = ? AND list_id = ? AND board_id = ?`,
+      [title, description, cardId, listId, boardId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    res.status(200).json({ message: "Successfully updated card" });
   } catch (error) {
-    res.status(500).json({ message: "Error updating card", error });
+    console.error("Error updating card", error);
+
+    res.status(500).json({
+      message: "Error updating card",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }
 
-export async function deleteCard(req: Request, res: Response) {
+export async function updateCardPosition(
+  req: CollaboratorRequest<
+    { boardId: Board["id"]; listId: List["id"]; cardId: Card["id"] },
+    object,
+    UpdateCardPositionBody
+  >,
+  res: Response,
+) {
+  const { boardId, listId, cardId } = req.params;
+  const { position } = req.body;
+
   try {
-    const { cardId } = req.params;
-    // TODO: Implement database query to delete card
-    res.status(200).json({ message: "Card deleted", cardId });
+    const [result] = await db.execute<ResultSetHeader>(
+      `UPDATE cards
+      SET position = ?
+      WHERE id = ? AND list_id = ? AND board_id = ?`,
+      [position, cardId, listId, boardId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    res.status(200).json({ message: "Successfully updated card position" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting card", error });
+    console.error("Error updating card position", error);
+
+    res.status(500).json({
+      message: "Error updating card position",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function deleteCard(
+  req: CollaboratorRequest<{
+    boardId: Board["id"];
+    listId: List["id"];
+    cardId: Card["id"];
+  }>,
+  res: Response,
+) {
+  const { boardId, listId, cardId } = req.params;
+
+  try {
+    const [result] = await db.execute<ResultSetHeader>(
+      `DELETE FROM cards
+      WHERE id = ? AND list_id = ? AND board_id = ?`,
+      [cardId, listId, boardId],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    res.status(200).json({ message: "Successfully deleted card" });
+  } catch (error) {
+    console.error("Error deleting card", error);
+
+    res.status(500).json({
+      message: "Error deleting card",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 }

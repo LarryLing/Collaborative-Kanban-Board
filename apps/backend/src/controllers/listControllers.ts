@@ -1,5 +1,4 @@
 import type { Response } from "express";
-import db from "../config/db";
 import {
   Board,
   CreateListBody,
@@ -8,7 +7,8 @@ import {
   UpdateListPositionBody,
   CollaboratorRequest,
 } from "../types";
-import { ResultSetHeader } from "mysql2/promise";
+import type { ResultSetHeader } from "mysql2/promise";
+import db from "../config/db";
 
 export async function getAllLists(
   req: CollaboratorRequest<{ boardId: Board["id"] }>,

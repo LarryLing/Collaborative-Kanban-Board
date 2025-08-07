@@ -44,3 +44,16 @@ export type List = {
 export type CreateListBody = Pick<List, "position">;
 export type UpdateListBody = Pick<List, "title">;
 export type UpdateListPositionBody = Pick<List, "position">;
+
+export type Card = {
+  id: string;
+  boardId: string;
+  listId: string;
+  title: string;
+  description: string;
+  position: number;
+};
+
+export type CreateCardBody = Pick<Card, "title" | "description" | "position">;
+export type UpdateCardBody = Pick<Card, "title" | "description">;
+export type UpdateCardPositionBody = Pick<Card, "position">;

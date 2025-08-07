@@ -137,10 +137,6 @@ export async function updateBoard(
     return res.status(401).json({ error: "User not authenticated" });
   }
 
-  if (!req.role) {
-    return res.status(401).json({ error: "Role not assigned" });
-  }
-
   const { sub } = req.user;
   const { boardId } = req.params;
   const { title } = req.body;
@@ -173,10 +169,6 @@ export async function deleteBoard(
   req: CollaboratorRequest<{ boardId: string }>,
   res: Response,
 ) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
-  }
-
   if (!req.role) {
     return res.status(401).json({ error: "Role not assigned" });
   }
