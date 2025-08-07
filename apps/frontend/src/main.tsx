@@ -1,10 +1,16 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { RouterProvider, createRouter } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
+import App from "./App";
 
-const router = createRouter({ routeTree });
+export const router = createRouter({
+  routeTree,
+  context: {
+    auth: undefined!,
+  },
+});
 
 declare module "@tanstack/react-router" {
   interface Register {
@@ -12,13 +18,12 @@ declare module "@tanstack/react-router" {
   }
 }
 
-// Render the app
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <App />
     </StrictMode>,
   );
 }
