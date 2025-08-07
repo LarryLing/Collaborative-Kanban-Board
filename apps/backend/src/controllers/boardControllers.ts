@@ -174,11 +174,16 @@ export async function deleteBoard(
   req: CollaboratorRequest<{ boardId: string }>,
   res: Response,
 ) {
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
   if (!req.role) {
     return res.status(401).json({ error: "Role not assigned" });
   }
 
   const role = req.role;
+  const { sub } = req.user;
   const { boardId } = req.params;
 
   if (role === "Collaborator") {
@@ -188,8 +193,12 @@ export async function deleteBoard(
   try {
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM boards
-      WHERE id = ?`,
-      [boardId],
+      WHERE id = ? AND EXISTS (
+        SELECT 1
+        FROM boards_collaborators
+        WHERE user_id = ? AND board_id = ?
+      )`,
+      [boardId, sub, boardId],
     );
 
     if (result.affectedRows === 0) {
