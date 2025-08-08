@@ -17,6 +17,20 @@ export type User = {
   email: string;
 };
 
+export type SignUpBody = Pick<User, "givenName" | "familyName" | "email"> & {
+  password: string;
+};
+export type LoginBody = Pick<User, "email"> & { password: string };
+export type LogoutBody = { accessToken: string | undefined };
+export type ConfirmSignUpBody = Pick<User, "email"> & {
+  confirmationCode: string;
+};
+export type PasswordResetBody = Pick<User, "email"> & {
+  confirmationCode: string;
+  password: string;
+};
+export type RequestPasswordResetBody = Pick<User, "email">;
+
 export type Board = {
   id: string;
   ownerId: string;

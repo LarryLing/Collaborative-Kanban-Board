@@ -1,13 +1,13 @@
 import {
   createFileRoute,
-  Link,
   redirect,
   useNavigate,
+  useSearch,
 } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { ForgotPasswordForm } from "@/lib/types";
-import { ForgotPasswordSchema } from "@/lib/schemas";
+import type { ConfirmSignupForm, EmailSearchBody } from "@/lib/types";
+import { ConfirmSignupSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/forgot-password")({
+export const Route = createFileRoute("/confirm-signup")({
   beforeLoad: ({ context }) => {
     if (context.auth.isAuthenticated) {
       throw redirect({
@@ -29,27 +29,29 @@ export const Route = createFileRoute("/forgot-password")({
       });
     }
   },
-  component: ForgotPassword,
+  component: ConfirmSignup,
 });
 
-function ForgotPassword() {
-  const { requestPasswordReset } = useAuth();
+function ConfirmSignup() {
+  const { confirmSignUp } = useAuth();
 
   const navigate = useNavigate();
 
-  const form = useForm<ForgotPasswordForm>({
-    resolver: zodResolver(ForgotPasswordSchema),
+  const { email } = useSearch({ from: "/confirm-signup" }) as EmailSearchBody;
+
+  const form = useForm<ConfirmSignupForm>({
+    resolver: zodResolver(ConfirmSignupSchema),
     defaultValues: {
-      email: "",
+      confirmationCode: "",
     },
   });
 
-  async function onSubmit(values: ForgotPasswordForm) {
+  async function onSubmit(values: ConfirmSignupForm) {
     try {
-      await requestPasswordReset(values.email);
-      navigate({ to: "/reset-password" });
+      await confirmSignUp(email, values.confirmationCode);
+      navigate({ to: "/" });
     } catch (error) {
-      console.error("Request password reset error", error);
+      console.error("Confirm sign up error", error);
       //TODO: Display error
     }
   }
@@ -63,34 +65,25 @@ function ForgotPassword() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col items-center gap-y-5"
             >
-              <h1 className="text-xl font-semibold">Forgot Password</h1>
+              <h1 className="text-xl font-semibold">Confirm Sign Up</h1>
               <FormField
                 control={form.control}
-                name="email"
+                name="confirmationCode"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Confirmation Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
+                      <Input placeholder="123456" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" className="w-full">
-                Send password recovery
+                Continue to login
               </Button>
             </form>
           </Form>
-          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
-            <p>Remember your password?</p>
-            <Link
-              to="/login"
-              className="text-primary font-medium hover:underline"
-            >
-              Go back
-            </Link>
-          </div>
         </Card>
       </div>
     </section>

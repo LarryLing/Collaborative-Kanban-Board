@@ -1,7 +1,13 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { ResetPasswordForm } from "@/lib/types";
+import type { EmailSearchBody, ResetPasswordForm } from "@/lib/types";
 import { ResetPasswordSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,29 +20,42 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/reset-password")({
   beforeLoad: ({ context }) => {
-    if (!context.auth.isAuthenticated) {
+    if (context.auth.isAuthenticated) {
       throw redirect({
-        to: "/login",
+        to: "/",
       });
     }
   },
-  component: ForgotPassword,
+  component: ResetPassword,
 });
 
-function ForgotPassword() {
+function ResetPassword() {
+  const { resetPassword } = useAuth();
+
+  const navigate = useNavigate();
+
+  const { email } = useSearch({ from: "/reset-password" }) as EmailSearchBody;
+
   const form = useForm<ResetPasswordForm>({
     resolver: zodResolver(ResetPasswordSchema),
     defaultValues: {
+      confirmationCode: "",
       password: "",
       confirmPassword: "",
     },
   });
 
-  function onSubmit(values: ResetPasswordForm) {
-    console.log(values);
+  async function onSubmit(values: ResetPasswordForm) {
+    try {
+      await resetPassword(email, values.password, values.confirmationCode);
+      navigate({ to: "/login" });
+    } catch (error) {
+      console.error("Password reset error", error);
+    }
   }
 
   return (
@@ -54,7 +73,7 @@ function ForgotPassword() {
                 name="password"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>New Password</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="••••••••"
@@ -84,10 +103,19 @@ function ForgotPassword() {
                 )}
               />
               <Button type="submit" className="w-full">
-                Reset password
+                Continue to login
               </Button>
             </form>
           </Form>
+          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
+            <p>Remember your password?</p>
+            <Link
+              to="/login"
+              className="text-primary font-medium hover:underline"
+            >
+              Go back
+            </Link>
+          </div>
         </Card>
       </div>
     </section>

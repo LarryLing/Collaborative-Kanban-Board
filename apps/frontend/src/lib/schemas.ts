@@ -32,12 +32,21 @@ export const SignupSchema = z
     path: ["confirmPassword"],
   });
 
+export const ConfirmSignupSchema = z.object({
+  confirmationCode: z
+    .string()
+    .length(6, { message: "Confirmation code must be 6 digits long" }),
+});
+
 export const ForgotPasswordSchema = z.object({
   email: z.email().min(1, { message: "Email is required" }),
 });
 
 export const ResetPasswordSchema = z
   .object({
+    confirmationCode: z
+      .string()
+      .length(6, { message: "Confirmation code must be 6 digits long" }),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long" })

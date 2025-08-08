@@ -1,9 +1,28 @@
-import type { Response } from "express";
-import type { AuthRequest } from "../types";
+import type { Response, Request } from "express";
+import type {
+  AuthRequest,
+  ConfirmSignUpBody,
+  LoginBody,
+  LogoutBody,
+  RequestPasswordResetBody,
+  PasswordResetBody,
+  SignUpBody,
+  User,
+} from "../types";
 import { RowDataPacket, type ResultSetHeader } from "mysql2/promise";
+import {
+  AuthFlowType,
+  ConfirmForgotPasswordCommand,
+  ConfirmSignUpCommand,
+  ForgotPasswordCommand,
+  GlobalSignOutCommand,
+  InitiateAuthCommand,
+  SignUpCommand,
+} from "@aws-sdk/client-cognito-identity-provider";
+import client from "../config/cognito";
 import db from "../config/db";
 
-export async function getUser(req: AuthRequest, res: Response) {
+export async function getMe(req: AuthRequest, res: Response) {
   if (!req.user) {
     return res.status(401).json({ error: "User not authenticated" });
   }
@@ -34,6 +53,277 @@ export async function getUser(req: AuthRequest, res: Response) {
 
     res.status(500).json({
       message: "Error retrieving user",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function confirmSignUp(
+  req: Request<object, object, ConfirmSignUpBody>,
+  res: Response,
+) {
+  const { email, confirmationCode } = req.body;
+
+  try {
+    const confirmSignUpCommand = new ConfirmSignUpCommand({
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Username: email,
+      ConfirmationCode: confirmationCode,
+    });
+
+    const { Session } = await client.send(confirmSignUpCommand);
+
+    if (!Session) {
+      throw new Error("Failed to confirm AWS Cognito user sign up");
+    }
+
+    const initiateAuthCommand = new InitiateAuthCommand({
+      AuthFlow: AuthFlowType.USER_AUTH,
+      AuthParameters: {
+        USERNAME: email,
+      },
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Session: Session,
+    });
+
+    const initiateAuthResponse = await client.send(initiateAuthCommand);
+
+    if (!initiateAuthResponse.AuthenticationResult) {
+      throw new Error(
+        "Failed to initiate AWS Cognito user auth after confirmation",
+      );
+    }
+
+    const { IdToken, AccessToken, RefreshToken } =
+      initiateAuthResponse.AuthenticationResult;
+
+    if (!IdToken || !AccessToken || !RefreshToken) {
+      throw new Error(
+        "Failed to generate AWS Cognito tokens after confirmation",
+      );
+    }
+
+    res.cookie("refreshToken", RefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Confirmed sign up successfully",
+      IdToken,
+      AccessToken,
+    });
+  } catch (error) {
+    console.error("Confirm sign up failed:", error);
+
+    res.status(500).json({
+      message: "Confirm sign up failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function resetPassword(
+  req: Request<object, object, PasswordResetBody>,
+  res: Response,
+) {
+  const { email, confirmationCode, password } = req.body;
+
+  try {
+    const confirmForgotPasswordConfirm = new ConfirmForgotPasswordCommand({
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Username: email,
+      ConfirmationCode: confirmationCode,
+      Password: password,
+    });
+
+    await client.send(confirmForgotPasswordConfirm);
+
+    res.status(200).json({
+      message: "Reset password successfully",
+    });
+  } catch (error) {
+    console.error("Password reset failed:", error);
+
+    res.status(500).json({
+      message: "Password reset failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function signUp(
+  req: Request<object, object, SignUpBody>,
+  res: Response,
+) {
+  const { givenName, familyName, email, password } = req.body;
+
+  try {
+    const signUpCommand = new SignUpCommand({
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Username: email,
+      Password: password,
+      UserAttributes: [
+        {
+          Name: "email",
+          Value: email,
+        },
+        {
+          Name: "given_name",
+          Value: givenName,
+        },
+        {
+          Name: "family_name",
+          Value: familyName,
+        },
+      ],
+    });
+
+    const signUpResponse = await client.send(signUpCommand);
+
+    if (!signUpResponse.UserSub) {
+      throw new Error("Failed to create AWS Cognito user");
+    }
+
+    const user: User = {
+      id: signUpResponse.UserSub,
+      givenName: givenName,
+      familyName: familyName,
+      email: email,
+    };
+
+    await db.execute(
+      `INSERT IGNORE INTO users (id, given_name, family_name, email)
+      VALUES (?, ?, ?, ?)`,
+      [signUpResponse.UserSub, givenName, familyName, email],
+    );
+
+    res.status(201).json({
+      message: "Signed up successfully",
+      user,
+    });
+  } catch (error) {
+    console.error("Sign up failed:", error);
+
+    res.status(500).json({
+      message: "Error signing up",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function login(
+  req: Request<object, object, LoginBody>,
+  res: Response,
+) {
+  const { email, password } = req.body;
+
+  try {
+    const initiateAuthCommand = new InitiateAuthCommand({
+      AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
+      AuthParameters: {
+        USERNAME: email,
+        PASSWORD: password,
+      },
+      ClientId: process.env.COGNITO_CLIENT_ID,
+    });
+
+    const initiateAuthResponse = await client.send(initiateAuthCommand);
+
+    if (!initiateAuthResponse.AuthenticationResult) {
+      throw new Error("Failed to login AWS Cognito user");
+    }
+
+    const { IdToken, AccessToken, RefreshToken } =
+      initiateAuthResponse.AuthenticationResult;
+
+    if (!IdToken || !AccessToken || !RefreshToken) {
+      throw new Error("Failed to generate AWS Cognito tokens");
+    }
+
+    res.cookie("refreshToken", RefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Logged in successfully",
+      IdToken,
+      AccessToken,
+    });
+  } catch (error) {
+    console.error("Error logging in:", error);
+
+    res.status(500).json({
+      message: "Error logging in",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function logout(
+  req: AuthRequest<object, object, LogoutBody>,
+  res: Response,
+) {
+  if (!req.user) {
+    return res.status(401).json({ error: "User not authenticated" });
+  }
+
+  const { accessToken } = req.body;
+
+  if (!accessToken) {
+    return res.status(404).json({
+      message: "Logout failed",
+      error: "Missing access token",
+    });
+  }
+
+  try {
+    const globalSignOutCommand = new GlobalSignOutCommand({
+      AccessToken: accessToken,
+    });
+
+    await client.send(globalSignOutCommand);
+
+    res.status(200).json({
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    console.error("Logout failed:", error);
+
+    res.status(500).json({
+      message: "Logout failed",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+}
+
+export async function requestPasswordReset(
+  req: AuthRequest<object, object, RequestPasswordResetBody>,
+  res: Response,
+) {
+  const { email } = req.body;
+
+  try {
+    const forgotPasswordCommand = new ForgotPasswordCommand({
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Username: email,
+    });
+
+    await client.send(forgotPasswordCommand);
+
+    res.status(200).json({
+      message: "Request password reset successfully",
+    });
+  } catch (error) {
+    console.error("Request password reset failed:", error);
+
+    res.status(500).json({
+      message: "Request password reset failed",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

@@ -1,4 +1,9 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  redirect,
+  useNavigate,
+} from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { LoginForm } from "@/lib/types";
@@ -14,6 +19,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
@@ -27,6 +33,10 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const { login } = useAuth();
+
+  const navigate = useNavigate();
+
   const form = useForm<LoginForm>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
@@ -35,8 +45,14 @@ function Login() {
     },
   });
 
-  function onSubmit(values: LoginForm) {
-    console.log(values);
+  async function onSubmit(values: LoginForm) {
+    try {
+      await login(values.email, values.password);
+      navigate({ to: "/" });
+    } catch (error) {
+      console.error("Login error:", error);
+      //TODO: Display error
+    }
   }
 
   return (
