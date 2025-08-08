@@ -2,7 +2,10 @@ import { Request } from "express";
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
   extends Request<P, ResBody, ReqBody> {
-  sub?: User["id"];
+  auth?: {
+    id: User["id"];
+    accessToken: string;
+  };
 }
 
 export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
@@ -21,7 +24,6 @@ export type SignUpBody = Pick<User, "givenName" | "familyName" | "email"> & {
   password: string;
 };
 export type LoginBody = Pick<User, "email"> & { password: string };
-export type LogoutBody = { accessToken: string | undefined };
 export type ConfirmSignUpBody = Pick<User, "email"> & {
   confirmationCode: string;
 };

@@ -1,6 +1,6 @@
 import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../types";
-import { verifier } from "../config/jwt-verifier";
+import jwtVerifier from "../config/jwtVerifier";
 
 export async function verifyAuth(
   req: AuthRequest,
@@ -9,34 +9,39 @@ export async function verifyAuth(
 ) {
   try {
     const authHeader = req.headers.authorization;
-    const cookieToken = req.cookies?.session;
 
-    const token = authHeader ? authHeader.split(" ")[1] : cookieToken;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({
+        message: "Error verifying auth",
+        error: "Authorization bearer not provided",
+      });
+      return;
+    }
+
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
       res.status(401).json({
         message: "Error verifying auth",
-        error: "No Access token provided",
+        error: "Token not provided",
       });
-
       return;
     }
 
-    if (!process.env.COGNITO_USER_POOL_ID || !process.env.COGNITO_CLIENT_ID) {
-      throw new Error("Missing Cognito environment variables");
-    }
+    const payload = await jwtVerifier.verify(token);
 
-    const payload = await verifier.verify(token);
-
-    req.sub = payload.sub;
+    req.auth = {
+      id: payload.sub,
+      accessToken: token,
+    };
 
     next();
   } catch (error) {
     console.error("Error verifying auth:", error);
 
-    res.status(500).json({
+    res.status(401).json({
       message: "Error verifying auth",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: "Invalid or expired token",
     });
   }
 }

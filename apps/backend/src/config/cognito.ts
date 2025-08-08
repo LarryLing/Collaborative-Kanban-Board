@@ -4,8 +4,8 @@ if (!process.env.AWS_REGION) {
   throw new Error("Missing AWS environment variables!");
 }
 
-const client = new CognitoIdentityProviderClient({
+const cognito = new CognitoIdentityProviderClient({
   region: process.env.AWS_REGION,
 });
 
-export default client;
+export default cognito;

@@ -135,7 +135,7 @@ export async function removeCollaborator(
   }>,
   res: Response,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error removing collaborator",
       error: "Not authorized",
@@ -151,6 +151,7 @@ export async function removeCollaborator(
     return;
   }
 
+  const { id } = req.auth;
   const role = req.role;
   const { boardId, collaboratorId } = req.params;
 
@@ -173,7 +174,7 @@ export async function removeCollaborator(
       case "Owner":
         break;
       case "Collaborator":
-        if (req.sub !== collaboratorId) {
+        if (id !== collaboratorId) {
           res.status(403).json({
             message: "Error removing collaborator",
             error: "Cannot remove other collaborators",

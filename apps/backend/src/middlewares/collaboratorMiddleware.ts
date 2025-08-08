@@ -7,7 +7,7 @@ export async function verifyRole(
   res: Response,
   next: NextFunction,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error verifying role",
       error: "Not authorized",
@@ -15,6 +15,7 @@ export async function verifyRole(
     return;
   }
 
+  const { id } = req.auth;
   const { boardId } = req.params;
 
   try {
@@ -23,7 +24,7 @@ export async function verifyRole(
       FROM boards_collaborators
       WHERE user_id = ? AND board_id = ?
       LIMIT 1`,
-      [req.sub, boardId],
+      [id, boardId],
     );
 
     if (!rows || (rows as BoardCollaborator[]).length === 0) {

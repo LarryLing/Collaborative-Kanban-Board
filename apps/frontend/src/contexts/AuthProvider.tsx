@@ -151,6 +151,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!accessToken) {
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem("idToken");
       return;
     }
 
@@ -199,6 +200,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     if (!accessToken) {
       setUser(null);
       setIsAuthenticated(false);
+      localStorage.removeItem("idToken");
       return;
     }
 
@@ -214,6 +216,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const data = await response.json();
       throw new Error(data.error || "Unknown error");
     }
+
+    setUser(null);
+    setIsAuthenticated(false);
+
+    localStorage.removeItem("idToken");
+    localStorage.removeItem("accessToken");
   };
 
   useEffect(() => {

@@ -3,7 +3,6 @@ import type {
   AuthRequest,
   ConfirmSignUpBody,
   LoginBody,
-  LogoutBody,
   RequestPasswordResetBody,
   PasswordResetBody,
   SignUpBody,
@@ -14,16 +13,17 @@ import {
   AuthFlowType,
   ConfirmForgotPasswordCommand,
   ConfirmSignUpCommand,
+  DeleteUserCommand,
   ForgotPasswordCommand,
   GlobalSignOutCommand,
   InitiateAuthCommand,
   SignUpCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
-import client from "../config/cognito";
+import cognito from "../config/cognito";
 import db from "../config/db";
 
 export async function getMe(req: AuthRequest, res: Response) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error retrieving user",
       error: "Not authorized",
@@ -31,12 +31,14 @@ export async function getMe(req: AuthRequest, res: Response) {
     return;
   }
 
+  const { id } = req.auth;
+
   try {
     const [rows] = await db.execute(
       `SELECT *
       FROM users
       WHERE id = ?`,
-      [req.sub],
+      [id],
     );
 
     if (!rows || (rows as User[]).length === 0) {
@@ -47,12 +49,10 @@ export async function getMe(req: AuthRequest, res: Response) {
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Successfully retrieved user",
-        data: (rows as User[])[0],
-      });
+    res.status(200).json({
+      message: "Successfully retrieved user",
+      data: (rows as User[])[0],
+    });
   } catch (error) {
     console.error("Error retrieving user:", error);
 
@@ -76,7 +76,7 @@ export async function confirmSignUp(
       ConfirmationCode: confirmationCode,
     });
 
-    const { Session } = await client.send(confirmSignUpCommand);
+    const { Session } = await cognito.send(confirmSignUpCommand);
 
     if (!Session) {
       throw new Error("Failed to confirm AWS Cognito user sign up");
@@ -91,7 +91,7 @@ export async function confirmSignUp(
       Session: Session,
     });
 
-    const initiateAuthResponse = await client.send(initiateAuthCommand);
+    const initiateAuthResponse = await cognito.send(initiateAuthCommand);
 
     if (!initiateAuthResponse.AuthenticationResult) {
       throw new Error(
@@ -146,7 +146,7 @@ export async function resetPassword(
       Password: password,
     });
 
-    await client.send(confirmForgotPasswordConfirm);
+    await cognito.send(confirmForgotPasswordConfirm);
 
     res.status(200).json({
       message: "Reset password successfully",
@@ -188,7 +188,7 @@ export async function signUp(
       ],
     });
 
-    const signUpResponse = await client.send(signUpCommand);
+    const signUpResponse = await cognito.send(signUpCommand);
 
     if (!signUpResponse.UserSub) {
       throw new Error("Failed to create AWS Cognito user");
@@ -237,7 +237,7 @@ export async function login(
       ClientId: process.env.COGNITO_CLIENT_ID,
     });
 
-    const initiateAuthResponse = await client.send(initiateAuthCommand);
+    const initiateAuthResponse = await cognito.send(initiateAuthCommand);
 
     if (!initiateAuthResponse.AuthenticationResult) {
       throw new Error("Failed to login AWS Cognito user");
@@ -274,34 +274,23 @@ export async function login(
   }
 }
 
-export async function logout(
-  req: AuthRequest<object, object, LogoutBody>,
-  res: Response,
-) {
-  if (!req.sub) {
+export async function logout(req: AuthRequest, res: Response) {
+  if (!req.auth) {
     res.status(401).json({
-      message: "Error retrieving user",
+      message: "Error logging out",
       error: "Not authorized",
     });
     return;
   }
 
-  const { accessToken } = req.body;
-
-  if (!accessToken) {
-    res.status(404).json({
-      message: "Error logging out",
-      error: "Missing access token",
-    });
-    return;
-  }
+  const { accessToken } = req.auth;
 
   try {
     const globalSignOutCommand = new GlobalSignOutCommand({
       AccessToken: accessToken,
     });
 
-    await client.send(globalSignOutCommand);
+    await cognito.send(globalSignOutCommand);
 
     res.status(200).json({
       message: "Logged out successfully",
@@ -328,7 +317,7 @@ export async function requestPasswordReset(
       Username: email,
     });
 
-    await client.send(forgotPasswordCommand);
+    await cognito.send(forgotPasswordCommand);
 
     res.status(200).json({
       message: "Request password reset successfully",
@@ -344,7 +333,7 @@ export async function requestPasswordReset(
 }
 
 export async function deleteUser(req: AuthRequest, res: Response) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error deleting user",
       error: "Not authorized",
@@ -352,11 +341,19 @@ export async function deleteUser(req: AuthRequest, res: Response) {
     return;
   }
 
+  const { id, accessToken } = req.auth;
+
   try {
+    const deleteUserComand = new DeleteUserCommand({
+      AccessToken: accessToken,
+    });
+
+    await cognito.send(deleteUserComand);
+
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM users
       WHERE id = ?`,
-      [req.sub],
+      [id],
     );
 
     if (result.affectedRows === 0) {
@@ -369,6 +366,8 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
     res.status(200).json({ message: "Successfully deleted user" });
   } catch (error) {
+    console.error("Error deleting user:", error);
+
     res.status(500).json({ message: "Error deleting user", error });
   }
 }

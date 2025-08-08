@@ -10,13 +10,15 @@ import type {
 import db from "../config/db";
 
 export async function getAllBoards(req: AuthRequest, res: Response) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error retrieving boards",
       error: "Not authorized",
     });
     return;
   }
+
+  const { id } = req.auth;
 
   try {
     const [rows] = await db.execute(
@@ -25,7 +27,7 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       WHERE bc.user_id = ?
       ORDER BY b.created_at`,
-      [req.sub],
+      [id],
     );
 
     res.status(200).json({
@@ -46,7 +48,7 @@ export async function getBoardById(
   req: AuthRequest<{ boardId: Board["id"] }>,
   res: Response,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error retrieving board",
       error: "Not authorized",
@@ -54,6 +56,7 @@ export async function getBoardById(
     return;
   }
 
+  const { id } = req.auth;
   const { boardId } = req.params;
 
   try {
@@ -63,7 +66,7 @@ export async function getBoardById(
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       WHERE bc.user_id = ? AND bc.board_id = ?
       LIMIT 1`,
-      [req.sub, boardId],
+      [id, boardId],
     );
 
     if (!rows || (rows as Board[]).length === 0) {
@@ -92,7 +95,7 @@ export async function createBoard(
   req: AuthRequest<object, object, CreateBoardBody>,
   res: Response,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error creating board",
       error: "Not authorized",
@@ -100,6 +103,7 @@ export async function createBoard(
     return;
   }
 
+  const { id } = req.auth;
   const { title } = req.body;
 
   const connection = await db.getConnection();
@@ -113,7 +117,7 @@ export async function createBoard(
 
     const board: Board = {
       id: boardId,
-      ownerId: req.sub,
+      ownerId: id,
       title: title,
       createdAt: currentTimestamp,
     };
@@ -127,7 +131,7 @@ export async function createBoard(
     await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
-      [req.sub, boardId, "Owner", currentTimestamp],
+      [id, boardId, "Owner", currentTimestamp],
     );
 
     await connection.commit();
@@ -152,7 +156,7 @@ export async function updateBoard(
   req: CollaboratorRequest<{ boardId: Board["id"] }, object, UpdateBoardBody>,
   res: Response,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error updating board",
       error: "Not authorized",
@@ -160,6 +164,7 @@ export async function updateBoard(
     return;
   }
 
+  const { id } = req.auth;
   const { boardId } = req.params;
   const { title } = req.body;
 
@@ -169,7 +174,7 @@ export async function updateBoard(
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       SET b.title = ?
       WHERE bc.user_id = ? AND bc.board_id = ?`,
-      [title, req.sub, boardId],
+      [title, id, boardId],
     );
 
     if (result.affectedRows === 0) {
@@ -195,7 +200,7 @@ export async function deleteBoard(
   req: CollaboratorRequest<{ boardId: string }>,
   res: Response,
 ) {
-  if (!req.sub) {
+  if (!req.auth) {
     res.status(401).json({
       message: "Error deleting board",
       error: "Not authorized",
@@ -211,6 +216,7 @@ export async function deleteBoard(
     return;
   }
 
+  const { id } = req.auth;
   const role = req.role;
   const { boardId } = req.params;
 
@@ -226,7 +232,7 @@ export async function deleteBoard(
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM boards
       WHERE id = ? AND owner_id = ?`,
-      [boardId, req.sub],
+      [boardId, id],
     );
 
     if (result.affectedRows === 0) {
