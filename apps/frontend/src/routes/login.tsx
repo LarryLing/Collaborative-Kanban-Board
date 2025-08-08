@@ -13,6 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/login")({
   beforeLoad: ({ context }) => {
@@ -41,11 +42,11 @@ function Login() {
   return (
     <section className="bg-muted h-screen">
       <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-6 lg:justify-start">
+        <Card className="w-full max-w-sm px-6 py-8">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="min-w-sm border-muted bg-background flex w-full max-w-sm flex-col items-center gap-y-4 rounded-md border px-6 py-8 shadow-md"
+              className="flex flex-col items-center gap-y-5"
             >
               <h1 className="text-xl font-semibold">Login</h1>
               <FormField
@@ -91,7 +92,7 @@ function Login() {
               </Button>
             </form>
           </Form>
-          <div className="text-muted-foreground flex justify-center gap-1 text-sm">
+          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Need an account?</p>
             <Link
               to="/signup"
@@ -100,7 +101,7 @@ function Login() {
               Sign up
             </Link>
           </div>
-        </div>
+        </Card>
       </div>
     </section>
   );
