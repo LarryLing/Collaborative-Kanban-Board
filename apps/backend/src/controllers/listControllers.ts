@@ -27,7 +27,7 @@ export async function getAllLists(
 
     res
       .status(200)
-      .json({ message: "Successfully retrieved lists", lists: rows as List[] });
+      .json({ message: "Successfully retrieved lists", data: rows as List[] });
   } catch (error) {
     console.error("Error retrieving lists", error);
 
@@ -61,7 +61,7 @@ export async function createList(
       [list.id, list.boardId, list.title, list.position],
     );
 
-    res.status(201).json({ message: "Successfully created list", list });
+    res.status(201).json({ message: "Successfully created list", data: list });
   } catch (error) {
     console.error("Error creating list", error);
 
@@ -92,7 +92,11 @@ export async function updateList(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "List not found" });
+      res.status(404).json({
+        message: "Error updating list",
+        error: "List not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully updated list" });
@@ -126,7 +130,11 @@ export async function updateListPosition(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "List not found" });
+      res.status(404).json({
+        message: "Error updating list position",
+        error: "List not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully updated list position" });
@@ -154,7 +162,11 @@ export async function deleteList(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "List not found" });
+      res.status(404).json({
+        message: "Error deleting list",
+        error: "List not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully deleted list" });

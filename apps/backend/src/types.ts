@@ -2,7 +2,7 @@ import { Request } from "express";
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
   extends Request<P, ResBody, ReqBody> {
-  user?: User;
+  sub?: User["id"];
 }
 
 export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>

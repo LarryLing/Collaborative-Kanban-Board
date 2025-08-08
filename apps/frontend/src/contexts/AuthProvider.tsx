@@ -1,6 +1,7 @@
 import type { AuthContextType, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
+import { verifier } from "@/services/jwt-verifier";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -14,36 +15,26 @@ export function AuthProvider({ children }: AuthProviderProps) {
     `${import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "")}${endpoint}`;
 
   const loadUser = async () => {
-    const token = localStorage.getItem("idToken");
+    const idToken: string | null = localStorage.getItem("idToken");
 
-    if (!token) {
-      setUser(null);
-      setIsAuthenticated(false);
+    if (idToken) {
+      const payload = await verifier.verify(idToken, {
+        tokenUse: "id",
+        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+      });
+
+      setUser({
+        id: payload.sub,
+        email: payload.email as string,
+        givenName: payload.given_name as string,
+        familyName: payload.family_name as string,
+      } as User);
+      setIsAuthenticated(true);
       return;
     }
 
-    try {
-      const response = await fetch(buildUrl("/api/auth/me"), {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Auth check failed");
-      }
-
-      const user = (await response.json()) as User;
-      setUser(user);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.error("Auth check error:", error);
-
-      setUser(null);
-      setIsAuthenticated(false);
-    }
+    setUser(null);
+    setIsAuthenticated(false);
   };
 
   const resetPassword = async (
@@ -85,7 +76,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.setItem("idToken", IdToken as string);
     localStorage.setItem("accessToken", AccessToken as string);
 
-    await loadUser();
+    const payload = await verifier.verify(IdToken as string, {
+      tokenUse: "id",
+      clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+    });
+
+    setUser({
+      id: payload.sub,
+      email: payload.email as string,
+      givenName: payload.given_name as string,
+      familyName: payload.family_name as string,
+    } as User);
+    setIsAuthenticated(true);
   };
 
   const signUp = async (
@@ -129,13 +131,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     localStorage.setItem("idToken", IdToken as string);
     localStorage.setItem("accessToken", AccessToken as string);
 
-    await loadUser();
+    const payload = await verifier.verify(IdToken as string, {
+      tokenUse: "id",
+      clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+    });
+
+    setUser({
+      id: payload.sub,
+      email: payload.email as string,
+      givenName: payload.given_name as string,
+      familyName: payload.family_name as string,
+    } as User);
+    setIsAuthenticated(true);
   };
 
   const logout = async (): Promise<void> => {
-    const token = localStorage.getItem("idToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (!token) {
+    if (!accessToken) {
       setUser(null);
       setIsAuthenticated(false);
       return;
@@ -146,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         method: "POST",
         credentials: "include",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -181,9 +194,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const deleteAccount = async () => {
-    const token = localStorage.getItem("idToken");
+    const accessToken = localStorage.getItem("accessToken");
 
-    if (!token) {
+    if (!accessToken) {
       setUser(null);
       setIsAuthenticated(false);
       return;
@@ -193,7 +206,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       method: "DELETE",
       credentials: "include",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 

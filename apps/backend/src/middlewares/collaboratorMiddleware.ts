@@ -7,11 +7,14 @@ export async function verifyRole(
   res: Response,
   next: NextFunction,
 ) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.sub) {
+    res.status(401).json({
+      message: "Error verifying role",
+      error: "Not authorized",
+    });
+    return;
   }
 
-  const { id } = req.user;
   const { boardId } = req.params;
 
   try {
@@ -20,21 +23,26 @@ export async function verifyRole(
       FROM boards_collaborators
       WHERE user_id = ? AND board_id = ?
       LIMIT 1`,
-      [id, boardId],
+      [req.sub, boardId],
     );
 
     if (!rows || (rows as BoardCollaborator[]).length === 0) {
-      return res.status(404).json({ message: "Not a board collaborator" });
+      res.status(404).json({
+        message: "Error verifying role",
+        error: "Not a board collaborator",
+      });
+
+      return;
     }
 
     req.role = (rows as BoardCollaborator[])[0].role;
 
     next();
   } catch (error) {
-    console.error("Error verifying collaborator permissions:", error);
+    console.error("Error verifying role:", error);
 
     res.status(500).json({
-      message: "Error verifying collaborator permissions",
+      message: "Error verifying role",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

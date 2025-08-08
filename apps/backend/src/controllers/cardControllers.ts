@@ -28,7 +28,7 @@ export async function getAllCards(
 
     res
       .status(200)
-      .json({ message: "Successfully retrieved cards", cards: rows as Card[] });
+      .json({ message: "Successfully retrieved cards", data: rows as Card[] });
   } catch (error) {
     console.error("Error retrieving cards", error);
 
@@ -75,7 +75,7 @@ export async function createCard(
       ],
     );
 
-    res.status(201).json({ message: "Successfully created card", card });
+    res.status(201).json({ message: "Successfully created card", data: card });
   } catch (error) {
     console.error("Error creating card", error);
 
@@ -106,7 +106,11 @@ export async function updateCard(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Card not found" });
+      res.status(404).json({
+        message: "Error updating card",
+        error: "Card not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully updated card" });
@@ -140,7 +144,11 @@ export async function updateCardPosition(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Card not found" });
+      res.status(404).json({
+        message: "Error updating card position",
+        error: "Card not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully updated card position" });
@@ -172,7 +180,11 @@ export async function deleteCard(
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Card not found" });
+      res.status(404).json({
+        message: "Error updating card",
+        error: "Card not found",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully deleted card" });

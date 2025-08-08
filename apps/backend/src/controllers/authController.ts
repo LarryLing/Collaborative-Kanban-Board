@@ -9,7 +9,7 @@ import type {
   SignUpBody,
   User,
 } from "../types";
-import { RowDataPacket, type ResultSetHeader } from "mysql2/promise";
+import { type ResultSetHeader } from "mysql2/promise";
 import {
   AuthFlowType,
   ConfirmForgotPasswordCommand,
@@ -23,31 +23,36 @@ import client from "../config/cognito";
 import db from "../config/db";
 
 export async function getMe(req: AuthRequest, res: Response) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.sub) {
+    res.status(401).json({
+      message: "Error retrieving user",
+      error: "Not authorized",
+    });
+    return;
   }
 
-  const { id, givenName, familyName, email } = req.user;
-
   try {
-    const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT 1
+    const [rows] = await db.execute(
+      `SELECT *
       FROM users
       WHERE id = ?`,
-      [id],
+      [req.sub],
     );
 
-    if (!rows || rows.length === 0) {
-      await db.execute(
-        `INSERT IGNORE INTO users (id, given_name, family_name, email)
-        VALUES (?, ?, ?, ?)`,
-        [id, givenName, familyName, email],
-      );
+    if (!rows || (rows as User[]).length === 0) {
+      res.status(404).json({
+        message: "Error retrieving user",
+        error: "User not found in database",
+      });
+      return;
     }
 
     res
       .status(200)
-      .json({ message: "Successfully retrieved user", user: req.user });
+      .json({
+        message: "Successfully retrieved user",
+        data: (rows as User[])[0],
+      });
   } catch (error) {
     console.error("Error retrieving user:", error);
 
@@ -112,8 +117,10 @@ export async function confirmSignUp(
 
     res.status(200).json({
       message: "Confirmed sign up successfully",
-      IdToken,
-      AccessToken,
+      data: {
+        idToken: IdToken,
+        accessToken: AccessToken,
+      },
     });
   } catch (error) {
     console.error("Confirm sign up failed:", error);
@@ -202,7 +209,7 @@ export async function signUp(
 
     res.status(201).json({
       message: "Signed up successfully",
-      user,
+      data: user,
     });
   } catch (error) {
     console.error("Sign up failed:", error);
@@ -252,8 +259,10 @@ export async function login(
 
     res.status(200).json({
       message: "Logged in successfully",
-      IdToken,
-      AccessToken,
+      data: {
+        idToken: IdToken,
+        accessToken: AccessToken,
+      },
     });
   } catch (error) {
     console.error("Error logging in:", error);
@@ -269,17 +278,22 @@ export async function logout(
   req: AuthRequest<object, object, LogoutBody>,
   res: Response,
 ) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.sub) {
+    res.status(401).json({
+      message: "Error retrieving user",
+      error: "Not authorized",
+    });
+    return;
   }
 
   const { accessToken } = req.body;
 
   if (!accessToken) {
-    return res.status(404).json({
-      message: "Logout failed",
+    res.status(404).json({
+      message: "Error logging out",
       error: "Missing access token",
     });
+    return;
   }
 
   try {
@@ -293,10 +307,10 @@ export async function logout(
       message: "Logged out successfully",
     });
   } catch (error) {
-    console.error("Logout failed:", error);
+    console.error("Error logging out", error);
 
     res.status(500).json({
-      message: "Logout failed",
+      message: "Error logging out",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -330,21 +344,27 @@ export async function requestPasswordReset(
 }
 
 export async function deleteUser(req: AuthRequest, res: Response) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.sub) {
+    res.status(401).json({
+      message: "Error deleting user",
+      error: "Not authorized",
+    });
+    return;
   }
-
-  const { id } = req.user;
 
   try {
     const [result] = await db.execute<ResultSetHeader>(
       `DELETE FROM users
       WHERE id = ?`,
-      [id],
+      [req.sub],
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        message: "Error deleting user",
+        error: "User not found in database",
+      });
+      return;
     }
 
     res.status(200).json({ message: "Successfully deleted user" });

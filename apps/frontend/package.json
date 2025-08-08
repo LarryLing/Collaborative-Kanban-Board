@@ -20,6 +20,7 @@
     "@tanstack/react-router": "^1.130.12",
     "@tanstack/react-router-devtools": "^1.130.13",
     "aws-amplify": "^6.15.5",
+    "aws-jwt-verify": "^5.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fractional-indexing": "^3.2.0",

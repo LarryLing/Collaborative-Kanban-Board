@@ -26,7 +26,7 @@ export async function getAllCollaborators(
 
     res.status(200).json({
       message: "Successfully retrieved collaborators",
-      collaborators: rows as BoardCollaborator[],
+      data: rows as BoardCollaborator[],
     });
   } catch (error) {
     console.error("Error retrieving collaborators:", error);
@@ -47,7 +47,11 @@ export async function addCollaborator(
   res: Response,
 ) {
   if (!req.role) {
-    return res.status(401).json({ error: "Role not assigned" });
+    res.status(401).json({
+      message: "Error adding collaborator",
+      error: "Role not assigned",
+    });
+    return;
   }
 
   const role = req.role;
@@ -55,7 +59,11 @@ export async function addCollaborator(
   const { email } = req.body;
 
   if (role === "Collaborator") {
-    return res.status(401).json({ error: "Invalid permissions" });
+    res.status(401).json({
+      message: "Error adding collaborator",
+      error: "Invalid permissions",
+    });
+    return;
   }
 
   try {
@@ -68,7 +76,11 @@ export async function addCollaborator(
     );
 
     if (!userRows || (userRows as User[]).length === 0) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({
+        message: "Error adding collaborator",
+        error: "User not found",
+      });
+      return;
     }
 
     const [collaboratorRows] = await db.execute(
@@ -83,7 +95,11 @@ export async function addCollaborator(
       collaboratorRows &&
       (collaboratorRows as BoardCollaborator[]).length > 0
     ) {
-      return res.status(409).json({ message: "Collaborator already added" });
+      res.status(409).json({
+        message: "Error adding collaborator",
+        error: "Collaborator already added",
+      });
+      return;
     }
 
     const now = new Date();
@@ -97,8 +113,10 @@ export async function addCollaborator(
 
     res.status(201).json({
       message: "Successfully added collaborator",
-      user: (userRows as User[])[0],
-      collaborator: (collaboratorRows as BoardCollaborator[])[0],
+      data: {
+        user: (userRows as User[])[0],
+        collaborator: (collaboratorRows as BoardCollaborator[])[0],
+      },
     });
   } catch (error) {
     console.error("Error adding collaborator:", error);
@@ -117,15 +135,23 @@ export async function removeCollaborator(
   }>,
   res: Response,
 ) {
-  if (!req.user) {
-    return res.status(401).json({ error: "User not authenticated" });
+  if (!req.sub) {
+    res.status(401).json({
+      message: "Error removing collaborator",
+      error: "Not authorized",
+    });
+    return;
   }
+
   if (!req.role) {
-    return res.status(401).json({ error: "Role not assigned" });
+    res.status(401).json({
+      message: "Error removing collaborator",
+      error: "Role not assigned",
+    });
+    return;
   }
 
   const role = req.role;
-  const { id } = req.user;
   const { boardId, collaboratorId } = req.params;
 
   try {
@@ -136,23 +162,31 @@ export async function removeCollaborator(
     );
 
     if (targetUserRows.length > 0 && targetUserRows[0].role === "Owner") {
-      return res.status(403).json({
-        message: "Cannot remove board owner. Delete the board instead.",
+      res.status(403).json({
+        message: "Error removing collaborator",
+        error: "Cannot remove board owner. Delete the board instead.",
       });
+      return;
     }
 
     switch (role) {
       case "Owner":
         break;
       case "Collaborator":
-        if (id !== collaboratorId) {
-          return res
-            .status(403)
-            .json({ message: "Cannot remove other collaborators" });
+        if (req.sub !== collaboratorId) {
+          res.status(403).json({
+            message: "Error removing collaborator",
+            error: "Cannot remove other collaborators",
+          });
+          return;
         }
         break;
       default:
-        return res.status(403).json({ message: "Invalid role" });
+        res.status(403).json({
+          message: "Error removing collaborator",
+          error: "Invalid role",
+        });
+        return;
     }
 
     const [rows] = await db.execute<ResultSetHeader>(
@@ -162,12 +196,14 @@ export async function removeCollaborator(
     );
 
     if (rows.affectedRows === 0) {
-      return res.status(404).json({ message: "Board collaborator not found" });
+      res.status(404).json({
+        message: "Error removing collaborator",
+        error: "Board collaborator not found",
+      });
+      return;
     }
 
-    return res
-      .status(200)
-      .json({ message: "Successfully removed collaborator" });
+    res.status(200).json({ message: "Successfully removed collaborator" });
   } catch (error) {
     console.error("Error removing collaborator:", error);
     res.status(500).json({
