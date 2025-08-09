@@ -6,6 +6,13 @@ import {
   ResetPasswordSchema,
   SignupSchema,
 } from "./schemas";
+import type { JwtPayload } from "jwt-decode";
+
+export interface IDTokenPayload extends JwtPayload {
+  email: string;
+  given_name: string;
+  family_name: string;
+}
 
 export type LoginForm = z.infer<typeof LoginSchema>;
 export type SignupForm = z.infer<typeof SignupSchema>;
@@ -21,7 +28,6 @@ export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  loadUser: () => Promise<void>;
   signUp: (
     givenName: string,
     familyName: string,

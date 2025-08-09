@@ -23,6 +23,71 @@ import {
 import cognito from "../config/cognito";
 import db from "../config/db";
 
+export async function getMe(req: Request, res: Response) {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      console.error("Failed to get user: Refresh token not found in cookies");
+
+      res.status(401).json({
+        message: "Failed to get user",
+        error: "Refresh token not found in cookies",
+      });
+
+      return;
+    }
+
+    const getTokensFromRefreshTokenCommand =
+      new GetTokensFromRefreshTokenCommand({
+        ClientId: process.env.COGNITO_CLIENT_ID,
+        RefreshToken: refreshToken,
+      });
+
+    const getTokensFromRefreshTokenResponse = await cognito.send(
+      getTokensFromRefreshTokenCommand,
+    );
+
+    if (!getTokensFromRefreshTokenResponse.AuthenticationResult) {
+      throw new Error(
+        "Could not regenerate tokens with the provided refresh token",
+      );
+    }
+
+    const { IdToken, AccessToken, RefreshToken } =
+      getTokensFromRefreshTokenResponse.AuthenticationResult;
+
+    if (!IdToken || !AccessToken || !RefreshToken) {
+      throw new Error("User pool tokens were not generated");
+    }
+
+    res.cookie("refreshToken", RefreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Successfully regenerated tokens",
+      data: {
+        idToken: IdToken,
+        accessToken: AccessToken,
+      },
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to get user:", errorMessage);
+
+    res.status(401).json({
+      message: "Failed to get user",
+      error: errorMessage,
+    });
+  }
+}
+
 export async function confirmSignUp(
   req: Request<object, object, ConfirmSignUpBody>,
   res: Response,
@@ -223,7 +288,6 @@ export async function login(
     res.status(200).json({
       message: "Successfully logged in returning user",
       data: {
-        idToken: IdToken,
         accessToken: AccessToken,
       },
     });
@@ -310,73 +374,6 @@ export async function requestPasswordReset(
 
     res.status(500).json({
       message: "Failed to request password reset",
-      error: errorMessage,
-    });
-  }
-}
-
-export async function refreshTokens(req: Request, res: Response) {
-  try {
-    const refreshToken = req.cookies.refreshToken;
-
-    if (!refreshToken) {
-      console.error(
-        "Failed to refresh tokens: Refresh token not found in cookies",
-      );
-
-      res.status(401).json({
-        message: "Failed to refresh tokens",
-        error: "Refresh token not found in cookies",
-      });
-
-      return;
-    }
-
-    const getTokensFromRefreshTokenCommand =
-      new GetTokensFromRefreshTokenCommand({
-        ClientId: process.env.COGNITO_CLIENT_ID,
-        RefreshToken: refreshToken,
-      });
-
-    const getTokensFromRefreshTokenResponse = await cognito.send(
-      getTokensFromRefreshTokenCommand,
-    );
-
-    if (!getTokensFromRefreshTokenResponse.AuthenticationResult) {
-      throw new Error(
-        "Could not regenerate tokens with the provided refresh token",
-      );
-    }
-
-    const { IdToken, AccessToken, RefreshToken } =
-      getTokensFromRefreshTokenResponse.AuthenticationResult;
-
-    if (!IdToken || !AccessToken || !RefreshToken) {
-      throw new Error("User pool tokens were not generated");
-    }
-
-    res.cookie("refreshToken", RefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
-
-    res.status(200).json({
-      message: "Successfully regenerated tokens",
-      data: {
-        idToken: IdToken,
-        accessToken: AccessToken,
-      },
-    });
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
-
-    console.error("Failed to regenerate tokens:", errorMessage);
-
-    res.status(401).json({
-      message: "Failed to regenerate tokens",
       error: errorMessage,
     });
   }

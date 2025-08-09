@@ -1,7 +1,7 @@
-import type { AuthContextType, User } from "@/lib/types";
+import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
-import jwtVerifier from "@/services/jwtVerifier";
+import { jwtDecode } from "jwt-decode";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -21,35 +21,45 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loadUser = async () => {
     try {
-      let idToken: string | null = localStorage.getItem("idToken");
-      let accessToken: string | null = localStorage.getItem("accessToken");
+      const accessToken: string | null = localStorage.getItem("accessToken");
 
-      if (!idToken || !accessToken) {
-        console.error("Failed to load user: ID or access token not found");
+      if (!accessToken) {
+        console.error("Failed to load user: Access token not found");
 
-        await refreshTokens();
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsLoading(false);
 
-        idToken = localStorage.getItem("idToken") as string;
-        accessToken = localStorage.getItem("accessToken") as string;
+        return;
       }
 
-      const payload = await jwtVerifier.verify(idToken, {
-        tokenUse: "id",
-        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
+      const response = await fetch(buildUrl("/api/auth/me"), {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
-      await jwtVerifier.verify(accessToken, {
-        tokenUse: "access",
-        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-      });
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error);
+      }
+
+      const { data } = await response.json();
+      const { idToken, accessToken: newAccessToken } = data;
+
+      const { sub, email, given_name, family_name } = jwtDecode<IDTokenPayload>(idToken);
 
       setUser({
-        id: payload.sub,
-        email: payload.email as string,
-        givenName: payload.given_name as string,
-        familyName: payload.family_name as string,
+        id: sub,
+        email: email as string,
+        givenName: given_name as string,
+        familyName: family_name as string,
       } as User);
       setIsAuthenticated(true);
+
+      localStorage.setItem("accessToken", newAccessToken as string);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -60,55 +70,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const refreshTokens = async () => {
-    try {
-      const response = await fetch(buildUrl("/api/auth/refresh"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error || "Unknown");
-      }
-
-      const { data } = await response.json();
-      const { idToken, accessToken } = data;
-
-      const payload = await jwtVerifier.verify(idToken as string, {
-        tokenUse: "id",
-        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-      });
-
-      setUser({
-        id: payload.sub,
-        email: payload.email as string,
-        givenName: payload.given_name as string,
-        familyName: payload.family_name as string,
-      } as User);
-      setIsAuthenticated(true);
-
-      localStorage.setItem("idToken", idToken as string);
-      localStorage.setItem("accessToken", accessToken as string);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to regenerate tokens:", errorMessage);
-
-      setUser(null);
-      setIsAuthenticated(false);
-
-      localStorage.removeItem("idToken");
-      localStorage.removeItem("accessToken");
-
-      throw error;
     }
   };
 
@@ -159,20 +120,16 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken } = data;
 
-      const payload = await jwtVerifier.verify(idToken as string, {
-        tokenUse: "id",
-        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-      });
+      const { sub, given_name, family_name } = jwtDecode<IDTokenPayload>(idToken);
 
       setUser({
-        id: payload.sub,
-        email: payload.email as string,
-        givenName: payload.given_name as string,
-        familyName: payload.family_name as string,
+        id: sub,
+        email: email,
+        givenName: given_name,
+        familyName: family_name,
       } as User);
       setIsAuthenticated(true);
 
-      localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
     } catch (error) {
       const errorMessage =
@@ -231,23 +188,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       const { data } = await response.json();
-      const { idToken, accessToken } = data;
+      const { accessToken } = data;
 
-      const payload = await jwtVerifier.verify(idToken as string, {
-        tokenUse: "id",
-        clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
-      });
-
-      setUser({
-        id: payload.sub,
-        email: payload.email as string,
-        givenName: payload.given_name as string,
-        familyName: payload.family_name as string,
-      } as User);
-      setIsAuthenticated(true);
-
-      localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
+
+      await loadUser();
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -260,14 +205,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      let accessToken: string | null = localStorage.getItem("accessToken");
+      const accessToken: string | null = localStorage.getItem("accessToken");
 
       if (!accessToken) {
-        console.error("Logout error: Access token not found");
+        console.error("Failed to logout user: Access token not found");
 
-        await refreshTokens();
+        setUser(null);
+        setIsAuthenticated(false);
 
-        accessToken = localStorage.getItem("accessToken") as string;
+        return;
       }
 
       const response = await fetch(buildUrl("/api/auth/logout"), {
@@ -286,7 +232,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       setIsAuthenticated(false);
 
-      localStorage.removeItem("idToken");
       localStorage.removeItem("accessToken");
     } catch (error) {
       const errorMessage =
@@ -323,14 +268,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const deleteAccount = async () => {
-    let accessToken: string | null = localStorage.getItem("accessToken");
+    const accessToken: string | null = localStorage.getItem("accessToken");
 
     if (!accessToken) {
-      console.error("Logout error: Access token not found");
+      console.error("Failed to delete user: Access token not found");
 
-      await refreshTokens();
+      setUser(null);
+      setIsAuthenticated(false);
 
-      accessToken = localStorage.getItem("accessToken") as string;
+      return;
     }
 
     try {
@@ -350,7 +296,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(null);
       setIsAuthenticated(false);
 
-      localStorage.removeItem("idToken");
       localStorage.removeItem("accessToken");
     } catch (error) {
       const errorMessage =
@@ -374,7 +319,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isAuthenticated,
     isLoading,
-    loadUser,
     signUp,
     confirmSignUp,
     login,
