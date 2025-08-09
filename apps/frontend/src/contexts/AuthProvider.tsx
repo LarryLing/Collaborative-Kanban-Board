@@ -2,7 +2,6 @@ import type { AuthContextType, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 import { verifier } from "@/services/jwt-verifier";
-import { useNavigate } from "@tanstack/react-router";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -11,8 +10,6 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-
-  const navigate = useNavigate();
 
   const buildUrl = (endpoint: string): string =>
     `${import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "")}${endpoint}`;
@@ -47,8 +44,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         familyName: payload.family_name as string,
       } as User);
       setIsAuthenticated(true);
-
-      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to load user:", error);
 
@@ -89,8 +84,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
-
-      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to regenerate tokens:", error);
 
@@ -122,8 +115,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const { error } = await response.json();
         throw new Error(error);
       }
-
-      navigate({ to: "/login" });
     } catch (error) {
       console.error("Failed to reset password:", error);
 
@@ -165,8 +156,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
-
-      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to login new user:", error);
 
@@ -194,8 +183,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const { error } = await response.json();
         throw new Error(error);
       }
-
-      navigate({ to: "/confirm-signup" });
     } catch (error) {
       console.error("Failed to sign up new user:", error);
 
@@ -237,8 +224,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
-
-      navigate({ to: "/" });
     } catch (error) {
       console.error("Failed to login returning user:", error);
 
@@ -297,8 +282,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const { error } = await response.json();
         throw new Error(error);
       }
-
-      navigate({ to: "/reset-password" });
     } catch (error) {
       console.error("Failed to request password reset:", error);
 
@@ -336,8 +319,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.removeItem("idToken");
       localStorage.removeItem("accessToken");
-
-      navigate({ to: "/login" });
     } catch (error) {
       console.error("Failed to delete user:", error);
 
