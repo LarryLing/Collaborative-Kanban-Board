@@ -8,10 +8,15 @@ export async function verifyRole(
   next: NextFunction,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to verify role: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to verify role",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
@@ -28,6 +33,8 @@ export async function verifyRole(
     );
 
     if (!rows || (rows as BoardCollaborator[]).length === 0) {
+      console.error("Failed to verify role: User is not a board collaborator");
+
       res.status(404).json({
         message: "Failed to verify role",
         error: "User is not a board collaborator",
@@ -40,11 +47,14 @@ export async function verifyRole(
 
     next();
   } catch (error) {
-    console.error("Failed to verify role:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to verify role:", errorMessage);
 
     res.status(500).json({
       message: "Failed to verify role",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }

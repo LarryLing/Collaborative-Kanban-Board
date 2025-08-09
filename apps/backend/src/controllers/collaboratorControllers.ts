@@ -30,11 +30,14 @@ export async function getAllCollaborators(
       data: rows as BoardCollaborator[],
     });
   } catch (error) {
-    console.error("Failed to retrieve collaborators:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to retrieve collaborators:", errorMessage);
 
     res.status(500).json({
       message: "Failed to retrieve collaborators",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -48,10 +51,15 @@ export async function addCollaborator(
   res: Response,
 ) {
   if (!req.role) {
+    console.error(
+      "Failed to add collaborator: User is not a board owner or collaborator",
+    );
+
     res.status(401).json({
       message: "Failed to add collaborator",
       error: "User is not a board owner or collaborator",
     });
+
     return;
   }
 
@@ -60,10 +68,15 @@ export async function addCollaborator(
   const { email } = req.body;
 
   if (role === COLLABORATOR) {
+    console.error(
+      "Failed to add collaborator: Cannot add collaborators without board ownership",
+    );
+
     res.status(401).json({
       message: "Failed to add collaborator",
       error: "Cannot add collaborators without board ownership",
     });
+
     return;
   }
 
@@ -77,10 +90,15 @@ export async function addCollaborator(
     );
 
     if (!userRows || (userRows as User[]).length === 0) {
+      console.error(
+        "Failed to add collaborator: Could not find user in database",
+      );
+
       res.status(404).json({
         message: "Failed to add collaborator",
         error: "Could not find user in database",
       });
+
       return;
     }
 
@@ -96,10 +114,15 @@ export async function addCollaborator(
       collaboratorRows &&
       (collaboratorRows as BoardCollaborator[]).length > 0
     ) {
+      console.error(
+        "Failed to add collaborator: Collaborator has already been added",
+      );
+
       res.status(409).json({
         message: "Failed to add collaborator",
         error: "Collaborator has already been added",
       });
+
       return;
     }
 
@@ -120,11 +143,14 @@ export async function addCollaborator(
       },
     });
   } catch (error) {
-    console.error("Failed to add collaborator:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to add collaborator:", errorMessage);
 
     res.status(500).json({
       message: "Failed to add collaborator",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -137,18 +163,28 @@ export async function removeCollaborator(
   res: Response,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to remove collaborator: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to remove collaborator",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
   if (!req.role) {
+    console.error(
+      "Failed to remove collaborator: User is not a board owner or collaborator",
+    );
+
     res.status(401).json({
       message: "Failed to remove collaborator",
       error: "User is not a board owner or collaborator",
     });
+
     return;
   }
 
@@ -167,19 +203,29 @@ export async function removeCollaborator(
       targetUserRows.length > 0 &&
       (targetUserRows[0].role as BoardCollaborator["role"]) === OWNER
     ) {
+      console.error(
+        "Failed to remove collaborator: Cannot leave board as the owner",
+      );
+
       res.status(403).json({
         message: "Failed to remove collaborator",
         error: "Cannot leave board as the owner",
       });
+
       return;
     }
 
     if (role === COLLABORATOR) {
       if (id !== collaboratorId) {
+        console.error(
+          "Failed to remove collaborator: Cannot remove collaborators without board ownership",
+        );
+
         res.status(403).json({
           message: "Failed to remove collaborator",
           error: "Cannot remove collaborators without board ownership",
         });
+
         return;
       }
     }
@@ -192,10 +238,14 @@ export async function removeCollaborator(
 
     res.status(200).json({ message: "Successfully removed collaborator" });
   } catch (error) {
-    console.error("Failed to remove collaborator:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to remove collaborator:", errorMessage);
+
     res.status(500).json({
       message: "Failed to remove collaborator",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }

@@ -11,20 +11,28 @@ export async function verifyAuth(
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      console.error("Failed to verify auth: Authorization bearer not provided");
+
       res.status(401).json({
         message: "Failed to verify auth",
         error: "Authorization bearer not provided",
       });
+
       return;
     }
 
     const token = authHeader.split(" ")[1];
 
     if (!token) {
+      console.error(
+        "Failed to verify auth: Access token not provided in authorization bearer",
+      );
+
       res.status(401).json({
         message: "Failed to verify auth",
         error: "Access token not provided in authorization bearer",
       });
+
       return;
     }
 
@@ -37,11 +45,14 @@ export async function verifyAuth(
 
     next();
   } catch (error) {
-    console.error("Failed to verify auth:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to verify auth:", errorMessage);
 
     res.status(401).json({
       message: "Failed to verify auth",
-      error,
+      error: errorMessage,
     });
   }
 }

@@ -1,38 +1,44 @@
 import type { AuthContextType, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
-import { verifier } from "@/services/jwt-verifier";
+import jwtVerifier from "@/services/jwtVerifier";
 
-interface AuthProviderProps {
+type AuthProviderProps = {
   children: ReactNode;
-}
+};
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const buildUrl = (endpoint: string): string =>
-    `${import.meta.env.VITE_BACKEND_URL?.replace(/\/$/, "")}${endpoint}`;
+  const buildUrl = (endpoint: string) => {
+    const baseUrl = import.meta.env.VITE_BACKEND_URL
+      ? (import.meta.env.VITE_BACKEND_URL as string)
+      : "http://localhost:3000/";
+    return `${baseUrl.replace(/\/$/, "")}${endpoint}`;
+  };
 
   const loadUser = async () => {
     try {
-      const idToken: string | null = localStorage.getItem("idToken");
-      const accessToken: string | null = localStorage.getItem("accessToken");
+      let idToken: string | null = localStorage.getItem("idToken");
+      let accessToken: string | null = localStorage.getItem("accessToken");
 
-      if (!idToken) {
-        throw new Error("ID token not found");
+      if (!idToken || !accessToken) {
+        console.error("Failed to load user: ID or access token not found");
+
+        await refreshTokens();
+
+        idToken = localStorage.getItem("idToken") as string;
+        accessToken = localStorage.getItem("accessToken") as string;
       }
 
-      if (!accessToken) {
-        throw new Error("Access token not found");
-      }
-
-      const payload = await verifier.verify(idToken, {
+      const payload = await jwtVerifier.verify(idToken, {
         tokenUse: "id",
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
       });
 
-      await verifier.verify(accessToken, {
+      await jwtVerifier.verify(accessToken, {
         tokenUse: "access",
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
       });
@@ -45,15 +51,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } as User);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error("Failed to load user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
 
-      await refreshTokens();
+      console.error("Failed to load user:", errorMessage);
+
+      setUser(null);
+      setIsAuthenticated(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const refreshTokens = async () => {
     try {
-      const response = await fetch("/api/auth/refresh", {
+      const response = await fetch(buildUrl("/api/auth/refresh"), {
         method: "POST",
         credentials: "include",
         headers: {
@@ -69,7 +81,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken } = data;
 
-      const payload = await verifier.verify(idToken, {
+      const payload = await jwtVerifier.verify(idToken as string, {
         tokenUse: "id",
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
       });
@@ -85,7 +97,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
     } catch (error) {
-      console.error("Failed to regenerate tokens:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to regenerate tokens:", errorMessage);
 
       setUser(null);
       setIsAuthenticated(false);
@@ -116,7 +131,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(error);
       }
     } catch (error) {
-      console.error("Failed to reset password:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to reset password:", errorMessage);
 
       throw error;
     }
@@ -141,7 +159,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken } = data;
 
-      const payload = await verifier.verify(idToken as string, {
+      const payload = await jwtVerifier.verify(idToken as string, {
         tokenUse: "id",
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
       });
@@ -157,7 +175,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
     } catch (error) {
-      console.error("Failed to login new user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to login new user:", errorMessage);
 
       throw error;
     }
@@ -184,7 +205,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(error);
       }
     } catch (error) {
-      console.error("Failed to sign up new user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to sign up new user:", errorMessage);
 
       throw error;
     }
@@ -209,7 +233,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken } = data;
 
-      const payload = await verifier.verify(idToken as string, {
+      const payload = await jwtVerifier.verify(idToken as string, {
         tokenUse: "id",
         clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
       });
@@ -225,7 +249,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.setItem("idToken", idToken as string);
       localStorage.setItem("accessToken", accessToken as string);
     } catch (error) {
-      console.error("Failed to login returning user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to login returning user:", errorMessage);
 
       throw error;
     }
@@ -262,7 +289,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem("idToken");
       localStorage.removeItem("accessToken");
     } catch (error) {
-      console.error("Failed to logout user", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to logout user", errorMessage);
 
       throw error;
     }
@@ -283,7 +313,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
         throw new Error(error);
       }
     } catch (error) {
-      console.error("Failed to request password reset:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to request password reset:", errorMessage);
 
       throw error;
     }
@@ -320,7 +353,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       localStorage.removeItem("idToken");
       localStorage.removeItem("accessToken");
     } catch (error) {
-      console.error("Failed to delete user:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error("Failed to delete user:", errorMessage);
 
       throw error;
     }
@@ -337,6 +373,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const contextValue: AuthContextType = {
     user,
     isAuthenticated,
+    isLoading,
+    loadUser,
     signUp,
     confirmSignUp,
     login,

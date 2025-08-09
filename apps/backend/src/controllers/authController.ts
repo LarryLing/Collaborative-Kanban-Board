@@ -27,9 +27,8 @@ export async function confirmSignUp(
   req: Request<object, object, ConfirmSignUpBody>,
   res: Response,
 ) {
-  const { email, confirmationCode } = req.body;
-
   try {
+    const { email, confirmationCode } = req.body;
     const confirmSignUpCommand = new ConfirmSignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
@@ -81,11 +80,14 @@ export async function confirmSignUp(
       },
     });
   } catch (error) {
-    console.error("Failed to login new user:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to login new user:", errorMessage);
 
     res.status(500).json({
       message: "Failed to login new user",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -94,9 +96,8 @@ export async function resetPassword(
   req: Request<object, object, PasswordResetBody>,
   res: Response,
 ) {
-  const { email, confirmationCode, password } = req.body;
-
   try {
+    const { email, confirmationCode, password } = req.body;
     const confirmForgotPasswordConfirm = new ConfirmForgotPasswordCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
@@ -110,11 +111,14 @@ export async function resetPassword(
       message: "Successfully reset password",
     });
   } catch (error) {
-    console.error("Failed to reset password:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to reset password:", errorMessage);
 
     res.status(500).json({
       message: "Failed to reset password",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -123,9 +127,8 @@ export async function signUp(
   req: Request<object, object, SignUpBody>,
   res: Response,
 ) {
-  const { givenName, familyName, email, password } = req.body;
-
   try {
+    const { givenName, familyName, email, password } = req.body;
     const signUpCommand = new SignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
@@ -170,11 +173,14 @@ export async function signUp(
       data: user,
     });
   } catch (error) {
-    console.error("Failed to sign up new user:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to sign up new user:", errorMessage);
 
     res.status(500).json({
       message: "Failed to sign up new user",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -183,9 +189,8 @@ export async function login(
   req: Request<object, object, LoginBody>,
   res: Response,
 ) {
-  const { email, password } = req.body;
-
   try {
+    const { email, password } = req.body;
     const initiateAuthCommand = new InitiateAuthCommand({
       AuthFlow: AuthFlowType.USER_PASSWORD_AUTH,
       AuthParameters: {
@@ -223,27 +228,35 @@ export async function login(
       },
     });
   } catch (error) {
-    console.error("Failed to login returning user:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to login returning user:", errorMessage);
 
     res.status(500).json({
       message: "Failed to login returning user",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
 
 export async function logout(req: AuthRequest, res: Response) {
-  if (!req.auth) {
-    res.status(401).json({
-      message: "Failed to logout user",
-      error: "User is not authorized to make request",
-    });
-    return;
-  }
-
-  const { accessToken } = req.auth;
-
   try {
+    if (!req.auth) {
+      console.error(
+        "Failed to logout user: User is not authorized to make request",
+      );
+
+      res.status(401).json({
+        message: "Failed to logout user",
+        error: "User is not authorized to make request",
+      });
+
+      return;
+    }
+
+    const { accessToken } = req.auth;
+
     const globalSignOutCommand = new GlobalSignOutCommand({
       AccessToken: accessToken,
     });
@@ -260,11 +273,14 @@ export async function logout(req: AuthRequest, res: Response) {
       message: "Logged out successfully",
     });
   } catch (error) {
-    console.error("Failed to logout user", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to logout user", errorMessage);
 
     res.status(500).json({
       message: "Failed to logout user",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -273,9 +289,9 @@ export async function requestPasswordReset(
   req: AuthRequest<object, object, RequestPasswordResetBody>,
   res: Response,
 ) {
-  const { email } = req.body;
-
   try {
+    const { email } = req.body;
+
     const forgotPasswordCommand = new ForgotPasswordCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
@@ -287,26 +303,35 @@ export async function requestPasswordReset(
       message: "Successfully request password reset",
     });
   } catch (error) {
-    console.error("Failed to request password reset:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to request password reset:", errorMessage);
 
     res.status(500).json({
       message: "Failed to request password reset",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
 
 export async function refreshTokens(req: Request, res: Response) {
-  const refreshToken = req.cookies.refreshToken;
-
-  if (!refreshToken) {
-    res.status(401).json({
-      message: "Failed to refresh tokens",
-      error: "Refresh token not found in cookies",
-    });
-  }
-
   try {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      console.error(
+        "Failed to refresh tokens: Refresh token not found in cookies",
+      );
+
+      res.status(401).json({
+        message: "Failed to refresh tokens",
+        error: "Refresh token not found in cookies",
+      });
+
+      return;
+    }
+
     const getTokensFromRefreshTokenCommand =
       new GetTokensFromRefreshTokenCommand({
         ClientId: process.env.COGNITO_CLIENT_ID,
@@ -345,27 +370,35 @@ export async function refreshTokens(req: Request, res: Response) {
       },
     });
   } catch (error) {
-    console.error("Failed to regenerate tokens:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to regenerate tokens:", errorMessage);
 
     res.status(401).json({
       message: "Failed to regenerate tokens",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
 
 export async function deleteUser(req: AuthRequest, res: Response) {
-  if (!req.auth) {
-    res.status(401).json({
-      message: "Failed to delete user",
-      error: "User is not authorized to make request",
-    });
-    return;
-  }
-
-  const { id, accessToken } = req.auth;
-
   try {
+    if (!req.auth) {
+      console.error(
+        "Failed to delete user: User is not authorized to make request",
+      );
+
+      res.status(401).json({
+        message: "Failed to delete user",
+        error: "User is not authorized to make request",
+      });
+
+      return;
+    }
+
+    const { id, accessToken } = req.auth;
+
     const deleteUserComand = new DeleteUserCommand({
       AccessToken: accessToken,
     });
@@ -386,8 +419,13 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
     res.status(200).json({ message: "Successfully deleted user" });
   } catch (error) {
-    console.error("Failed to delete user:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
 
-    res.status(500).json({ message: "Failed to delete user", error });
+    console.error("Failed to delete user:", errorMessage);
+
+    res
+      .status(500)
+      .json({ message: "Failed to delete user", error: errorMessage });
   }
 }

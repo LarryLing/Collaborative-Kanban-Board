@@ -7,8 +7,9 @@ if (
   throw new Error("Missing Cognito Environment Variables");
 }
 
-export const verifier = CognitoJwtVerifier.create({
+const jwtVerifier = CognitoJwtVerifier.create({
   userPoolId: import.meta.env.VITE_COGNITO_USER_POOL_ID,
-  tokenUse: "id",
   clientId: import.meta.env.VITE_COGNITO_CLIENT_ID,
 });
+
+export default jwtVerifier;

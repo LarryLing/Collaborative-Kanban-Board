@@ -31,8 +31,7 @@ interface CorsOptions {
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
     const allowedOrigins = [
-      process.env.FRONTEND_URL || "",
-      process.env.FRONTEND_URL_DEV || "",
+      process.env.FRONTEND_URL || "http://localhost:5173",
     ];
 
     if (allowedOrigins.includes(origin || "") || !origin) {

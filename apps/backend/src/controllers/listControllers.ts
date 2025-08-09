@@ -29,11 +29,14 @@ export async function getAllLists(
       .status(200)
       .json({ message: "Successfully retrieved lists", data: rows as List[] });
   } catch (error) {
-    console.error("Failed to retrieve lists", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to retrieve lists", errorMessage);
 
     res.status(500).json({
       message: "Failed to retrieve lists",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -63,11 +66,14 @@ export async function createList(
 
     res.status(201).json({ message: "Successfully created list", data: list });
   } catch (error) {
-    console.error("Failed to create list", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to create list", errorMessage);
 
     res.status(500).json({
       message: "Failed to create list",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -92,20 +98,26 @@ export async function updateList(
     );
 
     if (result.affectedRows === 0) {
+      console.error("Failed to update list: Could not find list in database");
+
       res.status(404).json({
         message: "Failed to update list",
         error: "Could not find list in database",
       });
+
       return;
     }
 
     res.status(200).json({ message: "Successfully updated list" });
   } catch (error) {
-    console.error("Failed to update list", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to update list", errorMessage);
 
     res.status(500).json({
       message: "Failed to update list",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -130,20 +142,28 @@ export async function updateListPosition(
     );
 
     if (result.affectedRows === 0) {
+      console.error(
+        "Failed to update list position: Could not find list in database",
+      );
+
       res.status(404).json({
         message: "Failed to update list position",
         error: "Could not find list in database",
       });
+
       return;
     }
 
     res.status(200).json({ message: "Successfully updated list position" });
   } catch (error) {
-    console.error("Failed to update list position", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to update list position", errorMessage);
 
     res.status(500).json({
       message: "Failed to update list position",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -163,11 +183,14 @@ export async function deleteList(
 
     res.status(200).json({ message: "Successfully deleted list" });
   } catch (error) {
-    console.error("Error deleting list", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Error deleting list", errorMessage);
 
     res.status(500).json({
       message: "Error deleting list",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }

@@ -12,10 +12,15 @@ import { COLLABORATOR, OWNER } from "../constants";
 
 export async function getAllBoards(req: AuthRequest, res: Response) {
   if (!req.auth) {
+    console.error(
+      "Failed to retrieve boards: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to retrieve boards",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
@@ -36,11 +41,14 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
       data: rows as Board[],
     });
   } catch (error) {
-    console.error("Failed to retrieve boards:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to retrieve boards:", errorMessage);
 
     res.status(500).json({
       message: "Failed to retrieve boards",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -50,10 +58,15 @@ export async function getBoardById(
   res: Response,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to retrieve board: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to retrieve board",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
@@ -71,10 +84,15 @@ export async function getBoardById(
     );
 
     if (!rows || (rows as Board[]).length === 0) {
+      console.error(
+        "Failed to retrieve board: Could not find board in database",
+      );
+
       res.status(404).json({
         message: "Failed to retrieve board",
         error: "Could not find board in database",
       });
+
       return;
     }
 
@@ -83,11 +101,14 @@ export async function getBoardById(
       data: (rows as Board[])[0],
     });
   } catch (error) {
-    console.error("Failed to retrieve board:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to retrieve board:", errorMessage);
 
     res.status(500).json({
       message: "Failed to retrieve board",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -97,10 +118,15 @@ export async function createBoard(
   res: Response,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to create board: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to create board",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
@@ -142,11 +168,14 @@ export async function createBoard(
   } catch (error) {
     await connection.rollback();
 
-    console.error("Failed to create board:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to create board:", errorMessage);
 
     res.status(500).json({
       message: "Failed to create board",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   } finally {
     connection.release();
@@ -158,10 +187,15 @@ export async function updateBoard(
   res: Response,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to update board: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to update board",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
@@ -179,20 +213,26 @@ export async function updateBoard(
     );
 
     if (result.affectedRows === 0) {
+      console.error("Failed to update board: Could not find board in database");
+
       res.status(404).json({
         message: "Failed to update board",
         error: "Could not find board in database",
       });
+
       return;
     }
 
     res.status(200).json({ message: "Successfully updated board" });
   } catch (error) {
-    console.error("Failed to update board:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to update board:", errorMessage);
 
     res.status(500).json({
       message: "Failed to update board",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
@@ -202,18 +242,28 @@ export async function deleteBoard(
   res: Response,
 ) {
   if (!req.auth) {
+    console.error(
+      "Failed to delete board: User is not authorized to make request",
+    );
+
     res.status(401).json({
       message: "Failed to delete board",
       error: "User is not authorized to make request",
     });
+
     return;
   }
 
   if (!req.role) {
+    console.error(
+      "Failed to delete board: User is not a board owner or collaborator",
+    );
+
     res.status(401).json({
       message: "Failed to delete board",
       error: "User is not a board owner or collaborator",
     });
+
     return;
   }
 
@@ -222,10 +272,15 @@ export async function deleteBoard(
   const { boardId } = req.params;
 
   if (role === COLLABORATOR) {
+    console.error(
+      "Failed to delete board: Cannot delete board as a collaborator",
+    );
+
     res.status(403).json({
       message: "Failed to delete board",
       error: "Cannot delete board as a collaborator",
     });
+
     return;
   }
 
@@ -238,11 +293,14 @@ export async function deleteBoard(
 
     res.status(200).json({ message: "Successfully deleted board" });
   } catch (error) {
-    console.error("Failed to delete board:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to delete board:", errorMessage);
 
     res.status(500).json({
       message: "Failed to delete board",
-      error: error instanceof Error ? error.message : "Unknown error",
+      error: errorMessage,
     });
   }
 }
