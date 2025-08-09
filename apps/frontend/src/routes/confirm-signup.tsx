@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  redirect,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, redirect, useSearch } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { ConfirmSignupForm, EmailSearchBody } from "@/lib/types";
@@ -20,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export const Route = createFileRoute("/confirm-signup")({
   beforeLoad: ({ context }) => {
@@ -33,9 +29,9 @@ export const Route = createFileRoute("/confirm-signup")({
 });
 
 function ConfirmSignup() {
-  const { confirmSignUp } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const { confirmSignUp } = useAuth();
 
   const { email } = useSearch({ from: "/confirm-signup" }) as EmailSearchBody;
 
@@ -49,10 +45,8 @@ function ConfirmSignup() {
   async function onSubmit(values: ConfirmSignupForm) {
     try {
       await confirmSignUp(email, values.confirmationCode);
-      navigate({ to: "/" });
     } catch (error) {
-      console.error("Confirm sign up error", error);
-      //TODO: Display error
+      setError(error instanceof Error ? error.message : "Unknown error");
     }
   }
 

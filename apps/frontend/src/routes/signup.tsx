@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { SignupForm } from "@/lib/types";
@@ -20,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export const Route = createFileRoute("/signup")({
   beforeLoad: ({ context }) => {
@@ -33,9 +29,9 @@ export const Route = createFileRoute("/signup")({
 });
 
 function SignUp() {
-  const { signUp } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const { signUp } = useAuth();
 
   const form = useForm<SignupForm>({
     resolver: zodResolver(SignupSchema),
@@ -56,10 +52,8 @@ function SignUp() {
         values.email,
         values.password,
       );
-      navigate({ to: "/confirm-signup" });
     } catch (error) {
-      console.error("Error signing up", error);
-      //TODO: Display error
+      setError(error instanceof Error ? error.message : "Unknown error");
     }
   }
 

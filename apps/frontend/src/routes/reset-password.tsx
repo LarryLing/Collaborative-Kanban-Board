@@ -2,7 +2,6 @@ import {
   createFileRoute,
   Link,
   redirect,
-  useNavigate,
   useSearch,
 } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export const Route = createFileRoute("/reset-password")({
   beforeLoad: ({ context }) => {
@@ -34,9 +34,9 @@ export const Route = createFileRoute("/reset-password")({
 });
 
 function ResetPassword() {
-  const { resetPassword } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const { resetPassword } = useAuth();
 
   const { email } = useSearch({ from: "/reset-password" }) as EmailSearchBody;
 
@@ -52,9 +52,8 @@ function ResetPassword() {
   async function onSubmit(values: ResetPasswordForm) {
     try {
       await resetPassword(email, values.password, values.confirmationCode);
-      navigate({ to: "/login" });
     } catch (error) {
-      console.error("Password reset error", error);
+      setError(error instanceof Error ? error.message : "Unknown error");
     }
   }
 

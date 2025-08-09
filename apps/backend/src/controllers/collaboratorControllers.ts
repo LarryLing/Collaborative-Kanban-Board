@@ -8,6 +8,7 @@ import type {
 } from "../types";
 import db from "../config/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { COLLABORATOR, OWNER } from "../constants";
 
 export async function getAllCollaborators(
   req: CollaboratorRequest<{ boardId: Board["id"] }>,
@@ -29,10 +30,10 @@ export async function getAllCollaborators(
       data: rows as BoardCollaborator[],
     });
   } catch (error) {
-    console.error("Error retrieving collaborators:", error);
+    console.error("Failed to retrieve collaborators:", error);
 
     res.status(500).json({
-      message: "Error retrieving collaborators",
+      message: "Failed to retrieve collaborators",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -48,8 +49,8 @@ export async function addCollaborator(
 ) {
   if (!req.role) {
     res.status(401).json({
-      message: "Error adding collaborator",
-      error: "Role not assigned",
+      message: "Failed to add collaborator",
+      error: "User is not a board owner or collaborator",
     });
     return;
   }
@@ -58,10 +59,10 @@ export async function addCollaborator(
   const { boardId } = req.params;
   const { email } = req.body;
 
-  if (role === "Collaborator") {
+  if (role === COLLABORATOR) {
     res.status(401).json({
-      message: "Error adding collaborator",
-      error: "Invalid permissions",
+      message: "Failed to add collaborator",
+      error: "Cannot add collaborators without board ownership",
     });
     return;
   }
@@ -77,8 +78,8 @@ export async function addCollaborator(
 
     if (!userRows || (userRows as User[]).length === 0) {
       res.status(404).json({
-        message: "Error adding collaborator",
-        error: "User not found",
+        message: "Failed to add collaborator",
+        error: "Could not find user in database",
       });
       return;
     }
@@ -96,8 +97,8 @@ export async function addCollaborator(
       (collaboratorRows as BoardCollaborator[]).length > 0
     ) {
       res.status(409).json({
-        message: "Error adding collaborator",
-        error: "Collaborator already added",
+        message: "Failed to add collaborator",
+        error: "Collaborator has already been added",
       });
       return;
     }
@@ -108,7 +109,7 @@ export async function addCollaborator(
     await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
-      [(userRows as User[])[0].id, boardId, "Collaborator", currentTimestamp],
+      [(userRows as User[])[0].id, boardId, COLLABORATOR, currentTimestamp],
     );
 
     res.status(201).json({
@@ -119,10 +120,10 @@ export async function addCollaborator(
       },
     });
   } catch (error) {
-    console.error("Error adding collaborator:", error);
+    console.error("Failed to add collaborator:", error);
 
     res.status(500).json({
-      message: "Error adding collaborator",
+      message: "Failed to add collaborator",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -137,16 +138,16 @@ export async function removeCollaborator(
 ) {
   if (!req.auth) {
     res.status(401).json({
-      message: "Error removing collaborator",
-      error: "Not authorized",
+      message: "Failed to remove collaborator",
+      error: "User is not authorized to make request",
     });
     return;
   }
 
   if (!req.role) {
     res.status(401).json({
-      message: "Error removing collaborator",
-      error: "Role not assigned",
+      message: "Failed to remove collaborator",
+      error: "User is not a board owner or collaborator",
     });
     return;
   }
@@ -162,53 +163,38 @@ export async function removeCollaborator(
       [collaboratorId, boardId],
     );
 
-    if (targetUserRows.length > 0 && targetUserRows[0].role === "Owner") {
+    if (
+      targetUserRows.length > 0 &&
+      (targetUserRows[0].role as BoardCollaborator["role"]) === OWNER
+    ) {
       res.status(403).json({
-        message: "Error removing collaborator",
-        error: "Cannot remove board owner. Delete the board instead.",
+        message: "Failed to remove collaborator",
+        error: "Cannot leave board as the owner",
       });
       return;
     }
 
-    switch (role) {
-      case "Owner":
-        break;
-      case "Collaborator":
-        if (id !== collaboratorId) {
-          res.status(403).json({
-            message: "Error removing collaborator",
-            error: "Cannot remove other collaborators",
-          });
-          return;
-        }
-        break;
-      default:
+    if (role === COLLABORATOR) {
+      if (id !== collaboratorId) {
         res.status(403).json({
-          message: "Error removing collaborator",
-          error: "Invalid role",
+          message: "Failed to remove collaborator",
+          error: "Cannot remove collaborators without board ownership",
         });
         return;
+      }
     }
 
-    const [rows] = await db.execute<ResultSetHeader>(
+    await db.execute<ResultSetHeader>(
       `DELETE FROM boards_collaborators
        WHERE user_id = ? AND board_id = ?`,
       [collaboratorId, boardId],
     );
 
-    if (rows.affectedRows === 0) {
-      res.status(404).json({
-        message: "Error removing collaborator",
-        error: "Board collaborator not found",
-      });
-      return;
-    }
-
     res.status(200).json({ message: "Successfully removed collaborator" });
   } catch (error) {
-    console.error("Error removing collaborator:", error);
+    console.error("Failed to remove collaborator:", error);
     res.status(500).json({
-      message: "Error removing collaborator",
+      message: "Failed to remove collaborator",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

@@ -30,10 +30,10 @@ export async function getAllCards(
       .status(200)
       .json({ message: "Successfully retrieved cards", data: rows as Card[] });
   } catch (error) {
-    console.error("Error retrieving cards", error);
+    console.error("Failed to retrieve cards", error);
 
     res.status(500).json({
-      message: "Error retrieving cards",
+      message: "Failed to retrieve cards",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -77,10 +77,10 @@ export async function createCard(
 
     res.status(201).json({ message: "Successfully created card", data: card });
   } catch (error) {
-    console.error("Error creating card", error);
+    console.error("Failed to create card", error);
 
     res.status(500).json({
-      message: "Error creating card",
+      message: "Failed to create card",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -107,18 +107,18 @@ export async function updateCard(
 
     if (result.affectedRows === 0) {
       res.status(404).json({
-        message: "Error updating card",
-        error: "Card not found",
+        message: "Failed to update card",
+        error: "Could not find card in database",
       });
       return;
     }
 
     res.status(200).json({ message: "Successfully updated card" });
   } catch (error) {
-    console.error("Error updating card", error);
+    console.error("Failed to update card", error);
 
     res.status(500).json({
-      message: "Error updating card",
+      message: "Failed to update card",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -145,18 +145,18 @@ export async function updateCardPosition(
 
     if (result.affectedRows === 0) {
       res.status(404).json({
-        message: "Error updating card position",
-        error: "Card not found",
+        message: "Failed to update card position",
+        error: "Could not find card in database",
       });
       return;
     }
 
     res.status(200).json({ message: "Successfully updated card position" });
   } catch (error) {
-    console.error("Error updating card position", error);
+    console.error("Failed to update card position", error);
 
     res.status(500).json({
-      message: "Error updating card position",
+      message: "Failed to update card position",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -173,26 +173,18 @@ export async function deleteCard(
   const { boardId, listId, cardId } = req.params;
 
   try {
-    const [result] = await db.execute<ResultSetHeader>(
+    await db.execute<ResultSetHeader>(
       `DELETE FROM cards
       WHERE id = ? AND list_id = ? AND board_id = ?`,
       [cardId, listId, boardId],
     );
 
-    if (result.affectedRows === 0) {
-      res.status(404).json({
-        message: "Error updating card",
-        error: "Card not found",
-      });
-      return;
-    }
-
     res.status(200).json({ message: "Successfully deleted card" });
   } catch (error) {
-    console.error("Error deleting card", error);
+    console.error("Failed to delete card", error);
 
     res.status(500).json({
-      message: "Error deleting card",
+      message: "Failed to delete card",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

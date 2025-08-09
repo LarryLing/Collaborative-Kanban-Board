@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { ForgotPasswordForm } from "@/lib/types";
@@ -20,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 export const Route = createFileRoute("/forgot-password")({
   beforeLoad: ({ context }) => {
@@ -33,9 +29,9 @@ export const Route = createFileRoute("/forgot-password")({
 });
 
 function ForgotPassword() {
-  const { requestPasswordReset } = useAuth();
+  const [error, setError] = useState<string | null>(null);
 
-  const navigate = useNavigate();
+  const { requestPasswordReset } = useAuth();
 
   const form = useForm<ForgotPasswordForm>({
     resolver: zodResolver(ForgotPasswordSchema),
@@ -47,10 +43,8 @@ function ForgotPassword() {
   async function onSubmit(values: ForgotPasswordForm) {
     try {
       await requestPasswordReset(values.email);
-      navigate({ to: "/reset-password" });
     } catch (error) {
-      console.error("Request password reset error", error);
-      //TODO: Display error
+      setError(error instanceof Error ? error.message : "Unknown error");
     }
   }
 

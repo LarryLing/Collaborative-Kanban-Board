@@ -9,8 +9,8 @@ export async function verifyRole(
 ) {
   if (!req.auth) {
     res.status(401).json({
-      message: "Error verifying role",
-      error: "Not authorized",
+      message: "Failed to verify role",
+      error: "User is not authorized to make request",
     });
     return;
   }
@@ -29,8 +29,8 @@ export async function verifyRole(
 
     if (!rows || (rows as BoardCollaborator[]).length === 0) {
       res.status(404).json({
-        message: "Error verifying role",
-        error: "Not a board collaborator",
+        message: "Failed to verify role",
+        error: "User is not a board collaborator",
       });
 
       return;
@@ -40,10 +40,10 @@ export async function verifyRole(
 
     next();
   } catch (error) {
-    console.error("Error verifying role:", error);
+    console.error("Failed to verify role:", error);
 
     res.status(500).json({
-      message: "Error verifying role",
+      message: "Failed to verify role",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }

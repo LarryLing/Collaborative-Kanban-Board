@@ -29,10 +29,10 @@ export async function getAllLists(
       .status(200)
       .json({ message: "Successfully retrieved lists", data: rows as List[] });
   } catch (error) {
-    console.error("Error retrieving lists", error);
+    console.error("Failed to retrieve lists", error);
 
     res.status(500).json({
-      message: "Error retrieving lists",
+      message: "Failed to retrieve lists",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -63,10 +63,10 @@ export async function createList(
 
     res.status(201).json({ message: "Successfully created list", data: list });
   } catch (error) {
-    console.error("Error creating list", error);
+    console.error("Failed to create list", error);
 
     res.status(500).json({
-      message: "Error creating list",
+      message: "Failed to create list",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -93,18 +93,18 @@ export async function updateList(
 
     if (result.affectedRows === 0) {
       res.status(404).json({
-        message: "Error updating list",
-        error: "List not found",
+        message: "Failed to update list",
+        error: "Could not find list in database",
       });
       return;
     }
 
     res.status(200).json({ message: "Successfully updated list" });
   } catch (error) {
-    console.error("Error updating list", error);
+    console.error("Failed to update list", error);
 
     res.status(500).json({
-      message: "Error updating list",
+      message: "Failed to update list",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -131,18 +131,18 @@ export async function updateListPosition(
 
     if (result.affectedRows === 0) {
       res.status(404).json({
-        message: "Error updating list position",
-        error: "List not found",
+        message: "Failed to update list position",
+        error: "Could not find list in database",
       });
       return;
     }
 
     res.status(200).json({ message: "Successfully updated list position" });
   } catch (error) {
-    console.error("Error updating list position", error);
+    console.error("Failed to update list position", error);
 
     res.status(500).json({
-      message: "Error updating list position",
+      message: "Failed to update list position",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
@@ -155,19 +155,11 @@ export async function deleteList(
   const { boardId, listId } = req.params;
 
   try {
-    const [result] = await db.execute<ResultSetHeader>(
+    await db.execute<ResultSetHeader>(
       `DELETE FROM lists
       WHERE id = ? AND board_id = ?`,
       [listId, boardId],
     );
-
-    if (result.affectedRows === 0) {
-      res.status(404).json({
-        message: "Error deleting list",
-        error: "List not found",
-      });
-      return;
-    }
 
     res.status(200).json({ message: "Successfully deleted list" });
   } catch (error) {

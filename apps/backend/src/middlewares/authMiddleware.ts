@@ -12,7 +12,7 @@ export async function verifyAuth(
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       res.status(401).json({
-        message: "Error verifying auth",
+        message: "Failed to verify auth",
         error: "Authorization bearer not provided",
       });
       return;
@@ -22,8 +22,8 @@ export async function verifyAuth(
 
     if (!token) {
       res.status(401).json({
-        message: "Error verifying auth",
-        error: "Token not provided",
+        message: "Failed to verify auth",
+        error: "Access token not provided in authorization bearer",
       });
       return;
     }
@@ -37,11 +37,11 @@ export async function verifyAuth(
 
     next();
   } catch (error) {
-    console.error("Error verifying auth:", error);
+    console.error("Failed to verify auth:", error);
 
     res.status(401).json({
-      message: "Error verifying auth",
-      error: "Invalid or expired token",
+      message: "Failed to verify auth",
+      error,
     });
   }
 }

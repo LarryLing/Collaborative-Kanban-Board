@@ -1,4 +1,5 @@
 import { Request } from "express";
+import { OWNER, COLLABORATOR } from "./constants";
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
   extends Request<P, ResBody, ReqBody> {
@@ -46,7 +47,7 @@ export type UpdateBoardBody = Pick<Board, "title">;
 export type BoardCollaborator = {
   userId: string;
   boardId: string;
-  role: "Owner" | "Collaborator";
+  role: typeof OWNER | typeof COLLABORATOR;
   joinedAt: string;
 };
 

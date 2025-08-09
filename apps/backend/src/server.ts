@@ -4,6 +4,7 @@ dotenv.config();
 
 import express, { Application } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import boardRoutes from "./routes/boardRoutes";
 import listRoutes from "./routes/listRoutes";
 import cardRoutes from "./routes/cardRoutes";
@@ -47,6 +48,8 @@ const corsOptions: CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use(cookieParser());
 
 let startTime: number;
 
