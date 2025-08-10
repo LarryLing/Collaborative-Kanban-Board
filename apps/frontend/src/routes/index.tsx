@@ -1,5 +1,6 @@
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
   beforeLoad: ({ context }) => {
@@ -13,12 +14,20 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const auth = useAuth();
+  const { user, logout } = useAuth();
+
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate({ to: "/login" });
+  };
 
   return (
     <div>
       <h3>
-        Hello: {auth.user?.givenName} {auth.user?.familyName}!
+        Hello: {user?.givenName} {user?.familyName}!
+        <Button onClick={handleLogout}>Logout</Button>
       </h3>
     </div>
   );

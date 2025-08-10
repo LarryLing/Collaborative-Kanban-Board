@@ -48,7 +48,7 @@ function SignUp() {
         values.email,
         values.password,
       );
-      navigate({ to: "/confirm-signup" });
+      navigate({ to: "/confirm-signup", search: { email: values.email } });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }

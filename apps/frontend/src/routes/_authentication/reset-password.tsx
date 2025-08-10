@@ -22,6 +22,12 @@ import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/AuthAlert";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 export const Route = createFileRoute("/_authentication/reset-password")({
   component: ResetPassword,
@@ -48,6 +54,8 @@ function ResetPassword() {
   });
 
   async function onSubmit(values: ResetPasswordForm) {
+    console.log(email);
+
     try {
       await resetPassword(email, values.password, values.confirmationCode);
       navigate({ to: "/login" });
@@ -66,6 +74,32 @@ function ResetPassword() {
               className="flex flex-col items-center gap-y-5"
             >
               <h1 className="text-xl font-semibold">Forgot Password</h1>
+              <FormField
+                control={form.control}
+                name="confirmationCode"
+                render={({ field }) => (
+                  <FormItem className="w-full">
+                    <FormLabel>Confirmation Code</FormLabel>
+                    <FormControl>
+                      <InputOTP
+                        maxLength={6}
+                        {...field}
+                        pattern={REGEXP_ONLY_DIGITS}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="password"

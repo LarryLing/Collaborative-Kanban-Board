@@ -16,11 +16,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/AuthAlert";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 export const Route = createFileRoute("/_authentication/confirm-signup")({
   component: ConfirmSignup,
@@ -70,7 +75,20 @@ function ConfirmSignup() {
                   <FormItem className="w-full">
                     <FormLabel>Confirmation Code</FormLabel>
                     <FormControl>
-                      <Input placeholder="123456" {...field} />
+                      <InputOTP
+                        maxLength={6}
+                        {...field}
+                        pattern={REGEXP_ONLY_DIGITS}
+                      >
+                        <InputOTPGroup>
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
