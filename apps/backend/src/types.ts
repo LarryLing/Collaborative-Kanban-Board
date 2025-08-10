@@ -1,5 +1,12 @@
 import { Request } from "express";
 import { OWNER, COLLABORATOR } from "./constants";
+import type { JwtPayload } from "jwt-decode";
+
+export interface IDTokenPayload extends JwtPayload {
+  email: string;
+  given_name: string;
+  family_name: string;
+}
 
 export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
   extends Request<P, ResBody, ReqBody> {

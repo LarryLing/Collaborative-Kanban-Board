@@ -21,7 +21,7 @@ export type ForgotPasswordForm = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 
 export type EmailSearchBody = {
-  email: string;
+  email: string | undefined;
 };
 
 export type AuthContextType = {

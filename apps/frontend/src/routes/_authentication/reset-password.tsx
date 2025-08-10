@@ -54,7 +54,9 @@ function ResetPassword() {
   });
 
   async function onSubmit(values: ResetPasswordForm) {
-    console.log(email);
+    if (email === undefined) {
+      throw new Error("Email has not been provided");
+    }
 
     try {
       await resetPassword(email, values.password, values.confirmationCode);

@@ -117,22 +117,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
         const { error } = await response.json();
         throw new Error(error);
       }
-
-      const { data } = await response.json();
-      const { idToken, accessToken } = data;
-
-      const { sub, given_name, family_name } =
-        jwtDecode<IDTokenPayload>(idToken);
-
-      setUser({
-        id: sub,
-        email: email,
-        givenName: given_name,
-        familyName: family_name,
-      } as User);
-      setIsAuthenticated(true);
-
-      localStorage.setItem("accessToken", accessToken as string);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";

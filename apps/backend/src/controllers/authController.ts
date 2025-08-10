@@ -7,6 +7,7 @@ import type {
   PasswordResetBody,
   SignUpBody,
   User,
+  IDTokenPayload,
 } from "../types";
 import { type ResultSetHeader } from "mysql2/promise";
 import {
@@ -22,6 +23,7 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import cognito from "../config/cognito";
 import db from "../config/db";
+import { jwtDecode } from "jwt-decode";
 
 export async function getMe(req: Request, res: Response) {
   try {
@@ -100,49 +102,10 @@ export async function confirmSignUp(
       ConfirmationCode: confirmationCode,
     });
 
-    const { Session } = await cognito.send(confirmSignUpCommand);
-
-    if (!Session) {
-      throw new Error("Session token was not generated");
-    }
-
-    const initiateAuthCommand = new InitiateAuthCommand({
-      AuthFlow: AuthFlowType.USER_AUTH,
-      AuthParameters: {
-        USERNAME: email,
-      },
-      ClientId: process.env.COGNITO_CLIENT_ID,
-      Session: Session,
-    });
-
-    const initiateAuthResponse = await cognito.send(initiateAuthCommand);
-
-    if (!initiateAuthResponse.AuthenticationResult) {
-      throw new Error(
-        "Could not initiate auth with the provided session token",
-      );
-    }
-
-    const { IdToken, AccessToken, RefreshToken } =
-      initiateAuthResponse.AuthenticationResult;
-
-    if (!IdToken || !AccessToken || !RefreshToken) {
-      throw new Error("User pool tokens were not generated");
-    }
-
-    res.cookie("refreshToken", RefreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    });
+    await cognito.send(confirmSignUpCommand);
 
     res.status(200).json({
       message: "Successfully logged in new user",
-      data: {
-        idToken: IdToken,
-        accessToken: AccessToken,
-      },
     });
   } catch (error) {
     const errorMessage =
@@ -220,22 +183,8 @@ export async function signUp(
       throw new Error("User subject was not generated");
     }
 
-    const user: User = {
-      id: signUpResponse.UserSub,
-      givenName: givenName,
-      familyName: familyName,
-      email: email,
-    };
-
-    await db.execute(
-      `INSERT IGNORE INTO users (id, given_name, family_name, email)
-      VALUES (?, ?, ?, ?)`,
-      [signUpResponse.UserSub, givenName, familyName, email],
-    );
-
     res.status(201).json({
       message: "Successfully signed up new user",
-      data: user,
     });
   } catch (error) {
     const errorMessage =
@@ -276,6 +225,23 @@ export async function login(
 
     if (!IdToken || !AccessToken || !RefreshToken) {
       throw new Error("User pool tokens were not generated");
+    }
+
+    const { sub, given_name, family_name } = jwtDecode<IDTokenPayload>(IdToken);
+
+    const [rows] = await db.execute(
+      `SELECT 1
+      FROM users
+      WHERE id = ?`,
+      [sub],
+    );
+
+    if (!rows || (rows as User[]).length === 0) {
+      await db.execute(
+        `INSERT INTO users (id, given_name, family_name, email)
+        VALUES (?, ?, ?, ?)`,
+        [sub, given_name, family_name, email],
+      );
     }
 
     res.cookie("refreshToken", RefreshToken, {

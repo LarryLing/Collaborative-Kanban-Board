@@ -35,6 +35,9 @@ importers:
       express:
         specifier: ^5.1.0
         version: 5.1.0
+      jwt-decode:
+        specifier: ^4.0.0
+        version: 4.0.0
       mysql2:
         specifier: ^3.14.3
         version: 3.14.3

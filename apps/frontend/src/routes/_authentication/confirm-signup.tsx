@@ -50,9 +50,13 @@ function ConfirmSignup() {
   });
 
   async function onSubmit(values: ConfirmSignupForm) {
+    if (email === undefined) {
+      throw new Error("Email has not been provided");
+    }
+
     try {
       await confirmSignUp(email, values.confirmationCode);
-      navigate({ to: "/" });
+      navigate({ to: "/login" });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
