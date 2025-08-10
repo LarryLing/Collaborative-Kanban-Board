@@ -49,7 +49,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken: newAccessToken } = data;
 
-      const { sub, email, given_name, family_name } = jwtDecode<IDTokenPayload>(idToken);
+      const { sub, email, given_name, family_name } =
+        jwtDecode<IDTokenPayload>(idToken);
 
       setUser({
         id: sub,
@@ -120,7 +121,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken } = data;
 
-      const { sub, given_name, family_name } = jwtDecode<IDTokenPayload>(idToken);
+      const { sub, given_name, family_name } =
+        jwtDecode<IDTokenPayload>(idToken);
 
       setUser({
         id: sub,
@@ -329,6 +331,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={contextValue}>
+      {isLoading ? null : children}
+    </AuthContext.Provider>
   );
 }

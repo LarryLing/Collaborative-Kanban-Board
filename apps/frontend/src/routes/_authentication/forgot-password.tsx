@@ -1,9 +1,4 @@
-import {
-  createFileRoute,
-  Link,
-  redirect,
-  useNavigate,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { ForgotPasswordForm } from "@/lib/types";
@@ -23,14 +18,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/AuthAlert";
 
-export const Route = createFileRoute("/forgot-password")({
-  beforeLoad: ({ context }) => {
-    if (context.auth.isAuthenticated) {
-      throw redirect({
-        to: "/",
-      });
-    }
-  },
+export const Route = createFileRoute("/_authentication/forgot-password")({
   component: ForgotPassword,
 });
 

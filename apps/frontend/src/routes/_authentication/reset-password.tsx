@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   Link,
-  redirect,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
@@ -24,14 +23,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/AuthAlert";
 
-export const Route = createFileRoute("/reset-password")({
-  beforeLoad: ({ context }) => {
-    if (context.auth.isAuthenticated) {
-      throw redirect({
-        to: "/",
-      });
-    }
-  },
+export const Route = createFileRoute("/_authentication/reset-password")({
   component: ResetPassword,
 });
 
@@ -42,7 +34,9 @@ function ResetPassword() {
 
   const navigate = useNavigate();
 
-  const { email } = useSearch({ from: "/reset-password" }) as EmailSearchBody;
+  const { email } = useSearch({
+    from: "/_authentication/reset-password",
+  }) as EmailSearchBody;
 
   const form = useForm<ResetPasswordForm>({
     resolver: zodResolver(ResetPasswordSchema),

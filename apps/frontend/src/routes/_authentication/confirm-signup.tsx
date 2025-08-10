@@ -1,6 +1,5 @@
 import {
   createFileRoute,
-  redirect,
   useNavigate,
   useSearch,
 } from "@tanstack/react-router";
@@ -23,14 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/AuthAlert";
 
-export const Route = createFileRoute("/confirm-signup")({
-  beforeLoad: ({ context }) => {
-    if (context.auth.isAuthenticated) {
-      throw redirect({
-        to: "/",
-      });
-    }
-  },
+export const Route = createFileRoute("/_authentication/confirm-signup")({
   component: ConfirmSignup,
 });
 
@@ -41,7 +33,9 @@ function ConfirmSignup() {
 
   const navigate = useNavigate();
 
-  const { email } = useSearch({ from: "/confirm-signup" }) as EmailSearchBody;
+  const { email } = useSearch({
+    from: "/_authentication/confirm-signup",
+  }) as EmailSearchBody;
 
   const form = useForm<ConfirmSignupForm>({
     resolver: zodResolver(ConfirmSignupSchema),
