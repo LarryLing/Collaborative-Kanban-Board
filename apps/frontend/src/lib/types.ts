@@ -53,3 +53,10 @@ export type User = {
   familyName: string;
   email: string;
 };
+
+export type Board = {
+  id: string;
+  ownerId: string;
+  title: string;
+  createdAt: string;
+};

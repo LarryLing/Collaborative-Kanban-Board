@@ -17,9 +17,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card } from "@/components/ui/card";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
-import AuthAlert from "@/components/auth/AuthAlert";
+import AuthAlert from "@/components/auth/auth-alert";
 import {
   InputOTP,
   InputOTPGroup,

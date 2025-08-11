@@ -1,6 +1,6 @@
 import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
 import { BACKEND_URL } from "@/lib/constants";
 
