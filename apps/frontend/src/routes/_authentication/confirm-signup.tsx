@@ -34,7 +34,7 @@ export const Route = createFileRoute("/_authentication/confirm-signup")({
 function ConfirmSignup() {
   const [error, setError] = useState<string | null>(null);
 
-  const { confirmSignUp } = useAuth();
+  const { confirmSignUp, resendSignUp } = useAuth();
 
   const navigate = useNavigate();
 
@@ -62,7 +62,17 @@ function ConfirmSignup() {
     }
   }
 
-  const handleResendCode = async () => {};
+  const handleResendCode = async () => {
+    if (email === undefined) {
+      throw new Error("Email has not been provided");
+    }
+
+    try {
+      await resendSignUp(email);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Unknown error");
+    }
+  };
 
   return (
     <section className="bg-muted h-screen">

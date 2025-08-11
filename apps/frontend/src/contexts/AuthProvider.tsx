@@ -156,6 +156,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const resendSignUp = async (email: string) => {
+    try {
+      const response = await fetch(buildUrl("/api/auth/signup/resend"), {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const { error } = await response.json();
+        throw new Error(error);
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error";
+
+      console.error(
+        "Failed to resend sign up confirmation code:",
+        errorMessage,
+      );
+
+      throw error;
+    }
+  };
+
   const login = async (email: string, password: string) => {
     try {
       const response = await fetch(buildUrl("/api/auth/login"), {
@@ -306,6 +334,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isAuthenticated,
     isLoading,
     signUp,
+    resendSignUp,
     confirmSignUp,
     login,
     logout,

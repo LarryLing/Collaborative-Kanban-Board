@@ -6,6 +6,7 @@ import {
   login,
   logout,
   requestPasswordReset,
+  resendSignUp,
   resetPassword,
   signUp,
 } from "../controllers/authController";
@@ -17,6 +18,7 @@ authRouter.get("/me", getMe);
 authRouter.put("/reset-password", resetPassword);
 authRouter.post("/confirm-signup", confirmSignUp);
 authRouter.post("/signup", signUp);
+authRouter.post("/signup/resend", resendSignUp);
 authRouter.post("/login", login);
 authRouter.post("/logout", verifyAuth, logout);
 authRouter.post("/reset-password", requestPasswordReset);

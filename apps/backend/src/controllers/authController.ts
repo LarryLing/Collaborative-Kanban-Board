@@ -2,7 +2,7 @@ import type { Response, Request } from "express";
 import type {
   AuthRequest,
   LoginBody,
-  RequestPasswordResetBody,
+  RequestConfirmationCode,
   PasswordResetBody,
   SignUpBody,
   User,
@@ -20,6 +20,7 @@ import {
   ConfirmForgotPasswordCommand,
   SignUpCommand,
   ConfirmSignUpCommand,
+  ResendConfirmationCodeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
 import cognito from "../config/cognito";
 import db from "../config/db";
@@ -129,6 +130,7 @@ export async function confirmSignUp(
 ) {
   try {
     const { email, confirmationCode } = req.body;
+
     const confirmSignUpCommand = new ConfirmSignUpCommand({
       ClientId: process.env.COGNITO_CLIENT_ID,
       Username: email,
@@ -199,6 +201,36 @@ export async function signUp(
 
     res.status(500).json({
       message: "Failed to sign up new user",
+      error: errorMessage,
+    });
+  }
+}
+
+export async function resendSignUp(
+  req: Request<object, object, RequestConfirmationCode>,
+  res: Response,
+) {
+  try {
+    const { email } = req.body;
+
+    const resendConfirmationCodeCommand = new ResendConfirmationCodeCommand({
+      ClientId: process.env.COGNITO_CLIENT_ID,
+      Username: email,
+    });
+
+    await cognito.send(resendConfirmationCodeCommand);
+
+    res.status(200).json({
+      message: "Successfully resent sign up confirmation code",
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    console.error("Failed to resend sign up confirmation code:", errorMessage);
+
+    res.status(500).json({
+      message: "Failed to resend sign up confirmation code",
       error: errorMessage,
     });
   }
@@ -337,7 +369,7 @@ export async function logout(req: AuthRequest, res: Response) {
 }
 
 export async function requestPasswordReset(
-  req: AuthRequest<object, object, RequestPasswordResetBody>,
+  req: AuthRequest<object, object, RequestConfirmationCode>,
   res: Response,
 ) {
   try {

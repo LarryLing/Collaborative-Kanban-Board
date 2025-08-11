@@ -39,7 +39,7 @@ export type PasswordResetBody = Pick<User, "email"> & {
   confirmationCode: string;
   password: string;
 };
-export type RequestPasswordResetBody = Pick<User, "email">;
+export type RequestConfirmationCode = Pick<User, "email">;
 
 export type Board = {
   id: string;

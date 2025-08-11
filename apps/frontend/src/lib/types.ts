@@ -34,6 +34,7 @@ export type AuthContextType = {
     email: string,
     password: string,
   ) => Promise<void>;
+  resendSignUp: (email: string) => Promise<void>;
   confirmSignUp: (email: string, confirmationCode: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
