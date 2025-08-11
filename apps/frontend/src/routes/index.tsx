@@ -14,7 +14,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { user, logout } = useAuth();
+  const { user, logout, deleteAccount } = useAuth();
 
   const navigate = useNavigate();
 
@@ -23,11 +23,19 @@ function Home() {
     navigate({ to: "/login" });
   };
 
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
+    navigate({ to: "/login" });
+  };
+
   return (
     <div>
       <h3>
         Hello: {user?.givenName} {user?.familyName}!
         <Button onClick={handleLogout}>Logout</Button>
+        <Button variant="destructive" onClick={handleDeleteAccount}>
+          Delete account
+        </Button>
       </h3>
     </div>
   );

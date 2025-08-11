@@ -14,7 +14,7 @@ import { verifyAuth } from "../middlewares/authMiddleware";
 
 const authRouter: Router = Router();
 
-authRouter.get("/me", getMe);
+authRouter.get("/me", verifyAuth, getMe);
 authRouter.put("/reset-password", resetPassword);
 authRouter.post("/confirm-signup", confirmSignUp);
 authRouter.post("/signup", signUp);

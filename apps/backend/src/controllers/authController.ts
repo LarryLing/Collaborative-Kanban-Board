@@ -27,8 +27,21 @@ import db from "../config/db";
 import { jwtDecode } from "jwt-decode";
 import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
 
-export async function getMe(req: Request, res: Response) {
+export async function getMe(req: AuthRequest, res: Response) {
   try {
+    if (!req.auth) {
+      console.error(
+        "Failed to get user: User is not authorized to make request",
+      );
+
+      res.status(401).json({
+        message: "Failed to get user",
+        error: "User is not authorized to make request",
+      });
+
+      return;
+    }
+
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
@@ -68,7 +81,7 @@ export async function getMe(req: Request, res: Response) {
     res.cookie("refreshToken", RefreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -285,7 +298,7 @@ export async function login(
     res.cookie("refreshToken", RefreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
 
@@ -349,7 +362,7 @@ export async function logout(req: AuthRequest, res: Response) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
     });
 
     res.status(200).json({
@@ -445,7 +458,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
     res.clearCookie("refreshToken", {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "strict",
     });
 
     res.status(200).json({ message: "Successfully deleted user" });
