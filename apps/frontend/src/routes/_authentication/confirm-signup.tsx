@@ -62,6 +62,8 @@ function ConfirmSignup() {
     }
   }
 
+  const handleResendCode = async () => {};
+
   return (
     <section className="bg-muted h-screen">
       <div className="flex h-full items-center justify-center">
@@ -103,6 +105,15 @@ function ConfirmSignup() {
               </Button>
             </form>
           </Form>
+          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
+            <p>Didn't receive a code?</p>
+            <p
+              onClick={handleResendCode}
+              className="text-primary font-medium hover:underline"
+            >
+              Resend code
+            </p>
+          </div>
           {error && (
             <AuthAlert title="Failed to confirm sign up" error={error} />
           )}

@@ -1,21 +1,18 @@
 import mysql from "mysql2/promise";
-
-if (
-  !process.env.RDS_HOSTNAME ||
-  !process.env.RDS_USERNAME ||
-  !process.env.RDS_PASSWORD ||
-  !process.env.RDS_PORT ||
-  !process.env.RDS_DB_NAME
-) {
-  throw new Error("Missing RDS environment variables!");
-}
+import {
+  RDS_HOSTNAME,
+  RDS_USERNAME,
+  RDS_PASSWORD,
+  RDS_PORT,
+  RDS_DB_NAME,
+} from "../constants";
 
 const db = mysql.createPool({
-  host: process.env.RDS_HOSTNAME,
-  user: process.env.RDS_USERNAME,
-  password: process.env.RDS_PASSWORD,
-  port: parseInt(process.env.RDS_PORT),
-  database: process.env.RDS_DB_NAME,
+  host: RDS_HOSTNAME,
+  user: RDS_USERNAME,
+  password: RDS_PASSWORD,
+  port: RDS_PORT,
+  database: RDS_DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

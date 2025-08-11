@@ -1,18 +1,15 @@
 import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
-
-if (
-  !process.env.AWS_REGION ||
-  !process.env.AWS_ACCESS_KEY ||
-  !process.env.AWS_SECRET_ACCESS_KEY
-) {
-  throw new Error("Missing AWS environment variables!");
-}
+import {
+  AWS_ACCESS_KEY,
+  AWS_REGION,
+  AWS_SECRET_ACCESS_KEY,
+} from "../constants";
 
 const cognito = new CognitoIdentityProviderClient({
-  region: process.env.AWS_REGION,
+  region: AWS_REGION,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: AWS_ACCESS_KEY,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
   },
 });
 

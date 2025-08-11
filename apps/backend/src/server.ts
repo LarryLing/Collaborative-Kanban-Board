@@ -12,6 +12,7 @@ import collaboratorRoutes from "./routes/collaboratorRoutes";
 import authRouter from "./routes/authRoutes";
 import config from "./config/config";
 import db from "./config/db";
+import { FRONTEND_URL } from "./constants";
 
 const app: Application = express();
 
@@ -30,9 +31,7 @@ interface CorsOptions {
 
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      process.env.FRONTEND_URL || "http://localhost:5173",
-    ];
+    const allowedOrigins = [FRONTEND_URL];
 
     if (allowedOrigins.includes(origin || "") || !origin) {
       callback(null, true);

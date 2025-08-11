@@ -2,6 +2,7 @@ import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./AuthContext";
 import { jwtDecode } from "jwt-decode";
+import { BACKEND_URL } from "@/lib/constants";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -13,10 +14,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const buildUrl = (endpoint: string) => {
-    const baseUrl = import.meta.env.VITE_BACKEND_URL
-      ? (import.meta.env.VITE_BACKEND_URL as string)
-      : "http://localhost:3000/";
-    return `${baseUrl.replace(/\/$/, "")}${endpoint}`;
+    return `${BACKEND_URL.replace(/\/$/, "")}${endpoint}`;
   };
 
   const loadUser = async () => {
@@ -82,6 +80,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await fetch(buildUrl("/api/auth/reset-password"), {
         method: "PUT",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -233,6 +232,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const response = await fetch(buildUrl("/api/auth/reset-password"), {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },

@@ -1,11 +1,13 @@
+import { NODE_ENV, PORT } from "../constants";
+
 interface Config {
   port: number;
   nodeEnv: string;
 }
 
 const config: Config = {
-  port: Number(process.env.PORT) || 3000,
-  nodeEnv: process.env.NODE_ENV || "development",
+  port: PORT,
+  nodeEnv: NODE_ENV,
 };
 
 export default config;
