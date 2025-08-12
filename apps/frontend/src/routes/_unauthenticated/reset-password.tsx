@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
-export const Route = createFileRoute("/_authentication/reset-password")({
+export const Route = createFileRoute("/_unauthenticated/reset-password")({
   component: ResetPassword,
 });
 

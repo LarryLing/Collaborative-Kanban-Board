@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import type { User } from "@/lib/types";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { CircleUserRound, EllipsisVertical, LogOutIcon } from "lucide-react";
 
 type NavUserProps = User;
@@ -82,9 +82,11 @@ export function NavUser({ givenName, familyName, email }: NavUserProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <CircleUserRound />
-              Account
+            <DropdownMenuItem asChild>
+              <Link to="/account">
+                <CircleUserRound />
+                Account
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleLogout}>
               <LogOutIcon />

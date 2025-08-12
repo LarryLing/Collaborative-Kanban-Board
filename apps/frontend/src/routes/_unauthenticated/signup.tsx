@@ -18,7 +18,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/auth-alert";
 
-export const Route = createFileRoute("/_authentication/signup")({
+export const Route = createFileRoute("/_unauthenticated/signup")({
   component: SignUp,
 });
 

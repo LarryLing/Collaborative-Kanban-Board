@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
-export const Route = createFileRoute("/_authentication/confirm-signup")({
+export const Route = createFileRoute("/_unauthenticated/confirm-signup")({
   component: ConfirmSignup,
 });
 
@@ -39,7 +39,7 @@ function ConfirmSignup() {
   const navigate = useNavigate();
 
   const { email } = useSearch({
-    from: "/_authentication/confirm-signup",
+    from: "/_unauthenticated/confirm-signup",
   }) as EmailSearchBody;
 
   const form = useForm<ConfirmSignupForm>({

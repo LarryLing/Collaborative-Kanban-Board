@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import type { LoginForm } from "@/lib/types";
-import { LoginSchema } from "@/lib/schemas";
+import type { ForgotPasswordForm } from "@/lib/types";
+import { ForgotPasswordSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -18,29 +18,28 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/auth-alert";
 
-export const Route = createFileRoute("/_authentication/login")({
-  component: Login,
+export const Route = createFileRoute("/_unauthenticated/forgot-password")({
+  component: ForgotPassword,
 });
 
-function Login() {
+function ForgotPassword() {
   const [error, setError] = useState<string | null>(null);
 
-  const { login } = useAuth();
+  const { requestPasswordReset } = useAuth();
 
   const navigate = useNavigate();
 
-  const form = useForm<LoginForm>({
-    resolver: zodResolver(LoginSchema),
+  const form = useForm<ForgotPasswordForm>({
+    resolver: zodResolver(ForgotPasswordSchema),
     defaultValues: {
       email: "",
-      password: "",
     },
   });
 
-  async function onSubmit(values: LoginForm) {
+  async function onSubmit(values: ForgotPasswordForm) {
     try {
-      await login(values.email, values.password);
-      navigate({ to: "/" });
+      await requestPasswordReset(values.email);
+      navigate({ to: "/reset-password", search: { email: values.email } });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
@@ -55,7 +54,7 @@ function Login() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col items-center gap-y-5"
             >
-              <h1 className="text-xl font-semibold">Login</h1>
+              <h1 className="text-xl font-semibold">Forgot Password</h1>
               <FormField
                 control={form.control}
                 name="email"
@@ -69,46 +68,23 @@ function Login() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <div className="flex justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input
-                        placeholder="••••••••"
-                        type="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <Button type="submit" className="w-full">
-                Login
+                Send password recovery
               </Button>
             </form>
           </Form>
           <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
-            <p>Need an account?</p>
+            <p>Remember your password?</p>
             <Link
-              to="/signup"
+              to="/login"
               className="text-primary font-medium hover:underline"
             >
-              Sign up
+              Go back
             </Link>
           </div>
-          {error && <AuthAlert title="Failed to login user" error={error} />}
+          {error && (
+            <AuthAlert title="Failed to request password reset" error={error} />
+          )}
         </Card>
       </div>
     </section>

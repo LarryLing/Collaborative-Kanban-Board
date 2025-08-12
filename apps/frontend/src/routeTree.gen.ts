@@ -9,16 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthenticationRouteImport } from './routes/_authentication'
+import { Route as UnauthenticatedRouteRouteImport } from './routes/_unauthenticated/route'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticationSignupRouteImport } from './routes/_authentication/signup'
-import { Route as AuthenticationResetPasswordRouteImport } from './routes/_authentication/reset-password'
-import { Route as AuthenticationLoginRouteImport } from './routes/_authentication/login'
-import { Route as AuthenticationForgotPasswordRouteImport } from './routes/_authentication/forgot-password'
-import { Route as AuthenticationConfirmSignupRouteImport } from './routes/_authentication/confirm-signup'
+import { Route as UnauthenticatedSignupRouteImport } from './routes/_unauthenticated/signup'
+import { Route as UnauthenticatedResetPasswordRouteImport } from './routes/_unauthenticated/reset-password'
+import { Route as UnauthenticatedLoginRouteImport } from './routes/_unauthenticated/login'
+import { Route as UnauthenticatedForgotPasswordRouteImport } from './routes/_unauthenticated/forgot-password'
+import { Route as UnauthenticatedConfirmSignupRouteImport } from './routes/_unauthenticated/confirm-signup'
+import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
+import { Route as AuthenticatedBoardsIndexRouteImport } from './routes/_authenticated/boards/index'
+import { Route as AuthenticatedBoardsBoardIdRouteImport } from './routes/_authenticated/boards/$boardId'
 
-const AuthenticationRoute = AuthenticationRouteImport.update({
-  id: '/_authentication',
+const UnauthenticatedRouteRoute = UnauthenticatedRouteRouteImport.update({
+  id: '/_unauthenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -26,101 +34,146 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticationSignupRoute = AuthenticationSignupRouteImport.update({
+const UnauthenticatedSignupRoute = UnauthenticatedSignupRouteImport.update({
   id: '/signup',
   path: '/signup',
-  getParentRoute: () => AuthenticationRoute,
+  getParentRoute: () => UnauthenticatedRouteRoute,
 } as any)
-const AuthenticationResetPasswordRoute =
-  AuthenticationResetPasswordRouteImport.update({
+const UnauthenticatedResetPasswordRoute =
+  UnauthenticatedResetPasswordRouteImport.update({
     id: '/reset-password',
     path: '/reset-password',
-    getParentRoute: () => AuthenticationRoute,
+    getParentRoute: () => UnauthenticatedRouteRoute,
   } as any)
-const AuthenticationLoginRoute = AuthenticationLoginRouteImport.update({
+const UnauthenticatedLoginRoute = UnauthenticatedLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => AuthenticationRoute,
+  getParentRoute: () => UnauthenticatedRouteRoute,
 } as any)
-const AuthenticationForgotPasswordRoute =
-  AuthenticationForgotPasswordRouteImport.update({
+const UnauthenticatedForgotPasswordRoute =
+  UnauthenticatedForgotPasswordRouteImport.update({
     id: '/forgot-password',
     path: '/forgot-password',
-    getParentRoute: () => AuthenticationRoute,
+    getParentRoute: () => UnauthenticatedRouteRoute,
   } as any)
-const AuthenticationConfirmSignupRoute =
-  AuthenticationConfirmSignupRouteImport.update({
+const UnauthenticatedConfirmSignupRoute =
+  UnauthenticatedConfirmSignupRouteImport.update({
     id: '/confirm-signup',
     path: '/confirm-signup',
-    getParentRoute: () => AuthenticationRoute,
+    getParentRoute: () => UnauthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountRoute = AuthenticatedAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBoardsIndexRoute =
+  AuthenticatedBoardsIndexRouteImport.update({
+    id: '/boards/',
+    path: '/boards/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBoardsBoardIdRoute =
+  AuthenticatedBoardsBoardIdRouteImport.update({
+    id: '/boards/$boardId',
+    path: '/boards/$boardId',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/confirm-signup': typeof AuthenticationConfirmSignupRoute
-  '/forgot-password': typeof AuthenticationForgotPasswordRoute
-  '/login': typeof AuthenticationLoginRoute
-  '/reset-password': typeof AuthenticationResetPasswordRoute
-  '/signup': typeof AuthenticationSignupRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/confirm-signup': typeof UnauthenticatedConfirmSignupRoute
+  '/forgot-password': typeof UnauthenticatedForgotPasswordRoute
+  '/login': typeof UnauthenticatedLoginRoute
+  '/reset-password': typeof UnauthenticatedResetPasswordRoute
+  '/signup': typeof UnauthenticatedSignupRoute
+  '/boards/$boardId': typeof AuthenticatedBoardsBoardIdRoute
+  '/boards': typeof AuthenticatedBoardsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/confirm-signup': typeof AuthenticationConfirmSignupRoute
-  '/forgot-password': typeof AuthenticationForgotPasswordRoute
-  '/login': typeof AuthenticationLoginRoute
-  '/reset-password': typeof AuthenticationResetPasswordRoute
-  '/signup': typeof AuthenticationSignupRoute
+  '/account': typeof AuthenticatedAccountRoute
+  '/confirm-signup': typeof UnauthenticatedConfirmSignupRoute
+  '/forgot-password': typeof UnauthenticatedForgotPasswordRoute
+  '/login': typeof UnauthenticatedLoginRoute
+  '/reset-password': typeof UnauthenticatedResetPasswordRoute
+  '/signup': typeof UnauthenticatedSignupRoute
+  '/boards/$boardId': typeof AuthenticatedBoardsBoardIdRoute
+  '/boards': typeof AuthenticatedBoardsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/_authentication': typeof AuthenticationRouteWithChildren
-  '/_authentication/confirm-signup': typeof AuthenticationConfirmSignupRoute
-  '/_authentication/forgot-password': typeof AuthenticationForgotPasswordRoute
-  '/_authentication/login': typeof AuthenticationLoginRoute
-  '/_authentication/reset-password': typeof AuthenticationResetPasswordRoute
-  '/_authentication/signup': typeof AuthenticationSignupRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/_unauthenticated': typeof UnauthenticatedRouteRouteWithChildren
+  '/_authenticated/account': typeof AuthenticatedAccountRoute
+  '/_unauthenticated/confirm-signup': typeof UnauthenticatedConfirmSignupRoute
+  '/_unauthenticated/forgot-password': typeof UnauthenticatedForgotPasswordRoute
+  '/_unauthenticated/login': typeof UnauthenticatedLoginRoute
+  '/_unauthenticated/reset-password': typeof UnauthenticatedResetPasswordRoute
+  '/_unauthenticated/signup': typeof UnauthenticatedSignupRoute
+  '/_authenticated/boards/$boardId': typeof AuthenticatedBoardsBoardIdRoute
+  '/_authenticated/boards/': typeof AuthenticatedBoardsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/account'
     | '/confirm-signup'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/boards/$boardId'
+    | '/boards'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/account'
     | '/confirm-signup'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/boards/$boardId'
+    | '/boards'
   id:
     | '__root__'
     | '/'
-    | '/_authentication'
-    | '/_authentication/confirm-signup'
-    | '/_authentication/forgot-password'
-    | '/_authentication/login'
-    | '/_authentication/reset-password'
-    | '/_authentication/signup'
+    | '/_authenticated'
+    | '/_unauthenticated'
+    | '/_authenticated/account'
+    | '/_unauthenticated/confirm-signup'
+    | '/_unauthenticated/forgot-password'
+    | '/_unauthenticated/login'
+    | '/_unauthenticated/reset-password'
+    | '/_unauthenticated/signup'
+    | '/_authenticated/boards/$boardId'
+    | '/_authenticated/boards/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthenticationRoute: typeof AuthenticationRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  UnauthenticatedRouteRoute: typeof UnauthenticatedRouteRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_authentication': {
-      id: '/_authentication'
+    '/_unauthenticated': {
+      id: '/_unauthenticated'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof AuthenticationRouteImport
+      preLoaderRoute: typeof UnauthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -130,67 +183,103 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authentication/signup': {
-      id: '/_authentication/signup'
+    '/_unauthenticated/signup': {
+      id: '/_unauthenticated/signup'
       path: '/signup'
       fullPath: '/signup'
-      preLoaderRoute: typeof AuthenticationSignupRouteImport
-      parentRoute: typeof AuthenticationRoute
+      preLoaderRoute: typeof UnauthenticatedSignupRouteImport
+      parentRoute: typeof UnauthenticatedRouteRoute
     }
-    '/_authentication/reset-password': {
-      id: '/_authentication/reset-password'
+    '/_unauthenticated/reset-password': {
+      id: '/_unauthenticated/reset-password'
       path: '/reset-password'
       fullPath: '/reset-password'
-      preLoaderRoute: typeof AuthenticationResetPasswordRouteImport
-      parentRoute: typeof AuthenticationRoute
+      preLoaderRoute: typeof UnauthenticatedResetPasswordRouteImport
+      parentRoute: typeof UnauthenticatedRouteRoute
     }
-    '/_authentication/login': {
-      id: '/_authentication/login'
+    '/_unauthenticated/login': {
+      id: '/_unauthenticated/login'
       path: '/login'
       fullPath: '/login'
-      preLoaderRoute: typeof AuthenticationLoginRouteImport
-      parentRoute: typeof AuthenticationRoute
+      preLoaderRoute: typeof UnauthenticatedLoginRouteImport
+      parentRoute: typeof UnauthenticatedRouteRoute
     }
-    '/_authentication/forgot-password': {
-      id: '/_authentication/forgot-password'
+    '/_unauthenticated/forgot-password': {
+      id: '/_unauthenticated/forgot-password'
       path: '/forgot-password'
       fullPath: '/forgot-password'
-      preLoaderRoute: typeof AuthenticationForgotPasswordRouteImport
-      parentRoute: typeof AuthenticationRoute
+      preLoaderRoute: typeof UnauthenticatedForgotPasswordRouteImport
+      parentRoute: typeof UnauthenticatedRouteRoute
     }
-    '/_authentication/confirm-signup': {
-      id: '/_authentication/confirm-signup'
+    '/_unauthenticated/confirm-signup': {
+      id: '/_unauthenticated/confirm-signup'
       path: '/confirm-signup'
       fullPath: '/confirm-signup'
-      preLoaderRoute: typeof AuthenticationConfirmSignupRouteImport
-      parentRoute: typeof AuthenticationRoute
+      preLoaderRoute: typeof UnauthenticatedConfirmSignupRouteImport
+      parentRoute: typeof UnauthenticatedRouteRoute
+    }
+    '/_authenticated/account': {
+      id: '/_authenticated/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AuthenticatedAccountRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/boards/': {
+      id: '/_authenticated/boards/'
+      path: '/boards'
+      fullPath: '/boards'
+      preLoaderRoute: typeof AuthenticatedBoardsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/boards/$boardId': {
+      id: '/_authenticated/boards/$boardId'
+      path: '/boards/$boardId'
+      fullPath: '/boards/$boardId'
+      preLoaderRoute: typeof AuthenticatedBoardsBoardIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
   }
 }
 
-interface AuthenticationRouteChildren {
-  AuthenticationConfirmSignupRoute: typeof AuthenticationConfirmSignupRoute
-  AuthenticationForgotPasswordRoute: typeof AuthenticationForgotPasswordRoute
-  AuthenticationLoginRoute: typeof AuthenticationLoginRoute
-  AuthenticationResetPasswordRoute: typeof AuthenticationResetPasswordRoute
-  AuthenticationSignupRoute: typeof AuthenticationSignupRoute
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
+  AuthenticatedBoardsBoardIdRoute: typeof AuthenticatedBoardsBoardIdRoute
+  AuthenticatedBoardsIndexRoute: typeof AuthenticatedBoardsIndexRoute
 }
 
-const AuthenticationRouteChildren: AuthenticationRouteChildren = {
-  AuthenticationConfirmSignupRoute: AuthenticationConfirmSignupRoute,
-  AuthenticationForgotPasswordRoute: AuthenticationForgotPasswordRoute,
-  AuthenticationLoginRoute: AuthenticationLoginRoute,
-  AuthenticationResetPasswordRoute: AuthenticationResetPasswordRoute,
-  AuthenticationSignupRoute: AuthenticationSignupRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountRoute: AuthenticatedAccountRoute,
+  AuthenticatedBoardsBoardIdRoute: AuthenticatedBoardsBoardIdRoute,
+  AuthenticatedBoardsIndexRoute: AuthenticatedBoardsIndexRoute,
 }
 
-const AuthenticationRouteWithChildren = AuthenticationRoute._addFileChildren(
-  AuthenticationRouteChildren,
-)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface UnauthenticatedRouteRouteChildren {
+  UnauthenticatedConfirmSignupRoute: typeof UnauthenticatedConfirmSignupRoute
+  UnauthenticatedForgotPasswordRoute: typeof UnauthenticatedForgotPasswordRoute
+  UnauthenticatedLoginRoute: typeof UnauthenticatedLoginRoute
+  UnauthenticatedResetPasswordRoute: typeof UnauthenticatedResetPasswordRoute
+  UnauthenticatedSignupRoute: typeof UnauthenticatedSignupRoute
+}
+
+const UnauthenticatedRouteRouteChildren: UnauthenticatedRouteRouteChildren = {
+  UnauthenticatedConfirmSignupRoute: UnauthenticatedConfirmSignupRoute,
+  UnauthenticatedForgotPasswordRoute: UnauthenticatedForgotPasswordRoute,
+  UnauthenticatedLoginRoute: UnauthenticatedLoginRoute,
+  UnauthenticatedResetPasswordRoute: UnauthenticatedResetPasswordRoute,
+  UnauthenticatedSignupRoute: UnauthenticatedSignupRoute,
+}
+
+const UnauthenticatedRouteRouteWithChildren =
+  UnauthenticatedRouteRoute._addFileChildren(UnauthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthenticationRoute: AuthenticationRouteWithChildren,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  UnauthenticatedRouteRoute: UnauthenticatedRouteRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
