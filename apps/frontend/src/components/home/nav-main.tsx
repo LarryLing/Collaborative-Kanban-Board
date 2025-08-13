@@ -23,13 +23,11 @@ import {
   SquareKanban,
   Trash,
 } from "lucide-react";
-import type { Board } from "@/lib/types";
+import { useBoards } from "@/hooks/use-boards";
+import { Link } from "@tanstack/react-router";
 
-type NavMainProps = {
-  boards: Board[];
-};
-
-export function NavMain({ boards }: NavMainProps) {
+export function NavMain() {
+  const { boards, isLoading } = useBoards();
   const { isMobile } = useSidebar();
 
   return (
@@ -46,46 +44,54 @@ export function NavMain({ boards }: NavMainProps) {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarGroupLabel>Boards</SidebarGroupLabel>
-          {boards.map((board) => (
-            <SidebarMenuItem key={board.id}>
-              <SidebarMenuButton asChild>
-                <a href="#">
-                  <SquareKanban />
-                  <span>{board.title}</span>
-                </a>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction
-                    showOnHover
-                    className="data-[state=open]:bg-accent rounded-sm"
+          {isLoading ? (
+            <p>Loading boards...</p>
+          ) : (
+            boards.map((board) => (
+              <SidebarMenuItem key={board.id}>
+                <SidebarMenuButton asChild>
+                  <Link
+                    to="/boards/$boardId"
+                    params={{
+                      boardId: board.id
+                    }}>
+                      <SquareKanban />
+                      <span>{board.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                    <SidebarMenuAction
+                      showOnHover
+                      className="data-[state=open]:bg-accent rounded-sm"
+                    >
+                      <EllipsisVertical />
+                      <span className="sr-only">More</span>
+                    </SidebarMenuAction>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    className="w-24 rounded-lg"
+                    side={isMobile ? "bottom" : "right"}
+                    align={isMobile ? "end" : "start"}
                   >
-                    <EllipsisVertical />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-24 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem>
-                    <Folder />
-                    <span>Open</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <Share />
-                    <span>Share</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive">
-                    <Trash />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
+                    <DropdownMenuItem>
+                      <Folder />
+                      <span>Open</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Share />
+                      <span>Share</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem variant="destructive">
+                      <Trash />
+                      <span>Delete</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </SidebarMenuItem>
+            ))
+          )}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

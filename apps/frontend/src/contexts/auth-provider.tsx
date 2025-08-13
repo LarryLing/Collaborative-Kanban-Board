@@ -2,7 +2,7 @@ import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
-import { BACKEND_URL } from "@/lib/constants";
+import { buildUrl } from "@/lib/utils";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -12,10 +12,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  const buildUrl = (endpoint: string) => {
-    return `${BACKEND_URL.replace(/\/$/, "")}${endpoint}`;
-  };
 
   const loadUser = async () => {
     try {
@@ -333,6 +329,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isAuthenticated,
     isLoading,
+    loadUser,
     signUp,
     resendSignUp,
     confirmSignUp,

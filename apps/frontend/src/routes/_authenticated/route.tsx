@@ -1,9 +1,6 @@
-import { useAuth } from "@/hooks/use-auth";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { HomeSidebar } from "@/components/home/home-sidebar";
-import { useState } from "react";
-import type { Board } from "@/lib/types";
 import { HomeHeader } from "@/components/home/home-header";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -18,10 +15,6 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 function AuthenticatedLayout() {
-  const [boards] = useState<Board[]>([]);
-
-  const { user } = useAuth();
-
   return (
     <SidebarProvider
       style={
@@ -31,7 +24,7 @@ function AuthenticatedLayout() {
         } as React.CSSProperties
       }
     >
-      <HomeSidebar user={user!} boards={boards} variant="inset" />
+      <HomeSidebar variant="inset" />
       <SidebarInset>
         <HomeHeader />
         <div className="flex flex-1 flex-col">
