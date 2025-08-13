@@ -7,6 +7,7 @@ import {
   SignupSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
+import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 
 export interface IDTokenPayload extends JwtPayload {
   email: string;
@@ -24,30 +25,6 @@ export type EmailSearchBody = {
   email: string | undefined;
 };
 
-export type AuthContextType = {
-  user: User | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  loadUser: () => Promise<void>;
-  signUp: (
-    givenName: string,
-    familyName: string,
-    email: string,
-    password: string,
-  ) => Promise<void>;
-  resendSignUp: (email: string) => Promise<void>;
-  confirmSignUp: (email: string, confirmationCode: string) => Promise<void>;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  requestPasswordReset: (email: string) => Promise<void>;
-  resetPassword: (
-    email: string,
-    password: string,
-    confirmationCode: string,
-  ) => Promise<void>;
-  deleteAccount: () => Promise<void>;
-};
-
 export type User = {
   id: string;
   givenName: string;
@@ -60,4 +37,61 @@ export type Board = {
   ownerId: string;
   title: string;
   createdAt: string;
+};
+
+export type AuthContextType = {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  loadUser: () => Promise<void>;
+  signUp: (
+    givenName: User["givenName"],
+    familyName: User["familyName"],
+    email: User["email"],
+    password: string,
+  ) => Promise<void>;
+  resendSignUp: (email: User["email"]) => Promise<void>;
+  confirmSignUp: (
+    email: User["email"],
+    confirmationCode: string,
+  ) => Promise<void>;
+  login: (email: User["email"], password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  requestPasswordReset: (email: User["email"]) => Promise<void>;
+  resetPassword: (
+    email: User["email"],
+    password: string,
+    confirmationCode: string,
+  ) => Promise<void>;
+  deleteAccount: () => Promise<void>;
+};
+
+export type UseBoardsReturnType = {
+  boards: Board[];
+  isLoading: boolean;
+  createBoardMutation: UseMutateAsyncFunction<
+    Board | undefined,
+    Error,
+    {
+      boardTitle: Board["title"];
+    },
+    unknown
+  >;
+  deleteBoardMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+    },
+    unknown
+  >;
+  updateBoardMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      boardTitle: Board["title"];
+    },
+    unknown
+  >;
 };

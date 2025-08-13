@@ -17,61 +17,48 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   EllipsisVertical,
+  House,
   Plus,
   Share,
   SquareKanban,
   Trash,
 } from "lucide-react";
 import { useBoards } from "@/hooks/use-boards";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
+import { Button } from "../ui/button";
 
 export function NavMain() {
-  const { boards, isLoading, createBoard, deleteBoard } = useBoards();
+  const { boards, isLoading, createBoardMutation, deleteBoardMutation } =
+    useBoards();
 
   const { isMobile } = useSidebar();
-
-  const navigate = useNavigate();
-
-  const handleCreateBoard = async () => {
-    try {
-      const newBoardId = await createBoard("Example board");
-
-      if (newBoardId) {
-        navigate({ to: "/boards/$boardId", params: { boardId: newBoardId } });
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to create board:", errorMessage);
-    }
-  };
-
-  const handleDeleteBoard = async (boardId: string) => {
-    try {
-      await deleteBoard(boardId);
-      navigate({ to: "/boards" });
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to delete board:", errorMessage);
-    }
-  };
 
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarMenuItem>
+          <SidebarMenuItem className="flex items-center gap-2">
             <SidebarMenuButton
               tooltip="Quick Create"
               className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-              onClick={handleCreateBoard}
+              onClick={() =>
+                createBoardMutation({ boardTitle: "Example Board" })
+              }
             >
               <Plus />
               <span>New Board</span>
             </SidebarMenuButton>
+            <Button
+              size="icon"
+              className="size-8 group-data-[collapsible=icon]:opacity-0"
+              variant="outline"
+              asChild
+            >
+              <Link to="/boards">
+                <House />
+                <span className="sr-only">Inbox</span>
+              </Link>
+            </Button>
           </SidebarMenuItem>
           <SidebarGroupLabel>Boards</SidebarGroupLabel>
           {isLoading ? (
@@ -79,7 +66,7 @@ export function NavMain() {
               <span>Loading boards...</span>
             </SidebarMenuItem>
           ) : (
-            boards.map((board) => (
+            boards?.map((board) => (
               <SidebarMenuItem key={board.id}>
                 <SidebarMenuButton asChild>
                   <Link
@@ -114,7 +101,7 @@ export function NavMain() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       variant="destructive"
-                      onClick={() => handleDeleteBoard(board.id)}
+                      onClick={() => deleteBoardMutation({ boardId: board.id })}
                     >
                       <Trash />
                       <span>Delete</span>

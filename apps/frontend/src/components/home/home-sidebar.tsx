@@ -11,7 +11,7 @@ import { Album } from "lucide-react";
 import { NavUser } from "./nav-user";
 import { NavMain } from "./nav-main";
 import { useAuth } from "@/hooks/use-auth";
-import { Link, redirect } from "@tanstack/react-router";
+import { redirect } from "@tanstack/react-router";
 
 type HomeSidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -26,12 +26,10 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
-          <Link to="/boards">
-            <SidebarMenuItem className="flex items-center gap-2">
-              <Album className="!size-5" />
-              <span className="text-base font-semibold">{`Hello ${user.givenName}!`}</span>
-            </SidebarMenuItem>
-          </Link>
+          <SidebarMenuItem className="flex items-center gap-2">
+            <Album className="!size-5" />
+            <span className="text-base font-semibold">{`Hello ${user.givenName}!`}</span>
+          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>

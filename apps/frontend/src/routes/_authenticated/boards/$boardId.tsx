@@ -1,4 +1,4 @@
-import { useBoard } from "@/hooks/use-board";
+import { useBoards } from "@/hooks/use-boards";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
@@ -8,7 +8,9 @@ export const Route = createFileRoute("/_authenticated/boards/$boardId")({
 function DynamicBoards() {
   const { boardId } = Route.useParams();
 
-  const { board, isLoading } = useBoard(boardId);
+  const { boards, isLoading } = useBoards();
+
+  const board = boards.find((board) => board.id === boardId);
 
   if (isLoading) {
     return <p>Loading board...</p>;
@@ -18,5 +20,9 @@ function DynamicBoards() {
     return <p>Could not find board...</p>;
   }
 
-  return <div>Hello {board.title}!</div>;
+  return (
+    <p>
+      Hello {board.title} {boardId}!
+    </p>
+  );
 }

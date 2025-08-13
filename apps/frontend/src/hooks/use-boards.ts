@@ -1,128 +1,98 @@
-import type { Board } from "@/lib/types";
-import { buildUrl } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { useAuth } from "./use-auth";
+import type { Board, UseBoardsReturnType } from "@/lib/types";
+import {
+  getAllBoards,
+  createBoard,
+  deleteBoard,
+  updateBoard,
+} from "@/api/boards";
+import {
+  useQueryClient,
+  useSuspenseQuery,
+  useMutation,
+} from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 
-export function useBoards() {
-  const [boards, setBoards] = useState<Board[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+export function useBoards(): UseBoardsReturnType {
+  const navigate = useNavigate();
 
-  const { loadUser } = useAuth();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function fetchBoards() {
-      try {
-        const accessToken: string | null = localStorage.getItem("accessToken");
+  const { data: boards, isLoading } = useSuspenseQuery({
+    queryKey: ["boards"],
+    queryFn: getAllBoards,
+  });
 
-        if (!accessToken) {
-          console.error("Failed to load boards: Access token not found");
+  const { mutateAsync: createBoardMutation } = useMutation({
+    mutationKey: ["createBoard"],
+    mutationFn: createBoard,
+    onSuccess: (data) => {
+      if (!data) return;
 
-          await loadUser();
+      queryClient.setQueryData(
+        ["boards"],
+        (prevBoards: Board[] | undefined) => {
+          if (!prevBoards) return prevBoards;
 
-          return;
-        }
+          return [data, ...prevBoards];
+        },
+      );
 
-        const response = await fetch(buildUrl("/api/boards"), {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+      navigate({ to: "/boards/$boardId", params: { boardId: data.id } });
+    },
+    onError: (error) => {
+      console.error("Failed to create board:", error.message);
+    },
+  });
 
-        if (!response.ok) {
-          const { error } = await response.json();
-          throw new Error(error);
-        }
+  const { mutateAsync: deleteBoardMutation } = useMutation({
+    mutationKey: ["deleteBoard"],
+    mutationFn: deleteBoard,
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(
+        ["boards"],
+        (prevBoards: Board[] | undefined) => {
+          if (!prevBoards) return prevBoards;
 
-        const { data } = await response.json();
+          return prevBoards.filter(
+            (prevBoards) => prevBoards.id !== variables.boardId,
+          );
+        },
+      );
 
-        setBoards(data as Board[]);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Unknown error";
+      navigate({ to: "/boards" });
+    },
+    onError: (error) => {
+      console.error("Failed to delete board:", error.message);
+    },
+  });
 
-        console.error("Failed to load boards:", errorMessage);
+  const { mutateAsync: updateBoardMutation } = useMutation({
+    mutationKey: ["updateBoard"],
+    mutationFn: updateBoard,
+    onSuccess: (_data, variables) => {
+      queryClient.setQueryData(
+        ["boards"],
+        (prevBoards: Board[] | undefined) => {
+          if (!prevBoards) return prevBoards;
 
-        setBoards([]);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchBoards();
-  }, [loadUser]);
-
-  const createBoard = async (boardTitle: Board["title"]) => {
-    const accessToken: string | null = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
-      console.error("Failed to create board: Access token not found");
-
-      await loadUser();
-
-      return;
-    }
-
-    const response = await fetch(buildUrl("/api/boards"), {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify({ title: boardTitle }),
-    });
-
-    if (!response.ok) {
-      const { error } = await response.json();
-      throw new Error(error);
-    }
-
-    const { data } = await response.json();
-
-    setBoards((prevBoards) => {
-      return [data as Board, ...prevBoards];
-    });
-
-    return (data as Board).id;
-  };
-
-  const deleteBoard = async (boardId: Board["id"]) => {
-    const accessToken: string | null = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
-      console.error("Failed to delete board: Access token not found");
-
-      await loadUser();
-
-      return;
-    }
-
-    const response = await fetch(buildUrl(`/api/boards/${boardId}`), {
-      method: "DELETE",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!response.ok) {
-      const { error } = await response.json();
-      throw new Error(error);
-    }
-
-    setBoards((prevBoards) => {
-      return prevBoards.filter((prevBoard) => prevBoard.id !== boardId);
-    });
-  };
+          return prevBoards.map((prevBoard) =>
+            prevBoard.id === variables.boardId
+              ? { ...prevBoard, title: variables.boardTitle }
+              : prevBoard,
+          );
+        },
+      );
+    },
+    onError: (error) => {
+      console.error("Failed to update board:", error.message);
+    },
+  });
 
   return {
     boards,
     isLoading,
-    createBoard,
-    deleteBoard,
+    createBoardMutation,
+    deleteBoardMutation,
+    updateBoardMutation,
   };
 }
