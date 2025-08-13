@@ -32,7 +32,7 @@ export async function getAllBoards(req: AuthRequest, res: Response) {
       FROM boards b
       INNER JOIN boards_collaborators bc ON b.id = bc.board_id
       WHERE bc.user_id = ?
-      ORDER BY b.created_at`,
+      ORDER BY b.created_at DESC`,
       [id],
     );
 
