@@ -2,6 +2,7 @@ import { RouterProvider } from "@tanstack/react-router";
 import { router } from "./main";
 import { useAuth } from "./hooks/use-auth";
 import { AuthProvider } from "./contexts/auth-provider";
+import { ThemeProvider } from "./contexts/theme-provider";
 
 function InnerApp() {
   const auth = useAuth();
@@ -11,8 +12,10 @@ function InnerApp() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <InnerApp />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <InnerApp />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

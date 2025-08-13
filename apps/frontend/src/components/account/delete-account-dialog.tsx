@@ -10,7 +10,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useBoards } from "@/hooks/use-boards";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -21,50 +20,44 @@ import {
   FormMessage,
   Form,
 } from "../ui/form";
-import { Plus } from "lucide-react";
-import { SidebarMenuButton } from "../ui/sidebar";
-import { useState } from "react";
-import type { CreateBoardForm } from "@/lib/types";
-import { CreateBoardSchema } from "@/lib/schemas";
+import type { DeleteAccountForm } from "@/lib/types";
+import { DeleteAccountSchema } from "@/lib/schemas";
+import { useAuth } from "@/hooks/use-auth";
+import { useNavigate } from "@tanstack/react-router";
 
-export function CreateBoardDialog() {
-  const [open, setOpen] = useState(false);
+export function DeleteAccountDialog() {
+  const { deleteAccount } = useAuth();
 
-  const { createBoardMutation } = useBoards();
+  const navigate = useNavigate();
 
-  const form = useForm<CreateBoardForm>({
-    resolver: zodResolver(CreateBoardSchema),
+  const form = useForm<DeleteAccountForm>({
+    resolver: zodResolver(DeleteAccountSchema),
     defaultValues: {
-      boardTitle: "",
+      prompt: "",
     },
   });
 
-  async function onSubmit(values: CreateBoardForm) {
+  async function onSubmit() {
     try {
-      await createBoardMutation({ boardTitle: values.boardTitle });
-      setOpen(false);
-      form.reset();
+      await deleteAccount();
+      navigate({ to: "/login" });
     } catch (error) {
-      console.error("Error creating board:", error);
+      console.error("Failed to delete account:", error);
     }
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
       <DialogTrigger asChild>
-        <SidebarMenuButton
-          tooltip="Quick Create"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-        >
-          <Plus />
-          <span>Create Board</span>
-        </SidebarMenuButton>
+        <Button variant="destructive">
+          <span>Delete Account</span>
+        </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create board</DialogTitle>
+          <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
-            Enter the title of the new board here.
+            This action is permanent and cannot be undone.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -74,12 +67,15 @@ export function CreateBoardDialog() {
           >
             <FormField
               control={form.control}
-              name="boardTitle"
+              name="prompt"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>
+                    Please enter the prompt{" "}
+                    <b className="font-bold">i understand</b> to continue
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Untitled Board" {...field} />
+                    <Input placeholder="i understand" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -95,8 +91,12 @@ export function CreateBoardDialog() {
                   Cancel
                 </Button>
               </DialogClose>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Creating..." : "Continue"}
+              <Button
+                variant="destructive"
+                type="submit"
+                disabled={form.formState.isSubmitting}
+              >
+                {form.formState.isSubmitting ? "Deleting..." : "Delete Account"}
               </Button>
             </DialogFooter>
           </form>

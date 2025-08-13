@@ -13,6 +13,10 @@ export const router = createRouter({
   context: {
     auth: undefined!,
     queryClient,
+    theme: {
+      theme: "system",
+      setTheme: () => null,
+    },
   },
 });
 

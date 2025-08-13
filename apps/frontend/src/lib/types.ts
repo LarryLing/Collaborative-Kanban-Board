@@ -2,6 +2,7 @@ import type z from "zod";
 import {
   ConfirmSignupSchema,
   CreateBoardSchema,
+  DeleteAccountSchema,
   ForgotPasswordSchema,
   LoginSchema,
   ResetPasswordSchema,
@@ -11,6 +12,8 @@ import {
 import type { JwtPayload } from "jwt-decode";
 import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
+
+export type Theme = "dark" | "light" | "system";
 
 export interface IDTokenPayload extends JwtPayload {
   email: string;
@@ -25,6 +28,7 @@ export type ForgotPasswordForm = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 export type CreateBoardForm = z.infer<typeof CreateBoardSchema>;
 export type UpdateBoardForm = z.infer<typeof UpdateBoardSchema>;
+export type DeleteAccountForm = z.infer<typeof DeleteAccountSchema>;
 
 export type EmailSearchBody = {
   email: string | undefined;
@@ -69,6 +73,11 @@ export type AuthContextType = {
     confirmationCode: string,
   ) => Promise<void>;
   deleteAccount: () => Promise<void>;
+};
+
+export type ThemeContextType = {
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
 };
 
 export type UpdateBoardContextType = {

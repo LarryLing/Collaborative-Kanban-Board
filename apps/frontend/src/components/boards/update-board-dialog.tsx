@@ -26,7 +26,7 @@ export function UpdateBoardDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Rename Board</DialogTitle>
+          <DialogTitle>Rename board</DialogTitle>
           <DialogDescription>
             Enter the new title of the board here.
           </DialogDescription>
@@ -60,7 +60,7 @@ export function UpdateBoardDialog() {
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Creating..." : "Continue"}
+                {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

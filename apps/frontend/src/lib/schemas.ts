@@ -76,3 +76,12 @@ export const CreateBoardSchema = z.object({
 export const UpdateBoardSchema = z.object({
   boardTitle: z.string(),
 });
+
+export const DeleteAccountSchema = z
+  .object({
+    prompt: z.string(),
+  })
+  .refine((data) => data.prompt === "i understand", {
+    message: "Prompt is incorrect",
+    path: ["prompt"],
+  });
