@@ -41,7 +41,7 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   const { email } = useSearch({
-    from: "/_authentication/reset-password",
+    from: "/_unauthenticated/reset-password",
   }) as EmailSearchBody;
 
   const form = useForm<ResetPasswordForm>({

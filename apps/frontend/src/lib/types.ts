@@ -1,13 +1,16 @@
 import type z from "zod";
 import {
   ConfirmSignupSchema,
+  CreateBoardSchema,
   ForgotPasswordSchema,
   LoginSchema,
   ResetPasswordSchema,
   SignupSchema,
+  UpdateBoardSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
 import type { UseMutateAsyncFunction } from "@tanstack/react-query";
+import type { UseFormReturn } from "react-hook-form";
 
 export interface IDTokenPayload extends JwtPayload {
   email: string;
@@ -20,6 +23,8 @@ export type SignupForm = z.infer<typeof SignupSchema>;
 export type ConfirmSignupForm = z.infer<typeof ConfirmSignupSchema>;
 export type ForgotPasswordForm = z.infer<typeof ForgotPasswordSchema>;
 export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
+export type CreateBoardForm = z.infer<typeof CreateBoardSchema>;
+export type UpdateBoardForm = z.infer<typeof UpdateBoardSchema>;
 
 export type EmailSearchBody = {
   email: string | undefined;
@@ -64,6 +69,25 @@ export type AuthContextType = {
     confirmationCode: string,
   ) => Promise<void>;
   deleteAccount: () => Promise<void>;
+};
+
+export type UpdateBoardContextType = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  form: UseFormReturn<
+    {
+      boardTitle: string;
+    },
+    unknown,
+    {
+      boardTitle: string;
+    }
+  >;
+  onSubmit: (values: UpdateBoardForm) => Promise<void>;
+  openUpdateBoardDialog: (
+    boardId: Board["id"],
+    boardTitle: Board["title"],
+  ) => void;
 };
 
 export type UseBoardsReturnType = {

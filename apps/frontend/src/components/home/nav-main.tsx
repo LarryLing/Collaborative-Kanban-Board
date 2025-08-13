@@ -18,7 +18,7 @@ import {
 import {
   EllipsisVertical,
   House,
-  Plus,
+  Pencil,
   Share,
   SquareKanban,
   Trash,
@@ -26,10 +26,13 @@ import {
 import { useBoards } from "@/hooks/use-boards";
 import { Link } from "@tanstack/react-router";
 import { Button } from "../ui/button";
+import { CreateBoardDialog } from "../boards/create-board-dialog";
+import { useUpdateBoard } from "@/hooks/use-update-board";
 
 export function NavMain() {
-  const { boards, isLoading, createBoardMutation, deleteBoardMutation } =
-    useBoards();
+  const { boards, isLoading, deleteBoardMutation } = useBoards();
+
+  const { openUpdateBoardDialog } = useUpdateBoard();
 
   const { isMobile } = useSidebar();
 
@@ -38,16 +41,7 @@ export function NavMain() {
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <SidebarMenuButton
-              tooltip="Quick Create"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-              onClick={() =>
-                createBoardMutation({ boardTitle: "Example Board" })
-              }
-            >
-              <Plus />
-              <span>New Board</span>
-            </SidebarMenuButton>
+            <CreateBoardDialog />
             <Button
               size="icon"
               className="size-8 group-data-[collapsible=icon]:opacity-0"
@@ -94,6 +88,14 @@ export function NavMain() {
                     side={isMobile ? "bottom" : "right"}
                     align={isMobile ? "end" : "start"}
                   >
+                    <DropdownMenuItem
+                      onClick={() =>
+                        openUpdateBoardDialog(board.id, board.title)
+                      }
+                    >
+                      <Pencil />
+                      <span>Rename</span>
+                    </DropdownMenuItem>
                     <DropdownMenuItem>
                       <Share />
                       <span>Share</span>

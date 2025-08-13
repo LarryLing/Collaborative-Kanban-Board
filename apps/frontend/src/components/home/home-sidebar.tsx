@@ -12,6 +12,7 @@ import { NavUser } from "./nav-user";
 import { NavMain } from "./nav-main";
 import { useAuth } from "@/hooks/use-auth";
 import { redirect } from "@tanstack/react-router";
+import { UpdateBoardDialog } from "../boards/update-board-dialog";
 
 type HomeSidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -34,6 +35,7 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
+        <UpdateBoardDialog />
       </SidebarContent>
       <SidebarFooter>
         <NavUser {...user} />

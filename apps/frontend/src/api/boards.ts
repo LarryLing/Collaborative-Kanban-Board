@@ -16,7 +16,9 @@ export async function createBoard({
   const response = await invokeAPI(
     "/api/boards",
     "POST",
-    JSON.stringify({ title: boardTitle }),
+    JSON.stringify({
+      title: boardTitle.length > 0 ? boardTitle : "Untitled Board",
+    }),
   );
   const { data } = await response.json();
 
@@ -37,6 +39,8 @@ export async function updateBoard({
   await invokeAPI(
     `/api/boards/${boardId}`,
     "PATCH",
-    JSON.stringify({ title: boardTitle }),
+    JSON.stringify({
+      title: boardTitle.length > 0 ? boardTitle : "Untitled Board",
+    }),
   );
 }

@@ -68,3 +68,11 @@ export const ResetPasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
+
+export const CreateBoardSchema = z.object({
+  boardTitle: z.string(),
+});
+
+export const UpdateBoardSchema = z.object({
+  boardTitle: z.string(),
+});
