@@ -70,7 +70,7 @@ export type UseBoardsReturnType = {
   boards: Board[];
   isLoading: boolean;
   createBoardMutation: UseMutateAsyncFunction<
-    Board | undefined,
+    Board,
     Error,
     {
       boardTitle: Board["title"];

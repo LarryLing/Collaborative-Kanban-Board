@@ -2,7 +2,7 @@ import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
-import { buildUrl } from "@/lib/utils";
+import { invokeAPI } from "@/lib/utils";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -15,31 +15,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const loadUser = async () => {
     try {
-      const accessToken: string | null = localStorage.getItem("accessToken");
-
-      if (!accessToken) {
-        console.error("Failed to load user: Access token not found");
-
-        setUser(null);
-        setIsAuthenticated(false);
-        setIsLoading(false);
-
-        return;
-      }
-
-      const response = await fetch(buildUrl("/api/auth/me"), {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
-
+      const response = await invokeAPI("/api/auth/me", "GET");
       const { data } = await response.json();
       const { idToken, accessToken: newAccessToken } = data;
 
@@ -74,19 +50,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     confirmationCode: string,
   ) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/reset-password"), {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password, confirmationCode }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI(
+        "/api/auth/reset-password",
+        "PUT",
+        JSON.stringify({ email, password, confirmationCode }),
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -99,19 +67,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const confirmSignUp = async (email: string, confirmationCode: string) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/confirm-signup"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, confirmationCode }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI(
+        "/api/auth/confirm-signup",
+        "POST",
+        JSON.stringify({ email, confirmationCode }),
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -129,19 +89,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     password: string,
   ) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/signup"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ givenName, familyName, email, password }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI(
+        "/api/auth/signup",
+        "POST",
+        JSON.stringify({ givenName, familyName, email, password }),
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -154,19 +106,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const resendSignUp = async (email: string) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/signup/resend"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI(
+        "/api/auth/signup/resend",
+        "POST",
+        JSON.stringify({ email }),
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -182,20 +126,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/login"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
-
+      const response = await invokeAPI(
+        "/api/auth/login",
+        "POST",
+        JSON.stringify({ email, password }),
+      );
       const { data } = await response.json();
       const { accessToken } = data;
 
@@ -214,29 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = async () => {
     try {
-      const accessToken: string | null = localStorage.getItem("accessToken");
-
-      if (!accessToken) {
-        console.error("Failed to logout user: Access token not found");
-
-        setUser(null);
-        setIsAuthenticated(false);
-
-        return;
-      }
-
-      const response = await fetch(buildUrl("/api/auth/logout"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI("/api/auth/logout", "POST");
 
       setUser(null);
       setIsAuthenticated(false);
@@ -254,19 +167,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const requestPasswordReset = async (email: string) => {
     try {
-      const response = await fetch(buildUrl("/api/auth/reset-password"), {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        const { error } = await response.json();
-        throw new Error(error);
-      }
+      await invokeAPI(
+        "/api/auth/reset-password",
+        "POST",
+        JSON.stringify({ email }),
+      );
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -278,35 +183,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const deleteAccount = async () => {
-    const accessToken: string | null = localStorage.getItem("accessToken");
-
-    if (!accessToken) {
-      console.error("Failed to delete user: Access token not found");
-
-      setUser(null);
-      setIsAuthenticated(false);
-
-      return;
-    }
-
     try {
-      const deleteResponse = await fetch(buildUrl("/api/auth/me"), {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!deleteResponse.ok) {
-        const { error } = await deleteResponse.json();
-        throw new Error(error);
-      }
-
-      setUser(null);
-      setIsAuthenticated(false);
-
-      localStorage.removeItem("accessToken");
+      await invokeAPI("/api/auth/me", "DELETE");
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
@@ -322,7 +200,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await loadUser();
     };
     initialize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const contextValue: AuthContextType = {
