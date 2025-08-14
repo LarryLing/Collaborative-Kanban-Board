@@ -13,7 +13,9 @@ function Account() {
     <div className="space-y-4">
       <div className="w-full flex justify-between">
         <div className="space-y-1">
-          <Label htmlFor="theme">Appearance</Label>
+          <Label htmlFor="theme" className="font-semibold">
+            Appearance
+          </Label>
           <p className="text-sm">Customize how site looks on your device.</p>
         </div>
         <ThemeDropdown />
@@ -21,7 +23,9 @@ function Account() {
       <Separator className="w-full" />
       <div className="w-full flex justify-between">
         <div className="space-y-1">
-          <Label htmlFor="theme">Delete Account</Label>
+          <Label htmlFor="theme" className="font-semibold">
+            Delete Account
+          </Label>
           <p className="text-sm">
             Permanently delete the account and remove access from all boards.
           </p>

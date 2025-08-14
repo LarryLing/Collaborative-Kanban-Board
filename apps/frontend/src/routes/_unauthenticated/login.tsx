@@ -13,7 +13,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/auth-alert";
@@ -49,57 +56,69 @@ function Login() {
   return (
     <section className="bg-muted h-screen">
       <div className="flex h-full items-center justify-center">
-        <Card className="w-full max-w-sm px-6 py-8">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col items-center gap-y-5"
-            >
-              <h1 className="text-xl font-semibold">Login</h1>
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="m@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-center font-semibold">
+              Login
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter your email and password below to login to your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col items-center gap-y-5"
+              >
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="m@example.com" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <div className="flex justify-between">
+                        <FormLabel>Password</FormLabel>
+                        <Link
+                          to="/forgot-password"
+                          className="text-sm text-primary hover:underline"
+                        >
+                          Forgot password?
+                        </Link>
+                      </div>
+                      <FormControl>
+                        <Input
+                          placeholder="••••••••"
+                          type="password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+                {error && (
+                  <AuthAlert title="Failed to login user" error={error} />
                 )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <div className="flex justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        to="/forgot-password"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
-                    <FormControl>
-                      <Input
-                        placeholder="••••••••"
-                        type="password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full">
-                Login
-              </Button>
-            </form>
-          </Form>
-          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Need an account?</p>
             <Link
               to="/signup"
@@ -107,8 +126,7 @@ function Login() {
             >
               Sign up
             </Link>
-          </div>
-          {error && <AuthAlert title="Failed to login user" error={error} />}
+          </CardFooter>
         </Card>
       </div>
     </section>

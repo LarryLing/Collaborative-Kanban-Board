@@ -16,7 +16,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import AuthAlert from "@/components/auth/auth-alert";
@@ -77,45 +84,57 @@ function ConfirmSignup() {
   return (
     <section className="bg-muted h-screen">
       <div className="flex h-full items-center justify-center">
-        <Card className="w-full max-w-sm px-6 py-8">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col items-center gap-y-5"
-            >
-              <h1 className="text-xl font-semibold">Confirm Sign Up</h1>
-              <FormField
-                control={form.control}
-                name="confirmationCode"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Confirmation Code</FormLabel>
-                    <FormControl>
-                      <InputOTP
-                        maxLength={6}
-                        {...field}
-                        pattern={REGEXP_ONLY_DIGITS}
-                      >
-                        <InputOTPGroup>
-                          <InputOTPSlot index={0} />
-                          <InputOTPSlot index={1} />
-                          <InputOTPSlot index={2} />
-                          <InputOTPSlot index={3} />
-                          <InputOTPSlot index={4} />
-                          <InputOTPSlot index={5} />
-                        </InputOTPGroup>
-                      </InputOTP>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-xl text-center font-semibold">
+              Confirm sign up
+            </CardTitle>
+            <CardDescription className="text-center">
+              Enter the confirmation code we sent you to verify your account.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col items-center gap-y-5"
+              >
+                <FormField
+                  control={form.control}
+                  name="confirmationCode"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Confirmation Code</FormLabel>
+                      <FormControl>
+                        <InputOTP
+                          maxLength={6}
+                          {...field}
+                          pattern={REGEXP_ONLY_DIGITS}
+                        >
+                          <InputOTPGroup>
+                            <InputOTPSlot index={0} />
+                            <InputOTPSlot index={1} />
+                            <InputOTPSlot index={2} />
+                            <InputOTPSlot index={3} />
+                            <InputOTPSlot index={4} />
+                            <InputOTPSlot index={5} />
+                          </InputOTPGroup>
+                        </InputOTP>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" className="w-full">
+                  Continue to login
+                </Button>
+                {error && (
+                  <AuthAlert title="Failed to confirm sign up" error={error} />
                 )}
-              />
-              <Button type="submit" className="w-full">
-                Continue to login
-              </Button>
-            </form>
-          </Form>
-          <div className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
+              </form>
+            </Form>
+          </CardContent>
+          <CardFooter className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Didn't receive a code?</p>
             <p
               onClick={handleResendCode}
@@ -123,10 +142,7 @@ function ConfirmSignup() {
             >
               Resend code
             </p>
-          </div>
-          {error && (
-            <AuthAlert title="Failed to confirm sign up" error={error} />
-          )}
+          </CardFooter>
         </Card>
       </div>
     </section>
