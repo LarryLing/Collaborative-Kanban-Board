@@ -173,7 +173,7 @@ export async function signUp(
   res: Response,
 ) {
   try {
-    const { givenName, familyName, email, password } = req.body;
+    const { given_name, family_name, email, password } = req.body;
 
     const signUpCommand = new SignUpCommand({
       ClientId: COGNITO_CLIENT_ID,
@@ -186,11 +186,11 @@ export async function signUp(
         },
         {
           Name: "given_name",
-          Value: givenName,
+          Value: given_name,
         },
         {
           Name: "family_name",
-          Value: familyName,
+          Value: family_name,
         },
       ],
     });

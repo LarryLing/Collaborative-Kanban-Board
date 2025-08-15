@@ -1,5 +1,5 @@
 import type { NextFunction, Response } from "express";
-import type { Board, BoardCollaborator, CollaboratorRequest } from "../types";
+import type { Board, Collaborator, CollaboratorRequest } from "../types";
 import db from "../config/db";
 
 export async function verifyRole(
@@ -32,7 +32,7 @@ export async function verifyRole(
       [id, boardId],
     );
 
-    if (!rows || (rows as BoardCollaborator[]).length === 0) {
+    if (!rows || (rows as Collaborator[]).length === 0) {
       console.error("Failed to verify role: User is not a board collaborator");
 
       res.status(404).json({
@@ -43,7 +43,7 @@ export async function verifyRole(
       return;
     }
 
-    req.role = (rows as BoardCollaborator[])[0].role;
+    req.role = (rows as Collaborator[])[0].role;
 
     next();
   } catch (error) {

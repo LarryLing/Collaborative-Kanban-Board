@@ -77,6 +77,10 @@ export const UpdateBoardSchema = z.object({
   boardTitle: z.string(),
 });
 
+export const AddCollaboratorSchema = z.object({
+  email: z.email().min(1, { message: "Email is required" }),
+});
+
 export const DeleteAccountSchema = z
   .object({
     prompt: z.string(),

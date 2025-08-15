@@ -20,7 +20,7 @@ import { CircleUserRound, EllipsisVertical, LogOutIcon } from "lucide-react";
 
 type NavUserProps = User;
 
-export function NavUser({ givenName, familyName, email }: NavUserProps) {
+export function NavUser({ given_name, family_name, email }: NavUserProps) {
   const { logout } = useAuth();
 
   const { isMobile } = useSidebar();
@@ -49,11 +49,11 @@ export function NavUser({ givenName, familyName, email }: NavUserProps) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage alt={`${givenName} ${familyName}`} />
-                <AvatarFallback className="rounded-lg">{`${givenName.substring(0, 1)}${familyName.substring(0, 1)}`}</AvatarFallback>
+                <AvatarImage alt={`${given_name} ${family_name}`} />
+                <AvatarFallback className="rounded-lg">{`${given_name.substring(0, 1)}${family_name.substring(0, 1)}`}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{`${givenName} ${familyName}`}</span>
+                <span className="truncate font-medium">{`${given_name} ${family_name}`}</span>
                 <span className="text-muted-foreground truncate text-xs">
                   {email}
                 </span>
@@ -70,11 +70,11 @@ export function NavUser({ givenName, familyName, email }: NavUserProps) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage alt={`${givenName} ${familyName}`} />
-                  <AvatarFallback className="rounded-lg">{`${givenName.substring(0, 1)}${familyName.substring(0, 1)}`}</AvatarFallback>
+                  <AvatarImage alt={`${given_name} ${family_name}`} />
+                  <AvatarFallback className="rounded-lg">{`${given_name.substring(0, 1)}${family_name.substring(0, 1)}`}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{`${givenName} ${familyName}`}</span>
+                  <span className="truncate font-medium">{`${given_name} ${family_name}`}</span>
                   <span className="text-muted-foreground truncate text-xs">
                     {email}
                   </span>

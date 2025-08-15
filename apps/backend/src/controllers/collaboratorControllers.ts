@@ -2,7 +2,7 @@ import type { Response } from "express";
 import type {
   AddCollaboratorBody,
   Board,
-  BoardCollaborator,
+  Collaborator,
   CollaboratorRequest,
   User,
 } from "../types";
@@ -18,16 +18,23 @@ export async function getAllCollaborators(
 
   try {
     const [rows] = await db.execute(
-      `SELECT *
-      FROM boards_collaborators
-      WHERE board_id = ?
-      ORDER BY joined_at`,
+      `SELECT
+          u.id,
+          u.given_name,
+          u.family_name,
+          u.email,
+          bc.role,
+          bc.joined_at
+      FROM users u
+      INNER JOIN boards_collaborators bc ON u.id = bc.user_id
+      WHERE bc.board_id = ?
+      ORDER BY bc.joined_at DESC`,
       [boardId],
     );
 
     res.status(200).json({
       message: "Successfully retrieved collaborators",
-      data: rows as BoardCollaborator[],
+      data: rows as Collaborator[],
     });
   } catch (error) {
     const errorMessage =
@@ -90,30 +97,27 @@ export async function addCollaborator(
     );
 
     if (!userRows || (userRows as User[]).length === 0) {
-      console.error(
-        "Failed to add collaborator: Could not find user in database",
-      );
+      console.error("Failed to add collaborator: Could not find user");
 
       res.status(404).json({
         message: "Failed to add collaborator",
-        error: "Could not find user in database",
+        error: "Could not find user",
       });
 
       return;
     }
 
-    const [collaboratorRows] = await db.execute(
-      `SELECT *
+    const user = (userRows as User[])[0];
+
+    const [collaboratorRows] = await db.execute<RowDataPacket[]>(
+      `SELECT 1
       FROM boards_collaborators
       WHERE user_id = ? AND board_id = ?
       LIMIT 1`,
-      [(userRows as User[])[0].id, boardId],
+      [user.id, boardId],
     );
 
-    if (
-      collaboratorRows &&
-      (collaboratorRows as BoardCollaborator[]).length > 0
-    ) {
+    if (collaboratorRows && collaboratorRows.length > 0) {
       console.error(
         "Failed to add collaborator: Collaborator has already been added",
       );
@@ -132,15 +136,18 @@ export async function addCollaborator(
     await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
-      [(userRows as User[])[0].id, boardId, COLLABORATOR, currentTimestamp],
+      [user.id, boardId, COLLABORATOR, currentTimestamp],
     );
+
+    const collaborator: Collaborator = {
+      ...user,
+      role: COLLABORATOR,
+      joined_at: currentTimestamp,
+    };
 
     res.status(201).json({
       message: "Successfully added collaborator",
-      data: {
-        user: (userRows as User[])[0],
-        collaborator: (collaboratorRows as BoardCollaborator[])[0],
-      },
+      data: collaborator,
     });
   } catch (error) {
     const errorMessage =
@@ -201,7 +208,7 @@ export async function removeCollaborator(
 
     if (
       targetUserRows.length > 0 &&
-      (targetUserRows[0].role as BoardCollaborator["role"]) === OWNER
+      (targetUserRows[0].role as Collaborator["role"]) === OWNER
     ) {
       console.error(
         "Failed to remove collaborator: Cannot leave board as the owner",

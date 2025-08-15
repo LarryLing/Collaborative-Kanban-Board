@@ -58,8 +58,8 @@ export async function createCard(
 
     const card: Card = {
       id: cardId,
-      boardId: boardId,
-      listId: listId,
+      board_id: boardId,
+      list_id: listId,
       title: title,
       description: description,
       position: position,
@@ -70,8 +70,8 @@ export async function createCard(
       VALUES (?, ?, ?, ?, ?, ?)`,
       [
         card.id,
-        card.boardId,
-        card.listId,
+        card.board_id,
+        card.list_id,
         card.title,
         card.description,
         card.position,

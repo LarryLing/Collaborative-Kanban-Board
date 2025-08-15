@@ -18,17 +18,17 @@ export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
 
 export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
   extends AuthRequest<P, ResBody, ReqBody> {
-  role?: BoardCollaborator["role"];
+  role?: Collaborator["role"];
 }
 
 export type User = {
   id: string;
-  givenName: string;
-  familyName: string;
+  given_name: string;
+  family_name: string;
   email: string;
 };
 
-export type SignUpBody = Pick<User, "givenName" | "familyName" | "email"> & {
+export type SignUpBody = Pick<User, "given_name" | "family_name" | "email"> & {
   password: string;
 };
 export type LoginBody = Pick<User, "email"> & { password: string };
@@ -43,26 +43,24 @@ export type RequestConfirmationCode = Pick<User, "email">;
 
 export type Board = {
   id: string;
-  ownerId: string;
+  owner_id: string;
   title: string;
-  createdAt: string;
+  created_at: string;
 };
 
 export type CreateBoardBody = Pick<Board, "title">;
 export type UpdateBoardBody = Pick<Board, "title">;
 
-export type BoardCollaborator = {
-  userId: string;
-  boardId: string;
+export type Collaborator = User & {
   role: typeof OWNER | typeof COLLABORATOR;
-  joinedAt: string;
+  joined_at: string;
 };
 
 export type AddCollaboratorBody = Pick<User, "email">;
 
 export type List = {
   id: string;
-  boardId: string;
+  board_id: string;
   title: string;
   position: number;
 };
@@ -73,8 +71,8 @@ export type UpdateListPositionBody = Pick<List, "position">;
 
 export type Card = {
   id: string;
-  boardId: string;
-  listId: string;
+  board_id: string;
+  list_id: string;
   title: string;
   description: string;
   position: number;

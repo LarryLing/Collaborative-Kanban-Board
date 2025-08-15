@@ -1,5 +1,6 @@
 import type z from "zod";
 import {
+  AddCollaboratorSchema,
   ConfirmSignupSchema,
   CreateBoardSchema,
   DeleteAccountSchema,
@@ -12,6 +13,7 @@ import {
 import type { JwtPayload } from "jwt-decode";
 import type { UseMutateAsyncFunction } from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
+import type { COLLABORATOR, OWNER } from "./constants";
 
 export type Theme = "dark" | "light" | "system";
 
@@ -29,6 +31,7 @@ export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 export type CreateBoardForm = z.infer<typeof CreateBoardSchema>;
 export type UpdateBoardForm = z.infer<typeof UpdateBoardSchema>;
 export type DeleteAccountForm = z.infer<typeof DeleteAccountSchema>;
+export type AddCollaboratorForm = z.infer<typeof AddCollaboratorSchema>;
 
 export type EmailSearchBody = {
   email: string | undefined;
@@ -36,16 +39,21 @@ export type EmailSearchBody = {
 
 export type User = {
   id: string;
-  givenName: string;
-  familyName: string;
+  given_name: string;
+  family_name: string;
   email: string;
 };
 
 export type Board = {
   id: string;
-  ownerId: string;
+  owner_id: string;
   title: string;
-  createdAt: string;
+  created_at: string;
+};
+
+export type Collaborator = User & {
+  role: typeof OWNER | typeof COLLABORATOR;
+  joined_at: string;
 };
 
 export type AuthContextType = {
@@ -54,8 +62,8 @@ export type AuthContextType = {
   isLoading: boolean;
   loadUser: () => Promise<void>;
   signUp: (
-    givenName: User["givenName"],
-    familyName: User["familyName"],
+    given_name: User["given_name"],
+    family_name: User["family_name"],
     email: User["email"],
     password: string,
   ) => Promise<void>;
@@ -80,7 +88,7 @@ export type ThemeContextType = {
   setTheme: (theme: Theme) => void;
 };
 
-export type UpdateBoardContextType = {
+export type UpdateBoardDialogContextType = {
   open: boolean;
   setOpen: (open: boolean) => void;
   form: UseFormReturn<
@@ -97,6 +105,32 @@ export type UpdateBoardContextType = {
     boardId: Board["id"],
     boardTitle: Board["title"],
   ) => void;
+};
+
+export type CollaboratorDialogContextType = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  boardId: Board["id"] | null;
+  removeCollaboratorMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      collaboratorId: Collaborator["id"];
+    },
+    unknown
+  >;
+  form: UseFormReturn<
+    {
+      email: string;
+    },
+    unknown,
+    {
+      email: string;
+    }
+  >;
+  onSubmit: (values: AddCollaboratorForm) => Promise<void>;
+  openCollaboratorDialog: (boardId: Board["id"]) => void;
 };
 
 export type UseBoardsReturnType = {

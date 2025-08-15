@@ -8,17 +8,32 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical, Pencil, Share, Trash } from "lucide-react";
 import { SidebarMenuAction, useSidebar } from "../ui/sidebar";
-import { useUpdateBoard } from "@/hooks/use-update-board";
+import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
 import { useBoards } from "@/hooks/use-boards";
+import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
 
 type BoardActionsDropdownProps = Pick<Board, "id" | "title">;
 
 export function BoardActionsDropdown({ id, title }: BoardActionsDropdownProps) {
   const { isMobile } = useSidebar();
 
-  const { openUpdateBoardDialog } = useUpdateBoard();
+  const { openUpdateBoardDialog } = useUpdateBoardDialog();
+
+  const { openCollaboratorDialog } = useCollaboratorDialog();
 
   const { deleteBoardMutation } = useBoards();
+
+  const handleOpenUpdateBoardDialog = () => {
+    openUpdateBoardDialog(id, title);
+  };
+
+  const handleOpenCollaboratorDialog = () => {
+    openCollaboratorDialog(id);
+  };
+
+  const handleDeleteBoardMutation = () => {
+    deleteBoardMutation({ boardId: id });
+  };
 
   return (
     <DropdownMenu>
@@ -36,18 +51,18 @@ export function BoardActionsDropdown({ id, title }: BoardActionsDropdownProps) {
         side={isMobile ? "bottom" : "right"}
         align={isMobile ? "end" : "start"}
       >
-        <DropdownMenuItem onClick={() => openUpdateBoardDialog(id, title)}>
+        <DropdownMenuItem onClick={handleOpenUpdateBoardDialog}>
           <Pencil />
           <span>Rename</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={handleOpenCollaboratorDialog}>
           <Share />
           <span>Share</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
-          onClick={() => deleteBoardMutation({ boardId: id })}
+          onClick={handleDeleteBoardMutation}
         >
           <Trash />
           <span>Delete</span>

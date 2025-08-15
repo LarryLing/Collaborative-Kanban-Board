@@ -25,8 +25,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser({
         id: sub,
         email: email as string,
-        givenName: given_name as string,
-        familyName: family_name as string,
+        given_name: given_name as string,
+        family_name: family_name as string,
       } as User);
       setIsAuthenticated(true);
 
@@ -83,8 +83,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   const signUp = async (
-    givenName: string,
-    familyName: string,
+    given_name: string,
+    family_name: string,
     email: string,
     password: string,
   ) => {
@@ -92,7 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       await invokeAPI(
         "/api/auth/signup",
         "POST",
-        JSON.stringify({ givenName, familyName, email, password }),
+        JSON.stringify({ given_name, family_name, email, password }),
       );
     } catch (error) {
       const errorMessage =

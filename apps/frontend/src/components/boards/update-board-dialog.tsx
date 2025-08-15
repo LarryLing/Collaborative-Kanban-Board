@@ -17,10 +17,10 @@ import {
   FormMessage,
   Form,
 } from "../ui/form";
-import { useUpdateBoard } from "@/hooks/use-update-board";
+import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
 
 export function UpdateBoardDialog() {
-  const { open, setOpen, form, onSubmit } = useUpdateBoard();
+  const { open, setOpen, form, onSubmit } = useUpdateBoardDialog();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -51,16 +51,12 @@ export function UpdateBoardDialog() {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => form.reset()}
-                >
+                <Button type="button" variant="outline">
                   Cancel
                 </Button>
               </DialogClose>
               <Button type="submit" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? "Saving..." : "Save Changes"}
+                {form.formState.isSubmitting ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </form>

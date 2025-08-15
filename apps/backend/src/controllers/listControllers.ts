@@ -53,7 +53,7 @@ export async function createList(
 
     const list: List = {
       id: listId,
-      boardId: boardId,
+      board_id: boardId,
       title: title,
       position: position,
     };
@@ -61,7 +61,7 @@ export async function createList(
     await db.execute(
       `INSERT INTO lists (id, board_id, title, position)
       VALUES (?, ?, ?, ?)`,
-      [list.id, list.boardId, list.title, list.position],
+      [list.id, list.board_id, list.title, list.position],
     );
 
     res.status(201).json({ message: "Successfully created list", data: list });

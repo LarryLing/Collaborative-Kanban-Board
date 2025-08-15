@@ -1,6 +1,6 @@
 import type {
   Board,
-  UpdateBoardContextType,
+  UpdateBoardDialogContextType,
   UpdateBoardForm,
 } from "@/lib/types";
 import { useState, type ReactNode } from "react";
@@ -8,13 +8,15 @@ import { UpdateBoardSchema } from "@/lib/schemas";
 import { useBoards } from "@/hooks/use-boards";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { UpdateBoardContext } from "./update-board-context";
+import { UpdateBoardDialogContext } from "./update-board-dialog-context";
 
-type UpdateBoardProviderProps = {
+type UpdateBoardDialogProviderProps = {
   children: ReactNode;
 };
 
-export function UpdateBoardProvider({ children }: UpdateBoardProviderProps) {
+export function UpdateBoardDialogProvider({
+  children,
+}: UpdateBoardDialogProviderProps) {
   const [open, setOpen] = useState(false);
   const [boardId, setBoardId] = useState<Board["id"]>("");
 
@@ -47,7 +49,7 @@ export function UpdateBoardProvider({ children }: UpdateBoardProviderProps) {
     setBoardId(boardId);
   };
 
-  const contextValue: UpdateBoardContextType = {
+  const contextValue: UpdateBoardDialogContextType = {
     open,
     setOpen,
     form,
@@ -56,8 +58,8 @@ export function UpdateBoardProvider({ children }: UpdateBoardProviderProps) {
   };
 
   return (
-    <UpdateBoardContext.Provider value={contextValue}>
+    <UpdateBoardDialogContext.Provider value={contextValue}>
       {children}
-    </UpdateBoardContext.Provider>
+    </UpdateBoardDialogContext.Provider>
   );
 }

@@ -144,15 +144,15 @@ export async function createBoard(
 
     const board: Board = {
       id: boardId,
-      ownerId: id,
+      owner_id: id,
       title: title,
-      createdAt: currentTimestamp,
+      created_at: currentTimestamp,
     };
 
     await db.execute(
       `INSERT INTO boards (id, owner_id, title, created_at)
       VALUES (?, ?, ?, ?)`,
-      [board.id, board.ownerId, board.title, board.createdAt],
+      [board.id, board.owner_id, board.title, board.created_at],
     );
 
     await db.execute(
