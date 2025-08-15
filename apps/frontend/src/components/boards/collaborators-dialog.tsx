@@ -26,7 +26,13 @@ import { useMemo } from "react";
 
 type CollaboratorDialogProps = Pick<
   UseCollaboratorDialogReturnType,
-  "open" | "setOpen" | "boardId" | "collaborators" | "form" | "onSubmit"
+  | "open"
+  | "setOpen"
+  | "boardId"
+  | "collaborators"
+  | "isLoading"
+  | "form"
+  | "onSubmit"
 >;
 
 export function CollaboratorDialog({
@@ -34,28 +40,29 @@ export function CollaboratorDialog({
   setOpen,
   boardId,
   collaborators,
+  isLoading,
   form,
   onSubmit,
 }: CollaboratorDialogProps) {
   const { user } = useAuth();
 
-  const currentCollaborator = collaborators.find(
-    (collaborator) => collaborator.id === user!.id,
-  );
-
   const collaboratorList = useMemo(() => {
+    if (!collaborators) return [];
+
+    const currentCollaborator = collaborators.find(
+      (collaborator) => collaborator.id === user!.id,
+    );
+
     if (!currentCollaborator) return [];
 
-    const list = [];
-
-    for (let i = 0; i < collaborators.length; i++) {
-      const { id, given_name, family_name, email, role } = collaborators[i];
+    return collaborators.map((collaborator) => {
+      const { id, given_name, family_name, email, role } = collaborator;
       const isDisabled =
         currentCollaborator!.role === OWNER
           ? id === user!.id && role === OWNER
           : id !== user!.id;
 
-      list.push(
+      return (
         <div key={id} className="flex justify-between items-center gap-2">
           <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-lg">
@@ -75,12 +82,10 @@ export function CollaboratorDialog({
             role={role}
             isDisabled={isDisabled}
           />
-        </div>,
+        </div>
       );
-    }
-
-    return list;
-  }, [collaborators, currentCollaborator, boardId, user]);
+    });
+  }, [collaborators, boardId, user]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -114,9 +119,15 @@ export function CollaboratorDialog({
             </Button>
           </form>
         </Form>
-        <div className="flex flex-col justify-start gap-y-2 ">
-          {collaboratorList}
-        </div>
+        {isLoading ? (
+          <div className="h-8 w-full flex justify-start items-center">
+            Loading collaborators...
+          </div>
+        ) : (
+          <div className="flex flex-col justify-start gap-y-2 ">
+            {collaboratorList}
+          </div>
+        )}
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline">

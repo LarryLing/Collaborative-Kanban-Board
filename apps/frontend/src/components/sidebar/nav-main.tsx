@@ -54,8 +54,9 @@ function NavMain({
               <span>Loading boards...</span>
             </SidebarMenuItem>
           ) : (
-            boards.map((board) => (
+            boards?.map((board) => (
               <SidebarBoardMenuItemMemo
+                key={board.id}
                 {...board}
                 openUpdateBoardDialog={openUpdateBoardDialog}
                 openCollaboratorDialog={openCollaboratorDialog}

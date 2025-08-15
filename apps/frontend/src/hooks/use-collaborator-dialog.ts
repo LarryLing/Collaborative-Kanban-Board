@@ -5,11 +5,7 @@ import type {
   Collaborator,
   UseCollaboratorDialogReturnType,
 } from "@/lib/types";
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addCollaborator,
   getAllCollaborators,
@@ -25,7 +21,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
 
   const queryClient = useQueryClient();
 
-  const { data: collaborators } = useSuspenseQuery({
+  const { data: collaborators, isLoading } = useQuery({
     queryKey: ["collaborators", { boardId }],
     queryFn: async () => {
       if (!boardId) return [];
@@ -106,6 +102,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     setOpen,
     boardId,
     collaborators,
+    isLoading,
     removeCollaboratorMutation,
     form,
     onSubmit,

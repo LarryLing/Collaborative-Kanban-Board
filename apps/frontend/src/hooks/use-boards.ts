@@ -5,11 +5,7 @@ import {
   deleteBoard,
   updateBoard,
 } from "@/api/boards";
-import {
-  useQueryClient,
-  useSuspenseQuery,
-  useMutation,
-} from "@tanstack/react-query";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
 export function useBoards(): UseBoardsReturnType {
@@ -17,7 +13,7 @@ export function useBoards(): UseBoardsReturnType {
 
   const queryClient = useQueryClient();
 
-  const { data: boards, isLoading } = useSuspenseQuery({
+  const { data: boards, isLoading } = useQuery({
     queryKey: ["boards"],
     queryFn: getAllBoards,
   });

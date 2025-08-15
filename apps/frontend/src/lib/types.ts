@@ -107,34 +107,8 @@ export type UpdateBoardDialogContextType = {
   ) => void;
 };
 
-export type CollaboratorDialogContextType = {
-  open: boolean;
-  setOpen: (open: boolean) => void;
-  boardId: Board["id"] | null;
-  removeCollaboratorMutation: UseMutateAsyncFunction<
-    void,
-    Error,
-    {
-      boardId: Board["id"];
-      collaboratorId: Collaborator["id"];
-    },
-    unknown
-  >;
-  form: UseFormReturn<
-    {
-      email: string;
-    },
-    unknown,
-    {
-      email: string;
-    }
-  >;
-  onSubmit: (values: AddCollaboratorForm) => Promise<void>;
-  openCollaboratorDialog: (boardId: Board["id"]) => void;
-};
-
 export type UseBoardsReturnType = {
-  boards: Board[];
+  boards: Board[] | undefined;
   isLoading: boolean;
   createBoardMutation: UseMutateAsyncFunction<
     Board,
@@ -167,7 +141,8 @@ export type UseCollaboratorDialogReturnType = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: string | null;
-  collaborators: Collaborator[];
+  collaborators: Collaborator[] | undefined;
+  isLoading: boolean;
   removeCollaboratorMutation: UseMutateAsyncFunction<
     void,
     Error,

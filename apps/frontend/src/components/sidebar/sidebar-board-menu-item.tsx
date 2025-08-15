@@ -23,7 +23,7 @@ function SidebarBoardMenuItem({
   openCollaboratorDialog,
 }: SidebarBoardMenuItemProps) {
   return (
-    <SidebarMenuItem key={id}>
+    <SidebarMenuItem>
       <SidebarMenuButton asChild>
         <Link
           to="/boards/$boardId"

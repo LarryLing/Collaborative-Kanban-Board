@@ -10,7 +10,7 @@ function DynamicBoards() {
 
   const { boards, isLoading } = useBoards();
 
-  const board = boards.find((board) => board.id === boardId);
+  const board = boards?.find((board) => board.id === boardId);
 
   if (isLoading) {
     return <p>Loading board...</p>;
