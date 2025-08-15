@@ -17,63 +17,70 @@ import {
   FormMessage,
   Form,
 } from "../ui/form";
-import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getAllCollaborators } from "@/api/collaborators";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { OWNER } from "@/lib/constants";
 import { CollaboratorRoleSelect } from "./collaborator-role-select";
-import type { ReactElement } from "react";
+import type { UseCollaboratorDialogReturnType } from "@/lib/types";
+import { useMemo } from "react";
 
-export function CollaboratorDialog() {
+type CollaboratorDialogProps = Pick<
+  UseCollaboratorDialogReturnType,
+  "open" | "setOpen" | "boardId" | "collaborators" | "form" | "onSubmit"
+>;
+
+export function CollaboratorDialog({
+  open,
+  setOpen,
+  boardId,
+  collaborators,
+  form,
+  onSubmit,
+}: CollaboratorDialogProps) {
   const { user } = useAuth();
-
-  const { open, setOpen, boardId, form, onSubmit } = useCollaboratorDialog();
-
-  const { data: collaborators } = useSuspenseQuery({
-    queryKey: ["collaborators", { boardId }],
-    queryFn: async () => {
-      if (!boardId) return [];
-      return await getAllCollaborators({ boardId });
-    },
-  });
 
   const currentCollaborator = collaborators.find(
     (collaborator) => collaborator.id === user!.id,
   );
-  const collaboratorList: ReactElement[] = [];
 
-  for (let i = 0; i < collaborators.length; i++) {
-    const { id, given_name, family_name, email, role } = collaborators[i];
-    const isDisabled =
-      currentCollaborator!.role === OWNER
-        ? id === user!.id && role === OWNER
-        : id !== user!.id;
+  const collaboratorList = useMemo(() => {
+    if (!currentCollaborator) return [];
 
-    collaboratorList.push(
-      <div key={id} className="flex justify-between items-center gap-2">
-        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-          <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage alt={`${given_name} ${family_name}`} />
-            <AvatarFallback className="rounded-lg">{`${given_name.substring(0, 1)}${family_name.substring(0, 1)}`}</AvatarFallback>
-          </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-medium">{`${given_name} ${family_name}`}</span>
-            <span className="text-muted-foreground truncate text-xs">
-              {email}
-            </span>
+    const list = [];
+
+    for (let i = 0; i < collaborators.length; i++) {
+      const { id, given_name, family_name, email, role } = collaborators[i];
+      const isDisabled =
+        currentCollaborator!.role === OWNER
+          ? id === user!.id && role === OWNER
+          : id !== user!.id;
+
+      list.push(
+        <div key={id} className="flex justify-between items-center gap-2">
+          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <Avatar className="h-8 w-8 rounded-lg">
+              <AvatarImage alt={`${given_name} ${family_name}`} />
+              <AvatarFallback className="rounded-lg">{`${given_name.substring(0, 1)}${family_name.substring(0, 1)}`}</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-medium">{`${given_name} ${family_name}`}</span>
+              <span className="text-muted-foreground truncate text-xs">
+                {email}
+              </span>
+            </div>
           </div>
-        </div>
-        <CollaboratorRoleSelect
-          boardId={boardId!}
-          collaboratorId={id}
-          role={role}
-          isDisabled={isDisabled}
-        />
-      </div>,
-    );
-  }
+          <CollaboratorRoleSelect
+            boardId={boardId!}
+            collaboratorId={id}
+            role={role}
+            isDisabled={isDisabled}
+          />
+        </div>,
+      );
+    }
+
+    return list;
+  }, [collaborators, currentCollaborator, boardId, user]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

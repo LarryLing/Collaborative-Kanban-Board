@@ -43,14 +43,14 @@ function ForgotPassword() {
     },
   });
 
-  async function onSubmit(values: ForgotPasswordForm) {
+  const onSubmit = async (values: ForgotPasswordForm) => {
     try {
       await requestPasswordReset(values.email);
       navigate({ to: "/reset-password", search: { email: values.email } });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
-  }
+  };
 
   return (
     <section className="bg-muted h-screen">

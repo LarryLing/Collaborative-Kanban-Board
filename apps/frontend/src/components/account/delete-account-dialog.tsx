@@ -37,14 +37,14 @@ export function DeleteAccountDialog() {
     },
   });
 
-  async function onSubmit() {
+  const onSubmit = async () => {
     try {
       await deleteAccount();
       navigate({ to: "/login" });
     } catch (error) {
       console.error("Failed to delete account:", error);
     }
-  }
+  };
 
   return (
     <Dialog>

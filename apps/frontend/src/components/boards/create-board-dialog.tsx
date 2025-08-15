@@ -39,15 +39,15 @@ export function CreateBoardDialog() {
     },
   });
 
-  async function onSubmit(values: CreateBoardForm) {
+  const onSubmit = async (values: CreateBoardForm) => {
     try {
       await createBoardMutation({ boardTitle: values.boardTitle });
       setOpen(false);
       form.reset();
     } catch (error) {
-      console.error("Error creating board:", error);
+      console.error("Failed to create board:", error);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

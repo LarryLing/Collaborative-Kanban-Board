@@ -1,4 +1,8 @@
-import type { Board } from "@/lib/types";
+import type {
+  Board,
+  UseCollaboratorDialogReturnType,
+  UseUpdateBoardDialogReturnType,
+} from "@/lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,18 +12,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical, Pencil, Share, Trash } from "lucide-react";
 import { SidebarMenuAction, useSidebar } from "../ui/sidebar";
-import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
 import { useBoards } from "@/hooks/use-boards";
-import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
 
-type BoardActionsDropdownProps = Pick<Board, "id" | "title">;
+type BoardActionsDropdownProps = Pick<Board, "id" | "title"> & {
+  openUpdateBoardDialog: UseUpdateBoardDialogReturnType["openUpdateBoardDialog"];
+  openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
+};
 
-export function BoardActionsDropdown({ id, title }: BoardActionsDropdownProps) {
+export default function BoardActionsDropdown({
+  id,
+  title,
+  openCollaboratorDialog,
+  openUpdateBoardDialog,
+}: BoardActionsDropdownProps) {
   const { isMobile } = useSidebar();
-
-  const { openUpdateBoardDialog } = useUpdateBoardDialog();
-
-  const { openCollaboratorDialog } = useCollaboratorDialog();
 
   const { deleteBoardMutation } = useBoards();
 

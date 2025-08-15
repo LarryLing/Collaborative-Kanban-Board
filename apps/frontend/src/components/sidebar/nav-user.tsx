@@ -17,10 +17,13 @@ import { useAuth } from "@/hooks/use-auth";
 import type { User } from "@/lib/types";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { CircleUserRound, EllipsisVertical, LogOutIcon } from "lucide-react";
+import { memo } from "react";
 
-type NavUserProps = User;
+export const NavUserMemo = memo(NavUser);
 
-export function NavUser({ given_name, family_name, email }: NavUserProps) {
+type NavUserProps = Pick<User, "given_name" | "family_name" | "email">;
+
+function NavUser({ given_name, family_name, email }: NavUserProps) {
   const { logout } = useAuth();
 
   const { isMobile } = useSidebar();

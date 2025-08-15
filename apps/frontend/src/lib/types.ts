@@ -162,3 +162,49 @@ export type UseBoardsReturnType = {
     unknown
   >;
 };
+
+export type UseCollaboratorDialogReturnType = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  boardId: string | null;
+  collaborators: Collaborator[];
+  removeCollaboratorMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      collaboratorId: Collaborator["id"];
+    },
+    unknown
+  >;
+  form: UseFormReturn<
+    {
+      email: string;
+    },
+    unknown,
+    {
+      email: string;
+    }
+  >;
+  onSubmit: (values: AddCollaboratorForm) => Promise<void>;
+  openCollaboratorDialog: (boardId: Board["id"]) => void;
+};
+
+export type UseUpdateBoardDialogReturnType = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  form: UseFormReturn<
+    {
+      boardTitle: string;
+    },
+    unknown,
+    {
+      boardTitle: string;
+    }
+  >;
+  onSubmit: (values: UpdateBoardForm) => Promise<void>;
+  openUpdateBoardDialog: (
+    boardId: Board["id"],
+    boardTitle: Board["title"],
+  ) => void;
+};

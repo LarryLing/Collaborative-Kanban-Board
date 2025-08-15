@@ -56,7 +56,7 @@ function ConfirmSignup() {
     },
   });
 
-  async function onSubmit(values: ConfirmSignupForm) {
+  const onSubmit = async (values: ConfirmSignupForm) => {
     if (email === undefined) {
       throw new Error("Email has not been provided");
     }
@@ -67,7 +67,7 @@ function ConfirmSignup() {
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
-  }
+  };
 
   const handleResendCode = async () => {
     if (email === undefined) {

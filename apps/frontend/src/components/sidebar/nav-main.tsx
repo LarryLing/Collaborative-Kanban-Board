@@ -3,17 +3,31 @@ import {
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { House, SquareKanban } from "lucide-react";
+import { House } from "lucide-react";
 import { useBoards } from "@/hooks/use-boards";
 import { Link } from "@tanstack/react-router";
 import { Button } from "../ui/button";
 import { CreateBoardDialog } from "../boards/create-board-dialog";
-import { BoardActionsDropdown } from "./board-actions-dropdown";
+import type {
+  UseCollaboratorDialogReturnType,
+  UseUpdateBoardDialogReturnType,
+} from "@/lib/types";
+import { memo } from "react";
+import { SidebarBoardMenuItemMemo } from "./sidebar-board-menu-item";
 
-export function NavMain() {
+export const NavMainMemo = memo(NavMain);
+
+type NavMainProps = {
+  openUpdateBoardDialog: UseUpdateBoardDialogReturnType["openUpdateBoardDialog"];
+  openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
+};
+
+function NavMain({
+  openUpdateBoardDialog,
+  openCollaboratorDialog,
+}: NavMainProps) {
   const { boards, isLoading } = useBoards();
 
   return (
@@ -40,21 +54,12 @@ export function NavMain() {
               <span>Loading boards...</span>
             </SidebarMenuItem>
           ) : (
-            boards?.map((board) => (
-              <SidebarMenuItem key={board.id}>
-                <SidebarMenuButton asChild>
-                  <Link
-                    to="/boards/$boardId"
-                    params={{
-                      boardId: board.id,
-                    }}
-                  >
-                    <SquareKanban />
-                    <span>{board.title}</span>
-                  </Link>
-                </SidebarMenuButton>
-                <BoardActionsDropdown {...board} />
-              </SidebarMenuItem>
+            boards.map((board) => (
+              <SidebarBoardMenuItemMemo
+                {...board}
+                openUpdateBoardDialog={openUpdateBoardDialog}
+                openCollaboratorDialog={openCollaboratorDialog}
+              />
             ))
           )}
         </SidebarMenu>

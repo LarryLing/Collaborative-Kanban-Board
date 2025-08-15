@@ -47,7 +47,7 @@ function SignUp() {
     },
   });
 
-  async function onSubmit(values: SignupForm) {
+  const onSubmit = async (values: SignupForm) => {
     try {
       await signUp(
         values.givenName,
@@ -59,7 +59,7 @@ function SignUp() {
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
-  }
+  };
 
   return (
     <section className="bg-muted h-screen">

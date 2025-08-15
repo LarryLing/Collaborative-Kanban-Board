@@ -44,14 +44,14 @@ function Login() {
     },
   });
 
-  async function onSubmit(values: LoginForm) {
+  const onSubmit = async (values: LoginForm) => {
     try {
       await login(values.email, values.password);
       navigate({ to: "/" });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
-  }
+  };
 
   return (
     <section className="bg-muted h-screen">

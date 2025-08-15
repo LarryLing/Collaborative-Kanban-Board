@@ -17,11 +17,19 @@ import {
   FormMessage,
   Form,
 } from "../ui/form";
-import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
+import type { UseUpdateBoardDialogReturnType } from "@/lib/types";
 
-export function UpdateBoardDialog() {
-  const { open, setOpen, form, onSubmit } = useUpdateBoardDialog();
+type UpdateBoardDialogProps = Pick<
+  UseUpdateBoardDialogReturnType,
+  "open" | "setOpen" | "form" | "onSubmit"
+>;
 
+export function UpdateBoardDialog({
+  open,
+  setOpen,
+  form,
+  onSubmit,
+}: UpdateBoardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">

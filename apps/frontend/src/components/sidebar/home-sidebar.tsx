@@ -8,12 +8,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Album } from "lucide-react";
-import { NavUser } from "./nav-user";
-import { NavMain } from "./nav-main";
+import { NavUserMemo } from "./nav-user";
+import { NavMainMemo } from "./nav-main";
 import { useAuth } from "@/hooks/use-auth";
 import { redirect } from "@tanstack/react-router";
 import { UpdateBoardDialog } from "../boards/update-board-dialog";
 import { CollaboratorDialog } from "../boards/collaborators-dialog";
+import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
+import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
 
 type HomeSidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -23,6 +25,9 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
   if (!user) {
     throw redirect({ to: "/login" });
   }
+
+  const useUpdateBoardDialogReturn = useUpdateBoardDialog();
+  const useCollaboratorDialogReturn = useCollaboratorDialog();
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -35,12 +40,19 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain />
-        <UpdateBoardDialog />
-        <CollaboratorDialog />
+        <NavMainMemo
+          openUpdateBoardDialog={
+            useUpdateBoardDialogReturn.openUpdateBoardDialog
+          }
+          openCollaboratorDialog={
+            useCollaboratorDialogReturn.openCollaboratorDialog
+          }
+        />
+        <UpdateBoardDialog {...useUpdateBoardDialogReturn} />
+        <CollaboratorDialog {...useCollaboratorDialogReturn} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser {...user} />
+        <NavUserMemo {...user} />
       </SidebarFooter>
     </Sidebar>
   );

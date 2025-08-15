@@ -60,7 +60,7 @@ function ResetPassword() {
     },
   });
 
-  async function onSubmit(values: ResetPasswordForm) {
+  const onSubmit = async (values: ResetPasswordForm) => {
     if (email === undefined) {
       throw new Error("Email has not been provided");
     }
@@ -71,7 +71,7 @@ function ResetPassword() {
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
     }
-  }
+  };
 
   return (
     <section className="bg-muted h-screen">

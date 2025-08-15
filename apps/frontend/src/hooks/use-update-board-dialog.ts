@@ -1,15 +1,52 @@
-import { useContext } from "react";
-import type { UpdateBoardDialogContextType } from "@/lib/types";
-import { UpdateBoardDialogContext } from "@/contexts/update-board-dialog-context";
+import type {
+  Board,
+  UpdateBoardForm,
+  UseUpdateBoardDialogReturnType,
+} from "@/lib/types";
+import { useCallback, useState } from "react";
+import { UpdateBoardSchema } from "@/lib/schemas";
+import { useBoards } from "@/hooks/use-boards";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-export function useUpdateBoardDialog(): UpdateBoardDialogContextType {
-  const context = useContext(UpdateBoardDialogContext);
+export function useUpdateBoardDialog(): UseUpdateBoardDialogReturnType {
+  const [open, setOpen] = useState(false);
+  const [boardId, setBoardId] = useState<Board["id"]>("");
 
-  if (context === undefined) {
-    throw new Error(
-      "useUpdateBoardDialog must be used within a UpdateBoardDialogProvider",
-    );
-  }
+  const { updateBoardMutation } = useBoards();
 
-  return context;
+  const form = useForm<UpdateBoardForm>({
+    resolver: zodResolver(UpdateBoardSchema),
+    defaultValues: {
+      boardTitle: "",
+    },
+  });
+
+  const onSubmit = async (values: UpdateBoardForm) => {
+    try {
+      await updateBoardMutation({ boardId, boardTitle: values.boardTitle });
+      setOpen(false);
+    } catch (error) {
+      console.error("Failed to update board:", error);
+    }
+  };
+
+  const openUpdateBoardDialog = useCallback(
+    (boardId: Board["id"], boardTitle: Board["title"]) => {
+      form.reset({
+        boardTitle,
+      });
+      setOpen(true);
+      setBoardId(boardId);
+    },
+    [form],
+  );
+
+  return {
+    open,
+    setOpen,
+    form,
+    onSubmit,
+    openUpdateBoardDialog,
+  };
 }
