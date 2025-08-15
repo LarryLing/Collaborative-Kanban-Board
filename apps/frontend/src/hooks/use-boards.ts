@@ -13,7 +13,11 @@ export function useBoards(): UseBoardsReturnType {
 
   const queryClient = useQueryClient();
 
-  const { data: boards, isLoading } = useQuery({
+  const {
+    data: boards,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["boards"],
     queryFn: getAllBoards,
   });
@@ -87,6 +91,7 @@ export function useBoards(): UseBoardsReturnType {
   return {
     boards,
     isLoading,
+    refetch,
     createBoardMutation,
     deleteBoardMutation,
     updateBoardMutation,

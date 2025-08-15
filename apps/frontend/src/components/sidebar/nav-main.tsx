@@ -5,7 +5,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { House } from "lucide-react";
+import { House, RefreshCcw } from "lucide-react";
 import { useBoards } from "@/hooks/use-boards";
 import { Link } from "@tanstack/react-router";
 import { Button } from "../ui/button";
@@ -28,7 +28,11 @@ function NavMain({
   openUpdateBoardDialog,
   openCollaboratorDialog,
 }: NavMainProps) {
-  const { boards, isLoading } = useBoards();
+  const { boards, isLoading, refetch } = useBoards();
+
+  const handleRefetch = async () => {
+    await refetch();
+  };
 
   return (
     <SidebarGroup>
@@ -44,8 +48,17 @@ function NavMain({
             >
               <Link to="/boards">
                 <House />
-                <span className="sr-only">Inbox</span>
+                <span className="sr-only">Boards</span>
               </Link>
+            </Button>
+            <Button
+              size="icon"
+              className="size-8 group-data-[collapsible=icon]:opacity-0"
+              variant="outline"
+              onClick={handleRefetch}
+            >
+              <RefreshCcw />
+              <span className="sr-only">Refresh</span>
             </Button>
           </SidebarMenuItem>
           <SidebarGroupLabel>Boards</SidebarGroupLabel>

@@ -11,7 +11,11 @@ import {
   UpdateBoardSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
-import type { UseMutateAsyncFunction } from "@tanstack/react-query";
+import type {
+  QueryObserverResult,
+  RefetchOptions,
+  UseMutateAsyncFunction,
+} from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
 import type { COLLABORATOR, OWNER } from "./constants";
 
@@ -110,6 +114,9 @@ export type UpdateBoardDialogContextType = {
 export type UseBoardsReturnType = {
   boards: Board[] | undefined;
   isLoading: boolean;
+  refetch: (
+    options?: RefetchOptions,
+  ) => Promise<QueryObserverResult<Board[], Error>>;
   createBoardMutation: UseMutateAsyncFunction<
     Board,
     Error,
