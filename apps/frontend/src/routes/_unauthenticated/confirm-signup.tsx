@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
-import AuthAlert from "@/components/auth/auth-alert";
+import ErrorAlert from "@/components/misc/error-alert";
 import {
   InputOTP,
   InputOTPGroup,
@@ -129,7 +129,7 @@ function ConfirmSignup() {
                   Continue to login
                 </Button>
                 {error && (
-                  <AuthAlert title="Failed to confirm sign up" error={error} />
+                  <ErrorAlert title="Failed to confirm sign up" error={error} />
                 )}
               </form>
             </Form>

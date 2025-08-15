@@ -5,16 +5,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuth } from "@/hooks/use-auth";
-import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
 import { COLLABORATOR, OWNER } from "@/lib/constants";
-import type { Board, Collaborator } from "@/lib/types";
-import { useNavigate } from "@tanstack/react-router";
+import type {
+  Board,
+  Collaborator,
+  UseCollaboratorDialogReturnType,
+} from "@/lib/types";
 
 type CollaboratorRoleSelectProps = {
   boardId: Board["id"];
   collaboratorId: Collaborator["id"];
   role: Collaborator["role"];
+  removeCollaboratorMutation: UseCollaboratorDialogReturnType["removeCollaboratorMutation"];
   isDisabled: boolean;
 };
 
@@ -22,21 +24,12 @@ export function CollaboratorRoleSelect({
   boardId,
   collaboratorId,
   role,
+  removeCollaboratorMutation,
   isDisabled,
 }: CollaboratorRoleSelectProps) {
-  const { user } = useAuth();
-
-  const navigate = useNavigate();
-
-  const { removeCollaboratorMutation } = useCollaboratorDialog();
-
   const handleValueChange = async (value: string) => {
     if (value === "Remove") {
       await removeCollaboratorMutation({ boardId, collaboratorId });
-
-      if (user!.id === collaboratorId) {
-        navigate({ to: "/boards" });
-      }
     }
   };
 

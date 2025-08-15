@@ -19,18 +19,21 @@ import {
 } from "../ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
-import { OWNER } from "@/lib/constants";
+import { COLLABORATOR, OWNER } from "@/lib/constants";
 import { CollaboratorRoleSelect } from "./collaborator-role-select";
 import type { UseCollaboratorDialogReturnType } from "@/lib/types";
 import { useMemo } from "react";
+import ErrorAlert from "../misc/error-alert";
 
 type CollaboratorDialogProps = Pick<
   UseCollaboratorDialogReturnType,
   | "open"
   | "setOpen"
   | "boardId"
+  | "error"
   | "collaborators"
   | "isLoading"
+  | "removeCollaboratorMutation"
   | "form"
   | "onSubmit"
 >;
@@ -39,21 +42,22 @@ export function CollaboratorDialog({
   open,
   setOpen,
   boardId,
+  error,
   collaborators,
   isLoading,
+  removeCollaboratorMutation,
   form,
   onSubmit,
 }: CollaboratorDialogProps) {
   const { user } = useAuth();
 
+  const currentCollaborator = useMemo(
+    () => collaborators?.find((collaborator) => collaborator.id === user!.id),
+    [collaborators, user],
+  );
+
   const collaboratorList = useMemo(() => {
-    if (!collaborators) return [];
-
-    const currentCollaborator = collaborators.find(
-      (collaborator) => collaborator.id === user!.id,
-    );
-
-    if (!currentCollaborator) return [];
+    if (!collaborators || !currentCollaborator) return [];
 
     return collaborators.map((collaborator) => {
       const { id, given_name, family_name, email, role } = collaborator;
@@ -80,12 +84,19 @@ export function CollaboratorDialog({
             boardId={boardId!}
             collaboratorId={id}
             role={role}
+            removeCollaboratorMutation={removeCollaboratorMutation}
             isDisabled={isDisabled}
           />
         </div>
       );
     });
-  }, [collaborators, boardId, user]);
+  }, [
+    collaborators,
+    currentCollaborator,
+    user,
+    boardId,
+    removeCollaboratorMutation,
+  ]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -104,6 +115,9 @@ export function CollaboratorDialog({
             <FormField
               control={form.control}
               name="email"
+              disabled={
+                currentCollaborator && currentCollaborator.role === COLLABORATOR
+              }
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
@@ -114,7 +128,12 @@ export function CollaboratorDialog({
                 </FormItem>
               )}
             />
-            <Button type="submit">
+            <Button
+              type="submit"
+              disabled={
+                currentCollaborator && currentCollaborator.role === COLLABORATOR
+              }
+            >
               {form.formState.isSubmitting ? "Inviting..." : "Invite"}
             </Button>
           </form>
@@ -127,6 +146,9 @@ export function CollaboratorDialog({
           <div className="flex flex-col justify-start gap-y-2 ">
             {collaboratorList}
           </div>
+        )}
+        {error && (
+          <ErrorAlert title="Failed to add collaborator" error={error} />
         )}
         <DialogFooter>
           <DialogClose asChild>

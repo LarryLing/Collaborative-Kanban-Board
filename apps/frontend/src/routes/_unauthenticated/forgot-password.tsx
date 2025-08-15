@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
-import AuthAlert from "@/components/auth/auth-alert";
+import ErrorAlert from "@/components/misc/error-alert";
 
 export const Route = createFileRoute("/_unauthenticated/forgot-password")({
   component: ForgotPassword,
@@ -88,7 +88,7 @@ function ForgotPassword() {
                   Send password recovery
                 </Button>
                 {error && (
-                  <AuthAlert
+                  <ErrorAlert
                     title="Failed to request password reset"
                     error={error}
                   />

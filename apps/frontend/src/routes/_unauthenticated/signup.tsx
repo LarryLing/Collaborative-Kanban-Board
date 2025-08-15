@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
-import AuthAlert from "@/components/auth/auth-alert";
+import ErrorAlert from "@/components/misc/error-alert";
 
 export const Route = createFileRoute("/_unauthenticated/signup")({
   component: SignUp,
@@ -156,7 +156,10 @@ function SignUp() {
                   Sign Up
                 </Button>
                 {error && (
-                  <AuthAlert title="Failed to sign up new user" error={error} />
+                  <ErrorAlert
+                    title="Failed to sign up new user"
+                    error={error}
+                  />
                 )}
               </form>
             </Form>

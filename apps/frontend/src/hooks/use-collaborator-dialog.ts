@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import type {
   AddCollaboratorForm,
   Board,
-  Collaborator,
   UseCollaboratorDialogReturnType,
 } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,14 +13,25 @@ import {
 import { AddCollaboratorSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "./use-auth";
+import { useNavigate } from "@tanstack/react-router";
 
 export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const [open, setOpen] = useState(false);
   const [boardId, setBoardId] = useState<Board["id"] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = useAuth();
+
+  const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
-  const { data: collaborators, isLoading } = useQuery({
+  const {
+    data: collaborators,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["collaborators", { boardId }],
     queryFn: async () => {
       if (!boardId) return [];
@@ -32,20 +42,19 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const { mutateAsync: addCollaboratorMutation } = useMutation({
     mutationKey: ["addCollaborator"],
     mutationFn: addCollaborator,
-    onSuccess: (data) => {
-      if (!data) return;
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["collaborators", { boardId: variables.boardId }],
+      });
 
-      queryClient.setQueryData(
-        ["collaborators", { boardId }],
-        (prevCollaborators: Collaborator[] | undefined) => {
-          if (!prevCollaborators) return prevCollaborators;
-
-          return [data, ...prevCollaborators];
-        },
-      );
+      setError(null);
+      form.reset();
     },
     onError: (error) => {
       console.error("Failed to add collaborator:", error.message);
+
+      setError(error.message);
+      form.reset();
     },
   });
 
@@ -53,20 +62,19 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     mutationKey: ["removeCollaborator"],
     mutationFn: removeCollaborator,
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData(
-        ["collaborators", { boardId }],
-        (prevCollaborators: Collaborator[] | undefined) => {
-          if (!prevCollaborators) return prevCollaborators;
+      queryClient.invalidateQueries({
+        queryKey: ["boards"],
+      });
 
-          return prevCollaborators.filter(
-            (prevCollaborators) =>
-              prevCollaborators.id !== variables.collaboratorId,
-          );
-        },
-      );
+      if (user!.id === variables.collaboratorId) {
+        setOpen(false);
+        navigate({ to: "/boards" });
+      }
     },
     onError: (error) => {
       console.error("Failed to remove collaborator:", error.message);
+
+      setError(error.message);
     },
   });
 
@@ -82,25 +90,26 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
 
     try {
       await addCollaboratorMutation({ boardId, email: values.email });
-      form.reset();
     } catch (error) {
       console.error("Failed to add collaborator:", error);
     }
   };
 
   const openCollaboratorDialog = useCallback(
-    (boardId: Board["id"]) => {
+    async (boardId: Board["id"]) => {
       form.reset();
       setBoardId(boardId);
       setOpen(true);
+      await refetch();
     },
-    [form],
+    [form, refetch],
   );
 
   return {
     open,
     setOpen,
     boardId,
+    error,
     collaborators,
     isLoading,
     removeCollaboratorMutation,

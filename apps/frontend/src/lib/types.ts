@@ -141,6 +141,7 @@ export type UseCollaboratorDialogReturnType = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: string | null;
+  error: string | null;
   collaborators: Collaborator[] | undefined;
   isLoading: boolean;
   removeCollaboratorMutation: UseMutateAsyncFunction<
@@ -162,7 +163,7 @@ export type UseCollaboratorDialogReturnType = {
     }
   >;
   onSubmit: (values: AddCollaboratorForm) => Promise<void>;
-  openCollaboratorDialog: (boardId: Board["id"]) => void;
+  openCollaboratorDialog: (boardId: Board["id"]) => Promise<void>;
 };
 
 export type UseUpdateBoardDialogReturnType = {
