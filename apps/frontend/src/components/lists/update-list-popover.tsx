@@ -4,11 +4,15 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "../ui/button";
-import type { Board, CreateListForm, UseListsReturnType } from "@/lib/types";
-import { Plus } from "lucide-react";
+import type {
+  Board,
+  UseListsReturnType,
+  UpdateListForm,
+  List,
+} from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateListSchema } from "@/lib/schemas";
+import { UpdateListSchema } from "@/lib/schemas";
 import {
   Form,
   FormControl,
@@ -19,32 +23,37 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { Badge } from "../ui/badge";
 
-type NewListPopoverProps = {
+type UpdateListPopoverProps = {
   boardId: Board["id"];
-  createListMutation: UseListsReturnType["createListMutation"];
+  listId: List["id"];
+  listTitle: List["title"];
+  updateListMutation: UseListsReturnType["updateListMutation"];
 };
 
-export default function NewListPopover({
+export default function UpdateListPopover({
   boardId,
-  createListMutation,
-}: NewListPopoverProps) {
+  listId,
+  listTitle,
+  updateListMutation,
+}: UpdateListPopoverProps) {
   const [open, setOpen] = useState<boolean>(false);
 
-  const form = useForm<CreateListForm>({
-    resolver: zodResolver(CreateListSchema),
+  const form = useForm<UpdateListForm>({
+    resolver: zodResolver(UpdateListSchema),
     defaultValues: {
-      listTitle: "",
+      listTitle,
     },
   });
 
-  const onSubmit = async (values: CreateListForm) => {
+  const onSubmit = async (values: UpdateListForm) => {
     try {
       setOpen(false);
-      await createListMutation({
+      await updateListMutation({
         boardId,
+        listId,
         listTitle: values.listTitle,
-        listPosition: 0,
       });
     } catch (error) {
       console.error(error instanceof Error ? error.message : "Unknown error");
@@ -54,10 +63,7 @@ export default function NewListPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost">
-          <Plus />
-          Create list
-        </Button>
+        <Badge variant="secondary">{listTitle}</Badge>
       </PopoverTrigger>
       <PopoverContent>
         <Form {...form}>
@@ -72,7 +78,7 @@ export default function NewListPopover({
                 <FormItem className="w-full">
                   <FormLabel className="hidden">Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Untitled List" {...field} />
+                    <Input placeholder={listTitle} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

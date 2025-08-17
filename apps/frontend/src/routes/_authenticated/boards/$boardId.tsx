@@ -17,6 +17,7 @@ function DynamicBoards() {
     lists,
     isLoading: isListsLoading,
     createListMutation,
+    updateListMutation,
   } = useLists(boardId);
 
   const board = boards?.find((board) => board.id === boardId);
@@ -32,7 +33,13 @@ function DynamicBoards() {
   return (
     <div className="h-full flex justify-start gap-3 overflow-auto text-sm">
       {lists?.map((list) => (
-        <List key={list.id} title={list.title} />
+        <List
+          key={list.id}
+          boardId={boardId}
+          listId={list.id}
+          listTitle={list.title}
+          updateListMutation={updateListMutation}
+        />
       ))}
       <NewListPopover
         boardId={boardId}

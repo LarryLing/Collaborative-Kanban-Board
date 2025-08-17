@@ -12,7 +12,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
   const queryClient = useQueryClient();
 
   const { data: lists, isLoading } = useQuery({
-    queryKey: ["lists"],
+    queryKey: ["lists", { boardId }],
     queryFn: async () => {
       return await getAllLists({ boardId });
     },
@@ -21,14 +21,17 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
   const { mutateAsync: createListMutation } = useMutation({
     mutationKey: ["createList"],
     mutationFn: createList,
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       if (!data) return;
 
-      queryClient.setQueryData(["lists"], (prevLists: List[] | undefined) => {
-        if (!prevLists) return prevLists;
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        (prevLists: List[] | undefined) => {
+          if (!prevLists) return prevLists;
 
-        return [data, ...prevLists];
-      });
+          return [data, ...prevLists];
+        },
+      );
     },
     onError: (error) => {
       console.error("Failed to create list:", error.message);
@@ -39,13 +42,16 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationKey: ["deleteList"],
     mutationFn: deleteList,
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData(["lists"], (prevLists: List[] | undefined) => {
-        if (!prevLists) return prevLists;
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        (prevLists: List[] | undefined) => {
+          if (!prevLists) return prevLists;
 
-        return prevLists.filter(
-          (prevLists) => prevLists.id !== variables.listId,
-        );
-      });
+          return prevLists.filter(
+            (prevLists) => prevLists.id !== variables.listId,
+          );
+        },
+      );
     },
     onError: (error) => {
       console.error("Failed to delete list:", error.message);
@@ -56,15 +62,18 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationKey: ["updateList"],
     mutationFn: updateList,
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData(["lists"], (prevLists: List[] | undefined) => {
-        if (!prevLists) return prevLists;
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        (prevLists: List[] | undefined) => {
+          if (!prevLists) return prevLists;
 
-        return prevLists.map((prevlist) =>
-          prevlist.id === variables.listId
-            ? { ...prevlist, title: variables.listTitle }
-            : prevlist,
-        );
-      });
+          return prevLists.map((prevlist) =>
+            prevlist.id === variables.listId
+              ? { ...prevlist, title: variables.listTitle }
+              : prevlist,
+          );
+        },
+      );
     },
     onError: (error) => {
       console.error("Failed to update list:", error.message);
@@ -75,15 +84,18 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationKey: ["updateListPosition"],
     mutationFn: updateListPosition,
     onSuccess: (_data, variables) => {
-      queryClient.setQueryData(["lists"], (prevLists: List[] | undefined) => {
-        if (!prevLists) return prevLists;
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        (prevLists: List[] | undefined) => {
+          if (!prevLists) return prevLists;
 
-        return prevLists.map((prevlist) =>
-          prevlist.id === variables.listId
-            ? { ...prevlist, position: variables.listPosition }
-            : prevlist,
-        );
-      });
+          return prevLists.map((prevlist) =>
+            prevlist.id === variables.listId
+              ? { ...prevlist, position: variables.listPosition }
+              : prevlist,
+          );
+        },
+      );
     },
     onError: (error) => {
       console.error("Failed to update list position:", error.message);
