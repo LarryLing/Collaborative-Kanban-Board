@@ -18,6 +18,7 @@ function DynamicBoards() {
     isLoading: isListsLoading,
     createListMutation,
     updateListMutation,
+    deleteListMutation,
   } = useLists(boardId);
 
   const board = boards?.find((board) => board.id === boardId);
@@ -39,6 +40,7 @@ function DynamicBoards() {
           listId={list.id}
           listTitle={list.title}
           updateListMutation={updateListMutation}
+          deleteListMutation={deleteListMutation}
         />
       ))}
       <NewListPopover

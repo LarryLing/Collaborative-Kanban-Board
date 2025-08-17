@@ -40,12 +40,12 @@ export default function NewListPopover({
 
   const onSubmit = async (values: CreateListForm) => {
     try {
-      setOpen(false);
       await createListMutation({
         boardId,
         listTitle: values.listTitle,
         listPosition: 0,
       });
+      setOpen(false);
     } catch (error) {
       console.error(error instanceof Error ? error.message : "Unknown error");
     }

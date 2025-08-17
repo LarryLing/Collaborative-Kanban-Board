@@ -1,7 +1,7 @@
 import {
   Popover,
+  PopoverAnchor,
   PopoverContent,
-  PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "../ui/button";
 import type {
@@ -22,10 +22,11 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { useState } from "react";
 import { Badge } from "../ui/badge";
 
 type UpdateListPopoverProps = {
+  open: boolean;
+  setOpen: (open: boolean) => void;
   boardId: Board["id"];
   listId: List["id"];
   listTitle: List["title"];
@@ -33,13 +34,13 @@ type UpdateListPopoverProps = {
 };
 
 export default function UpdateListPopover({
+  open,
+  setOpen,
   boardId,
   listId,
   listTitle,
   updateListMutation,
 }: UpdateListPopoverProps) {
-  const [open, setOpen] = useState<boolean>(false);
-
   const form = useForm<UpdateListForm>({
     resolver: zodResolver(UpdateListSchema),
     defaultValues: {
@@ -49,12 +50,12 @@ export default function UpdateListPopover({
 
   const onSubmit = async (values: UpdateListForm) => {
     try {
-      setOpen(false);
       await updateListMutation({
         boardId,
         listId,
         listTitle: values.listTitle,
       });
+      setOpen(false);
     } catch (error) {
       console.error(error instanceof Error ? error.message : "Unknown error");
     }
@@ -62,9 +63,9 @@ export default function UpdateListPopover({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverAnchor asChild>
         <Badge variant="secondary">{listTitle}</Badge>
-      </PopoverTrigger>
+      </PopoverAnchor>
       <PopoverContent>
         <Form {...form}>
           <form
