@@ -3,12 +3,14 @@ import {
   AddCollaboratorSchema,
   ConfirmSignupSchema,
   CreateBoardSchema,
+  CreateListSchema,
   DeleteAccountSchema,
   ForgotPasswordSchema,
   LoginSchema,
   ResetPasswordSchema,
   SignupSchema,
   UpdateBoardSchema,
+  UpdateListSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
 import type {
@@ -35,6 +37,8 @@ export type ResetPasswordForm = z.infer<typeof ResetPasswordSchema>;
 export type CreateBoardForm = z.infer<typeof CreateBoardSchema>;
 export type UpdateBoardForm = z.infer<typeof UpdateBoardSchema>;
 export type DeleteAccountForm = z.infer<typeof DeleteAccountSchema>;
+export type CreateListForm = z.infer<typeof CreateListSchema>;
+export type UpdateListForm = z.infer<typeof UpdateListSchema>;
 export type AddCollaboratorForm = z.infer<typeof AddCollaboratorSchema>;
 
 export type EmailSearchBody = {
@@ -58,6 +62,13 @@ export type Board = {
 export type Collaborator = User & {
   role: typeof OWNER | typeof COLLABORATOR;
   joined_at: string;
+};
+
+export type List = {
+  id: string;
+  board_id: string;
+  title: string;
+  position: number;
 };
 
 export type AuthContextType = {
@@ -190,4 +201,48 @@ export type UseUpdateBoardDialogReturnType = {
     boardId: Board["id"],
     boardTitle: Board["title"],
   ) => void;
+};
+
+export type UseListsReturnType = {
+  lists: List[] | undefined;
+  isLoading: boolean;
+  createListMutation: UseMutateAsyncFunction<
+    List,
+    Error,
+    {
+      boardId: Board["id"];
+      listTitle: List["title"];
+      listPosition: List["position"];
+    },
+    unknown
+  >;
+  deleteListMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+    },
+    unknown
+  >;
+  updateListMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      listTitle: List["title"];
+    },
+    unknown
+  >;
+  updateListPositionMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      listPosition: List["position"];
+    },
+    unknown
+  >;
 };

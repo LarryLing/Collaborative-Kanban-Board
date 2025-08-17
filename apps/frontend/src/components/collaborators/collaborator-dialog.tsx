@@ -85,7 +85,7 @@ export function CollaboratorDialog({
             collaboratorId={id}
             role={role}
             removeCollaboratorMutation={removeCollaboratorMutation}
-            isDisabled={isDisabled}
+            isDisabled={isDisabled || isLoading}
           />
         </div>
       );
@@ -96,6 +96,7 @@ export function CollaboratorDialog({
     user,
     boardId,
     removeCollaboratorMutation,
+    isLoading,
   ]);
 
   return (
@@ -116,7 +117,9 @@ export function CollaboratorDialog({
               control={form.control}
               name="email"
               disabled={
-                currentCollaborator && currentCollaborator.role === COLLABORATOR
+                (currentCollaborator &&
+                  currentCollaborator.role === COLLABORATOR) ||
+                isLoading
               }
               render={({ field }) => (
                 <FormItem>
@@ -131,22 +134,28 @@ export function CollaboratorDialog({
             <Button
               type="submit"
               disabled={
-                currentCollaborator && currentCollaborator.role === COLLABORATOR
+                (currentCollaborator &&
+                  currentCollaborator.role === COLLABORATOR) ||
+                isLoading
               }
             >
               {form.formState.isSubmitting ? "Inviting..." : "Invite"}
             </Button>
           </form>
         </Form>
-        {isLoading ? (
-          <div className="h-8 w-full flex justify-start items-center">
-            Loading collaborators...
-          </div>
-        ) : (
-          <div className="flex flex-col justify-start gap-y-2 ">
-            {collaboratorList}
-          </div>
-        )}
+        <div className="flex flex-col justify-start gap-y-2 ">
+          {isLoading ? (
+            <div className="flex justify-between items-center gap-2">
+              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="h-8">Loading collaborators...</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            collaboratorList
+          )}
+        </div>
         {error && (
           <ErrorAlert title="Failed to add collaborator" error={error} />
         )}

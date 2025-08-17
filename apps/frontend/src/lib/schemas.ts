@@ -81,6 +81,14 @@ export const AddCollaboratorSchema = z.object({
   email: z.email().min(1, { message: "Email is required" }),
 });
 
+export const CreateListSchema = z.object({
+  listTitle: z.string(),
+});
+
+export const UpdateListSchema = z.object({
+  listTitle: z.string(),
+});
+
 export const DeleteAccountSchema = z
   .object({
     prompt: z.string(),

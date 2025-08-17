@@ -13,7 +13,7 @@ import { NavMainMemo } from "./nav-main";
 import { useAuth } from "@/hooks/use-auth";
 import { redirect } from "@tanstack/react-router";
 import { UpdateBoardDialog } from "../boards/update-board-dialog";
-import { CollaboratorDialog } from "../boards/collaborators-dialog";
+import { CollaboratorDialog } from "../collaborators/collaborator-dialog";
 import { useCollaboratorDialog } from "@/hooks/use-collaborator-dialog";
 import { useUpdateBoardDialog } from "@/hooks/use-update-board-dialog";
 
