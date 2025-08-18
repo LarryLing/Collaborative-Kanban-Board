@@ -68,7 +68,7 @@ export async function updateListPosition({
   listPosition: List["position"];
 }) {
   await invokeAPI(
-    `/api/lists/${boardId}/${listId}`,
+    `/api/lists/${boardId}/${listId}/position`,
     "PATCH",
     JSON.stringify({
       position: listPosition,

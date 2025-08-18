@@ -19,14 +19,17 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { useState } from "react";
+import { generateKeyBetween } from "fractional-indexing";
 
 type NewListPopoverProps = {
   boardId: Board["id"];
+  lists: UseListsReturnType["lists"];
   createListMutation: UseListsReturnType["createListMutation"];
 };
 
 export default function NewListPopover({
   boardId,
+  lists,
   createListMutation,
 }: NewListPopoverProps) {
   const [open, setOpen] = useState<boolean>(false);
@@ -39,13 +42,25 @@ export default function NewListPopover({
   });
 
   const onSubmit = async (values: CreateListForm) => {
+    if (!lists) return;
+
     try {
+      const lastList = lists.at(-1);
+
+      let listPosition;
+      if (lastList) {
+        listPosition = generateKeyBetween(lastList.position, null);
+      } else {
+        listPosition = generateKeyBetween(null, null);
+      }
+
       await createListMutation({
         boardId,
         listTitle: values.listTitle,
-        listPosition: 0,
+        listPosition,
       });
       setOpen(false);
+      form.reset();
     } catch (error) {
       console.error(error instanceof Error ? error.message : "Unknown error");
     }

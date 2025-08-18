@@ -68,7 +68,7 @@ export type List = {
   id: string;
   board_id: string;
   title: string;
-  position: number;
+  position: string;
 };
 
 export type AuthContextType = {
@@ -204,7 +204,7 @@ export type UseUpdateBoardDialogReturnType = {
 };
 
 export type UseListsReturnType = {
-  lists: List[] | undefined;
+  lists: List[];
   isLoading: boolean;
   createListMutation: UseMutateAsyncFunction<
     List,

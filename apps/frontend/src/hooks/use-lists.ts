@@ -7,16 +7,25 @@ import {
   updateListPosition,
 } from "@/api/lists";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
+  const [lists, setLists] = useState<List[]>([]);
+
   const queryClient = useQueryClient();
 
-  const { data: lists, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["lists", { boardId }],
     queryFn: async () => {
       return await getAllLists({ boardId });
     },
   });
+
+  useEffect(() => {
+    if (data) {
+      setLists(data);
+    }
+  }, [data]);
 
   const { mutateAsync: createListMutation } = useMutation({
     mutationKey: ["createList"],
@@ -29,7 +38,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         (prevLists: List[] | undefined) => {
           if (!prevLists) return prevLists;
 
-          return [data, ...prevLists];
+          return [...prevLists, data];
         },
       );
     },
@@ -45,7 +54,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
         (prevLists: List[] | undefined) => {
-          if (!prevLists) return prevLists;
+          if (!prevLists) return [];
 
           return prevLists.filter(
             (prevLists) => prevLists.id !== variables.listId,
@@ -65,7 +74,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
         (prevLists: List[] | undefined) => {
-          if (!prevLists) return prevLists;
+          if (!prevLists) return [];
 
           return prevLists.map((prevlist) =>
             prevlist.id === variables.listId
@@ -87,13 +96,17 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
         (prevLists: List[] | undefined) => {
-          if (!prevLists) return prevLists;
+          if (!prevLists) return [];
 
-          return prevLists.map((prevlist) =>
-            prevlist.id === variables.listId
-              ? { ...prevlist, position: variables.listPosition }
-              : prevlist,
-          );
+          return prevLists
+            .map((prevlist) =>
+              prevlist.id === variables.listId
+                ? { ...prevlist, position: variables.listPosition }
+                : prevlist,
+            )
+            .sort((a, b) =>
+              a.position < b.position ? -1 : a.position > b.position ? 1 : 0,
+            );
         },
       );
     },

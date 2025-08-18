@@ -62,7 +62,7 @@ export type List = {
   id: string;
   board_id: string;
   title: string;
-  position: number;
+  position: string;
 };
 
 export type CreateListBody = Pick<List, "title" | "position">;

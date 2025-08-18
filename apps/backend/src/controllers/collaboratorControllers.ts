@@ -28,7 +28,7 @@ export async function getAllCollaborators(
       FROM users u
       INNER JOIN boards_collaborators bc ON u.id = bc.user_id
       WHERE bc.board_id = ?
-      ORDER BY bc.joined_at DESC`,
+      ORDER BY bc.joined_at`,
       [boardId],
     );
 

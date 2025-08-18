@@ -31,7 +31,7 @@ export function useBoards(): UseBoardsReturnType {
       queryClient.setQueryData(
         ["boards"],
         (prevBoards: Board[] | undefined) => {
-          if (!prevBoards) return prevBoards;
+          if (!prevBoards) return [];
 
           return [data, ...prevBoards];
         },
@@ -51,7 +51,7 @@ export function useBoards(): UseBoardsReturnType {
       queryClient.setQueryData(
         ["boards"],
         (prevBoards: Board[] | undefined) => {
-          if (!prevBoards) return prevBoards;
+          if (!prevBoards) return [];
 
           return prevBoards.filter(
             (prevBoards) => prevBoards.id !== variables.boardId,
@@ -73,7 +73,7 @@ export function useBoards(): UseBoardsReturnType {
       queryClient.setQueryData(
         ["boards"],
         (prevBoards: Board[] | undefined) => {
-          if (!prevBoards) return prevBoards;
+          if (!prevBoards) return [];
 
           return prevBoards.map((prevBoard) =>
             prevBoard.id === variables.boardId
