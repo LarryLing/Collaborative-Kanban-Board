@@ -18,6 +18,7 @@ import List from "@/components/lists/list";
 import { useState } from "react";
 import type { List as ListType } from "@/lib/types";
 import { LIST } from "@/lib/constants";
+import ListOverlay from "@/components/lists/list-overlay";
 
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   component: DynamicBoards,
@@ -89,6 +90,8 @@ function DynamicBoards() {
         return;
       }
 
+      setActiveList(null);
+
       await updateListPositionMutation({
         boardId,
         listId: active.id as string,
@@ -108,7 +111,7 @@ function DynamicBoards() {
   }
 
   return (
-    <div className="h-screen flex justify-start gap-3 overflow-auto text-sm">
+    <div className="flex justify-start items-start gap-3 overflow-auto text-sm">
       <DndContext
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
@@ -129,16 +132,8 @@ function DynamicBoards() {
             />
           ))}
         </SortableContext>
-        <DragOverlay>
-          {activeList && (
-            <List
-              boardId={boardId}
-              listId={activeList.id}
-              listTitle={activeList.title}
-              updateListMutation={updateListMutation}
-              deleteListMutation={deleteListMutation}
-            />
-          )}
+        <DragOverlay className="cursor-grabbing">
+          {activeList && <ListOverlay listTitle={activeList.title} />}
         </DragOverlay>
       </DndContext>
       <NewListPopover

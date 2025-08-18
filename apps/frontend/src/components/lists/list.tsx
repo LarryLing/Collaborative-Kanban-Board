@@ -8,6 +8,8 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { LIST } from "@/lib/constants";
 import { Badge } from "../ui/badge";
+import CreateCardIconButton from "../cards/create-card-icon-button";
+import CreateCardButton from "../cards/create-card-button";
 
 type ListProps = {
   boardId: Board["id"];
@@ -45,29 +47,19 @@ export default function List({
     transition,
   };
 
-  if (isDragging) {
-    return (
-      <Card
-        className="flex-shrink-0 w-[250px] p-2 border opacity-50"
-        style={style}
-      >
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div ref={setNodeRef} {...attributes} {...listeners}>
-              <GripVertical className="size-4" />
-            </div>
-            <Badge variant="secondary">{listTitle}</Badge>
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="flex-shrink-0 w-[250px] p-2 border" style={style}>
-      <div className="flex justify-between items-center">
+    <Card
+      className={`flex-shrink-0 gap-3 w-[275px] p-2 border ${isDragging && "opacity-50"}`}
+      style={style}
+    >
+      <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2">
-          <div ref={setNodeRef} {...attributes} {...listeners}>
+          <div
+            ref={setNodeRef}
+            {...attributes}
+            {...listeners}
+            className="cursor-grab"
+          >
             <GripVertical className="size-4" />
           </div>
           <UpdateListPopover
@@ -78,13 +70,21 @@ export default function List({
             listTitle={listTitle}
             updateListMutation={updateListMutation}
           />
+          <Badge variant="outline" className="size-5">
+            0
+          </Badge>
         </div>
-        <ListActionsDropdown
-          boardId={boardId}
-          listId={listId}
-          setOpen={setOpen}
-          deleteListMutation={deleteListMutation}
-        />
+        <div className="flex justify-center items-center gap-1">
+          <CreateCardIconButton />
+          <ListActionsDropdown
+            boardId={boardId}
+            listId={listId}
+            deleteListMutation={deleteListMutation}
+          />
+        </div>
+      </div>
+      <div className="flex-col gap-2">
+        <CreateCardButton />
       </div>
     </Card>
   );

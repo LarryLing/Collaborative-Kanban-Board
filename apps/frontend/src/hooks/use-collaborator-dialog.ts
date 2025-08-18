@@ -66,6 +66,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         queryKey: ["boards"],
       });
 
+      //TODO: dialog doesn't close when this condition is met
       if (user!.id === variables.collaboratorId) {
         setOpen(false);
         navigate({ to: "/boards" });

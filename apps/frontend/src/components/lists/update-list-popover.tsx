@@ -1,6 +1,6 @@
 import {
   Popover,
-  PopoverAnchor,
+  PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
 import { Button } from "../ui/button";
@@ -63,9 +63,14 @@ export default function UpdateListPopover({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverAnchor asChild>
-        <Badge variant="secondary">{listTitle}</Badge>
-      </PopoverAnchor>
+      <PopoverTrigger asChild>
+        <Badge
+          variant="secondary"
+          className="max-w-[150px] hover:bg-secondary/70 cursor-pointer"
+        >
+          <p className="truncate">{listTitle}</p>
+        </Badge>
+      </PopoverTrigger>
       <PopoverContent>
         <Form {...form}>
           <form

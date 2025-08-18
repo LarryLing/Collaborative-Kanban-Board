@@ -3,23 +3,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Ellipsis, Pencil, Trash } from "lucide-react";
+import { Ellipsis, Trash } from "lucide-react";
 import { Button } from "../ui/button";
 
 type ListActionsDropdownProps = {
   boardId: Board["id"];
   listId: List["id"];
-  setOpen: (open: boolean) => void;
   deleteListMutation: UseListsReturnType["deleteListMutation"];
 };
 
 export default function ListActionsDropdown({
   boardId,
   listId,
-  setOpen,
   deleteListMutation,
 }: ListActionsDropdownProps) {
   const handleDeleteListMutation = async () => {
@@ -39,11 +36,6 @@ export default function ListActionsDropdown({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-24 rounded-lg">
-        <DropdownMenuItem onClick={() => setOpen(true)}>
-          <Pencil />
-          <span>Rename</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           variant="destructive"
           onClick={handleDeleteListMutation}
