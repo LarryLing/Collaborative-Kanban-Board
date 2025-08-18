@@ -9,20 +9,23 @@ export async function getAllBoards() {
 }
 
 export async function createBoard({
+  boardId,
   boardTitle,
+  boardCreatedAt,
 }: {
+  boardId: Board["id"];
   boardTitle: Board["title"];
+  boardCreatedAt: Board["created_at"];
 }) {
-  const response = await invokeAPI(
+  await invokeAPI(
     "/api/boards",
     "POST",
     JSON.stringify({
+      id: boardId,
       title: boardTitle.length > 0 ? boardTitle : "Untitled Board",
+      created_at: boardCreatedAt,
     }),
   );
-  const { data } = await response.json();
-
-  return data as Board;
 }
 
 export async function deleteBoard({ boardId }: { boardId: Board["id"] }) {

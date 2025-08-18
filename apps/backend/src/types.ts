@@ -48,7 +48,7 @@ export type Board = {
   created_at: string;
 };
 
-export type CreateBoardBody = Pick<Board, "title">;
+export type CreateBoardBody = Pick<Board, "id" | "title" | "created_at">;
 export type UpdateBoardBody = Pick<Board, "title">;
 
 export type Collaborator = User & {

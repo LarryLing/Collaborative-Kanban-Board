@@ -130,41 +130,28 @@ export async function createBoard(
     return;
   }
 
-  const { id } = req.auth;
-  const { title } = req.body;
+  const { id: owner_id } = req.auth;
+  const { id, title, created_at } = req.body;
 
   const connection = await db.getConnection();
 
   try {
     await connection.beginTransaction();
 
-    const now = new Date();
-    const currentTimestamp = now.toISOString().slice(0, 19).replace("T", " ");
-    const boardId = crypto.randomUUID();
-
-    const board: Board = {
-      id: boardId,
-      owner_id: id,
-      title: title,
-      created_at: currentTimestamp,
-    };
-
     await db.execute(
       `INSERT INTO boards (id, owner_id, title, created_at)
       VALUES (?, ?, ?, ?)`,
-      [board.id, board.owner_id, board.title, board.created_at],
+      [id, owner_id, title, created_at],
     );
 
     await db.execute(
       `INSERT INTO boards_collaborators (user_id, board_id, role, joined_at)
       VALUES (?, ?, ?, ?)`,
-      [id, boardId, OWNER, currentTimestamp],
+      [owner_id, id, OWNER, created_at],
     );
 
     await connection.commit();
-    res
-      .status(201)
-      .json({ message: "Successfully created board", data: board });
+    res.status(201).json({ message: "Successfully created board" });
   } catch (error) {
     await connection.rollback();
 

@@ -41,7 +41,16 @@ export function CreateBoardDialog() {
 
   const onSubmit = async (values: CreateBoardForm) => {
     try {
-      await createBoardMutation({ boardTitle: values.boardTitle });
+      const boardId = crypto.randomUUID();
+
+      const now = new Date();
+      const created_at = now.toISOString().slice(0, 19).replace("T", " ");
+
+      await createBoardMutation({
+        boardId,
+        boardTitle: values.boardTitle,
+        boardCreatedAt: created_at,
+      });
       setOpen(false);
       form.reset();
     } catch (error) {

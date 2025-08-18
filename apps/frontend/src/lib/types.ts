@@ -129,12 +129,16 @@ export type UseBoardsReturnType = {
     options?: RefetchOptions,
   ) => Promise<QueryObserverResult<Board[], Error>>;
   createBoardMutation: UseMutateAsyncFunction<
-    Board,
+    void,
     Error,
     {
+      boardId: Board["id"];
       boardTitle: Board["title"];
+      boardCreatedAt: Board["created_at"];
     },
-    unknown
+    {
+      prevBoards: Board[];
+    }
   >;
   deleteBoardMutation: UseMutateAsyncFunction<
     void,
