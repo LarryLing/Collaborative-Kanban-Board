@@ -2,14 +2,22 @@ import NewListPopover from "@/components/lists/new-list-popover";
 import { useBoards } from "@/hooks/use-boards";
 import { useLists } from "@/hooks/use-lists";
 import { createFileRoute } from "@tanstack/react-router";
-import { closestCenter, DndContext, type DragEndEvent } from "@dnd-kit/core";
-import { restrictToHorizontalAxis } from "@dnd-kit/modifiers";
+import {
+  closestCorners,
+  DndContext,
+  DragOverlay,
+  type DragEndEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { generateKeyBetween } from "fractional-indexing";
 import List from "@/components/lists/list";
+import { useState } from "react";
+import type { List as ListType } from "@/lib/types";
+import { LIST } from "@/lib/constants";
 
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   component: DynamicBoards,
@@ -29,7 +37,23 @@ function DynamicBoards() {
     updateListPositionMutation,
   } = useLists(boardId);
 
+  const [activeList, setActiveList] = useState<ListType | null>(null);
+
+  const handleDragStart = (event: DragStartEvent) => {
+    if (!lists) return;
+
+    const { active } = event;
+
+    if (active.data.current?.type === LIST) {
+      setActiveList(() => {
+        return lists.find((list) => list.id === active.id) || null;
+      });
+    }
+  };
+
   const handleDragEnd = async (event: DragEndEvent) => {
+    if (!lists) return;
+
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -79,22 +103,22 @@ function DynamicBoards() {
     return <p>Loading board...</p>;
   }
 
-  if (!board) {
-    return <p>Could not find board...</p>;
+  if (!board || !lists) {
+    return <p>Could not load board...</p>;
   }
 
   return (
-    <div className="h-full flex justify-start gap-3 overflow-auto text-sm">
+    <div className="h-screen flex justify-start gap-3 overflow-auto text-sm">
       <DndContext
-        collisionDetection={closestCenter}
-        modifiers={[restrictToHorizontalAxis]}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
       >
         <SortableContext
           items={lists.map((list) => list.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {lists?.map((list) => (
+          {lists.map((list) => (
             <List
               key={list.id}
               boardId={boardId}
@@ -105,6 +129,17 @@ function DynamicBoards() {
             />
           ))}
         </SortableContext>
+        <DragOverlay>
+          {activeList && (
+            <List
+              boardId={boardId}
+              listId={activeList.id}
+              listTitle={activeList.title}
+              updateListMutation={updateListMutation}
+              deleteListMutation={deleteListMutation}
+            />
+          )}
+        </DragOverlay>
       </DndContext>
       <NewListPopover
         boardId={boardId}

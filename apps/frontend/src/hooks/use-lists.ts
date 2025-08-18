@@ -7,111 +7,193 @@ import {
   updateListPosition,
 } from "@/api/lists";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
-  const [lists, setLists] = useState<List[]>([]);
-
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
+  const { data: lists, isLoading } = useQuery({
     queryKey: ["lists", { boardId }],
     queryFn: async () => {
       return await getAllLists({ boardId });
     },
   });
 
-  useEffect(() => {
-    if (data) {
-      setLists(data);
-    }
-  }, [data]);
-
   const { mutateAsync: createListMutation } = useMutation({
     mutationKey: ["createList"],
     mutationFn: createList,
-    onSuccess: (data, variables) => {
-      if (!data) return;
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
+
+      const prevLists: List[] | undefined = queryClient.getQueryData([
+        "lists",
+        { boardId: variables.boardId },
+      ]);
+
+      if (!prevLists) return prevLists;
+
+      const newList: List = {
+        id: variables.listId,
+        board_id: boardId,
+        title: variables.listTitle,
+        position: variables.listPosition,
+      };
+
+      const nextLists = [...prevLists, newList];
 
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
-        (prevLists: List[] | undefined) => {
-          if (!prevLists) return prevLists;
+        nextLists,
+      );
 
-          return [...prevLists, data];
-        },
+      return { prevLists };
+    },
+    onError: (error, variables, context) => {
+      console.error("Failed to create list:", error.message);
+
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        context?.prevLists,
       );
     },
-    onError: (error) => {
-      console.error("Failed to create list:", error.message);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
     },
   });
 
   const { mutateAsync: deleteListMutation } = useMutation({
     mutationKey: ["deleteList"],
     mutationFn: deleteList,
-    onSuccess: (_data, variables) => {
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
+
+      const prevLists: List[] | undefined = queryClient.getQueryData([
+        "lists",
+        { boardId: variables.boardId },
+      ]);
+
+      if (!prevLists) return prevLists;
+
+      const nextLists = prevLists.filter(
+        (prevLists) => prevLists.id !== variables.listId,
+      );
+
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
-        (prevLists: List[] | undefined) => {
-          if (!prevLists) return [];
+        nextLists,
+      );
 
-          return prevLists.filter(
-            (prevLists) => prevLists.id !== variables.listId,
-          );
-        },
+      return { prevLists };
+    },
+    onError: (error, variables, context) => {
+      console.error("Failed to delete list:", error.message);
+
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        context?.prevLists,
       );
     },
-    onError: (error) => {
-      console.error("Failed to delete list:", error.message);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
     },
   });
 
   const { mutateAsync: updateListMutation } = useMutation({
     mutationKey: ["updateList"],
     mutationFn: updateList,
-    onSuccess: (_data, variables) => {
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
+
+      const prevLists: List[] | undefined = queryClient.getQueryData([
+        "lists",
+        { boardId: variables.boardId },
+      ]);
+
+      if (!prevLists) return prevLists;
+
+      const nextLists = prevLists.map((prevlist) =>
+        prevlist.id === variables.listId
+          ? { ...prevlist, title: variables.listTitle }
+          : prevlist,
+      );
+
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
-        (prevLists: List[] | undefined) => {
-          if (!prevLists) return [];
+        nextLists,
+      );
 
-          return prevLists.map((prevlist) =>
-            prevlist.id === variables.listId
-              ? { ...prevlist, title: variables.listTitle }
-              : prevlist,
-          );
-        },
+      return { prevLists, nextLists };
+    },
+    onError: (error, variables, context) => {
+      console.error("Failed to update list:", error.message);
+
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        context?.prevLists,
       );
     },
-    onError: (error) => {
-      console.error("Failed to update list:", error.message);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
     },
   });
 
   const { mutateAsync: updateListPositionMutation } = useMutation({
     mutationKey: ["updateListPosition"],
     mutationFn: updateListPosition,
-    onSuccess: (_data, variables) => {
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
+
+      const prevLists: List[] | undefined = queryClient.getQueryData([
+        "lists",
+        { boardId: variables.boardId },
+      ]);
+
+      if (!prevLists) return prevLists;
+
+      const nextLists = prevLists
+        .map((prevlist) =>
+          prevlist.id === variables.listId
+            ? { ...prevlist, position: variables.listPosition }
+            : prevlist,
+        )
+        .sort((a, b) => {
+          if (a.position < b.position) return -1;
+          if (a.position > b.position) return 1;
+          return 0;
+        });
+
       queryClient.setQueryData(
         ["lists", { boardId: variables.boardId }],
-        (prevLists: List[] | undefined) => {
-          if (!prevLists) return [];
+        nextLists,
+      );
 
-          return prevLists
-            .map((prevlist) =>
-              prevlist.id === variables.listId
-                ? { ...prevlist, position: variables.listPosition }
-                : prevlist,
-            )
-            .sort((a, b) =>
-              a.position < b.position ? -1 : a.position > b.position ? 1 : 0,
-            );
-        },
+      return { prevLists, nextLists };
+    },
+    onError: (error, variables, context) => {
+      console.error("Failed to update list position:", error.message);
+
+      queryClient.setQueryData(
+        ["lists", { boardId: variables.boardId }],
+        context?.prevLists,
       );
     },
-    onError: (error) => {
-      console.error("Failed to update list position:", error.message);
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["lists", { boardId: variables.boardId }],
+      });
     },
   });
 

@@ -65,7 +65,7 @@ export type List = {
   position: string;
 };
 
-export type CreateListBody = Pick<List, "title" | "position">;
+export type CreateListBody = Pick<List, "id" | "title" | "position">;
 export type UpdateListBody = Pick<List, "title">;
 export type UpdateListPositionBody = Pick<List, "position">;
 

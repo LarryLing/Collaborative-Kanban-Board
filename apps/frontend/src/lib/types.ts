@@ -204,17 +204,20 @@ export type UseUpdateBoardDialogReturnType = {
 };
 
 export type UseListsReturnType = {
-  lists: List[];
+  lists: List[] | undefined;
   isLoading: boolean;
   createListMutation: UseMutateAsyncFunction<
-    List,
+    void,
     Error,
     {
       boardId: Board["id"];
-      listTitle: List["title"];
-      listPosition: List["position"];
+      listId: List["id"];
+      listTitle: List["id"];
+      listPosition: List["id"];
     },
-    unknown
+    {
+      prevLists: List[];
+    }
   >;
   deleteListMutation: UseMutateAsyncFunction<
     void,

@@ -20,14 +20,19 @@ export async function getAllLists(
     const [rows] = await db.execute(
       `SELECT *
       FROM lists
-      WHERE board_id = ?
-      ORDER BY position`,
+      WHERE board_id = ?`,
       [boardId],
     );
 
+    const sortedLists = (rows as List[]).sort((a, b) => {
+      if (a.position < b.position) return -1;
+      if (a.position > b.position) return 1;
+      return 0;
+    });
+
     res
       .status(200)
-      .json({ message: "Successfully retrieved lists", data: rows as List[] });
+      .json({ message: "Successfully retrieved lists", data: sortedLists });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -46,25 +51,16 @@ export async function createList(
   res: Response,
 ) {
   const { boardId } = req.params;
-  const { title, position } = req.body;
+  const { id, title, position } = req.body;
 
   try {
-    const listId = crypto.randomUUID();
-
-    const list: List = {
-      id: listId,
-      board_id: boardId,
-      title: title,
-      position: position,
-    };
-
     await db.execute(
       `INSERT INTO lists (id, board_id, title, position)
       VALUES (?, ?, ?, ?)`,
-      [list.id, list.board_id, list.title, list.position],
+      [id, boardId, title, position],
     );
 
-    res.status(201).json({ message: "Successfully created list", data: list });
+    res.status(201).json({ message: "Successfully created list" });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";

@@ -45,6 +45,8 @@ export default function NewListPopover({
     if (!lists) return;
 
     try {
+      const listId = crypto.randomUUID();
+
       const lastList = lists.at(-1);
 
       let listPosition;
@@ -56,6 +58,7 @@ export default function NewListPopover({
 
       await createListMutation({
         boardId,
+        listId,
         listTitle: values.listTitle,
         listPosition,
       });

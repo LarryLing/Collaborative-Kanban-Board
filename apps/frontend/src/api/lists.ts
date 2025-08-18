@@ -10,24 +10,24 @@ export async function getAllLists({ boardId }: { boardId: Board["id"] }) {
 
 export async function createList({
   boardId,
+  listId,
   listTitle,
   listPosition,
 }: {
   boardId: Board["id"];
-  listTitle: List["title"];
-  listPosition: List["position"];
+  listId: List["id"];
+  listTitle: List["id"];
+  listPosition: List["id"];
 }) {
-  const response = await invokeAPI(
+  await invokeAPI(
     `/api/lists/${boardId}`,
     "POST",
     JSON.stringify({
+      id: listId,
       title: listTitle.length > 0 ? listTitle : "Untitled List",
       position: listPosition,
     }),
   );
-  const { data } = await response.json();
-
-  return data as List;
 }
 
 export async function deleteList({
