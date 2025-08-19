@@ -131,7 +131,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         nextLists,
       );
 
-      return { prevLists, nextLists };
+      return { prevLists };
     },
     onError: (error, variables, context) => {
       console.error("Failed to update list:", error.message);
@@ -180,7 +180,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         nextLists,
       );
 
-      return { prevLists, nextLists };
+      return { prevLists };
     },
     onError: (error, variables, context) => {
       console.error("Failed to update list position:", error.message);

@@ -44,7 +44,7 @@ export async function deleteCard({
   listId: List["id"];
   cardId: Card["id"];
 }) {
-  await invokeAPI(`/api/lists/${boardId}/${listId}/${cardId}`, "DELETE");
+  await invokeAPI(`/api/cards/${boardId}/${listId}/${cardId}`, "DELETE");
 }
 
 export async function updateCard({
@@ -61,7 +61,7 @@ export async function updateCard({
   cardDescription: Card["description"];
 }) {
   await invokeAPI(
-    `/api/lists/${boardId}/${listId}/${cardId}`,
+    `/api/cards/${boardId}/${listId}/${cardId}`,
     "PATCH",
     JSON.stringify({
       title: cardTitle,
@@ -70,7 +70,7 @@ export async function updateCard({
   );
 }
 
-export async function updateListPosition({
+export async function updateCardPosition({
   boardId,
   listId,
   cardId,
@@ -84,7 +84,7 @@ export async function updateListPosition({
   newListId: List["id"];
 }) {
   await invokeAPI(
-    `/api/lists/${boardId}/${listId}/${cardId}/position`,
+    `/api/cards/${boardId}/${listId}/${cardId}/position`,
     "PATCH",
     JSON.stringify({
       newListId,

@@ -262,3 +262,63 @@ export type UseListsReturnType = {
     unknown
   >;
 };
+
+export type UseCardsReturnType = {
+  cards: Card[] | undefined;
+  isLoading: boolean;
+  createCardMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      cardId: Card["id"];
+      cardTitle: Card["id"];
+      cardDescription: Card["description"];
+      cardPosition: Card["id"];
+    },
+    {
+      prevCards: Card[];
+    }
+  >;
+  deleteCardMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      cardId: Card["id"];
+    },
+    {
+      prevCards: Card[];
+    }
+  >;
+  updateCardMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      cardId: Card["id"];
+      cardTitle: Card["title"];
+      cardDescription: Card["description"];
+    },
+    {
+      prevCards: List[];
+    }
+  >;
+  updateCardPositionMutation: UseMutateAsyncFunction<
+    void,
+    Error,
+    {
+      boardId: Board["id"];
+      listId: List["id"];
+      cardId: Card["id"];
+      cardPosition: Card["position"];
+      newListId: List["id"];
+    },
+    {
+      prevCards: List[];
+    }
+  >;
+};
