@@ -127,7 +127,7 @@ function DynamicBoards() {
     return <p>Loading board...</p>;
   }
 
-  if (!board || !lists || !cardsMap) {
+  if (!board || !lists) {
     return <p>Could not load board...</p>;
   }
 
@@ -146,7 +146,7 @@ function DynamicBoards() {
             return (
               <List
                 key={list.id}
-                cards={cardsMap.get(list.id) || []}
+                cards={cardsMap?.get(list.id) || []}
                 boardId={boardId}
                 listId={list.id}
                 listTitle={list.title}
@@ -164,7 +164,12 @@ function DynamicBoards() {
           })}
         </SortableContext>
         <DragOverlay className="cursor-grabbing">
-          {activeList && <ListOverlay listTitle={activeList.title} />}
+          {activeList && (
+            <ListOverlay
+              listTitle={activeList.title}
+              cards={cardsMap?.get(activeList.id) || []}
+            />
+          )}
         </DragOverlay>
       </DndContext>
       <CreateListPopover

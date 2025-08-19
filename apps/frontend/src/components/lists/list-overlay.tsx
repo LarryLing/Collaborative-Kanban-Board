@@ -2,13 +2,15 @@ import { Ellipsis, GripVertical, Plus } from "lucide-react";
 import { Card } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import type { List } from "@/lib/types";
+import type { Card as CardType, List } from "@/lib/types";
+import CardButtonOverlay from "../cards/card-button-overlay";
 
 type ListOverlayProps = {
   listTitle: List["title"];
+  cards: CardType[];
 };
 
-export default function ListOverlay({ listTitle }: ListOverlayProps) {
+export default function ListOverlay({ listTitle, cards }: ListOverlayProps) {
   return (
     <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border">
       <div className="flex justify-between items-center gap-2">
@@ -30,10 +32,13 @@ export default function ListOverlay({ listTitle }: ListOverlayProps) {
           </Button>
         </div>
       </div>
-      <div className="flex-col gap-2">
-        <Button variant="ghost" className="w-full">
+      <div className="flex flex-col gap-y-2">
+        {cards.map((card) => (
+          <CardButtonOverlay key={card.id} title={card.title} />
+        ))}
+        <Button variant="ghost" className="w-full" size="sm">
           <Plus />
-          <p>Create Card</p>
+          <p className="text-xs">Create Card</p>
         </Button>
       </div>
     </Card>

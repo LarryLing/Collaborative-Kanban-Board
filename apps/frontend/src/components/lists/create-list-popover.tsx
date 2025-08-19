@@ -71,9 +71,9 @@ export default function CreateListPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost">
+        <Button variant="ghost" size="sm">
           <Plus />
-          Create list
+          <p className="text-xs">Create List</p>
         </Button>
       </PopoverTrigger>
       <PopoverContent>

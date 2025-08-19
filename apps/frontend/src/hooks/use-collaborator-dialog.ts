@@ -18,7 +18,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const [open, setOpen] = useState(false);
-  const [boardId, setBoardId] = useState<Board["id"]>("");
+  const [boardId, setBoardId] = useState<Board["id"] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useAuth();
@@ -34,6 +34,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   } = useQuery({
     queryKey: ["collaborators", boardId],
     queryFn: async () => {
+      if (!boardId) return;
       return await getAllCollaborators({ boardId });
     },
   });
@@ -90,6 +91,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   });
 
   const onSubmit = async (values: AddCollaboratorForm) => {
+    if (!boardId) return;
     await addCollaboratorMutation({ boardId, email: values.email });
   };
 

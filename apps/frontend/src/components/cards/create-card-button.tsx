@@ -21,10 +21,11 @@ export default function CreateCardButton({
     <Button
       variant="ghost"
       className="w-full"
+      size="sm"
       onClick={handleOpenCreateCardDialog}
     >
       <Plus />
-      <p>Create Card</p>
+      <p className="text-xs">Create Card</p>
     </Button>
   );
 }
