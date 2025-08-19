@@ -21,14 +21,6 @@ export default function CardActionsDropdown({
   cardId,
   deleteCardMutation,
 }: CardActionsDropdownProps) {
-  const handleDeleteCardMutation = async () => {
-    try {
-      await deleteCardMutation({ boardId, listId, cardId });
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : "Unknown error");
-    }
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -40,7 +32,10 @@ export default function CardActionsDropdown({
       <DropdownMenuContent className="w-24 rounded-lg">
         <DropdownMenuItem
           variant="destructive"
-          onClick={handleDeleteCardMutation}
+          onClick={async (e) => {
+            e.stopPropagation();
+            await deleteCardMutation({ boardId, listId, cardId });
+          }}
         >
           <Trash />
           <span>Delete</span>

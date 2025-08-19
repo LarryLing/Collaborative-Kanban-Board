@@ -40,23 +40,21 @@ export function CreateBoardDialog() {
   });
 
   const onSubmit = async (values: CreateBoardForm) => {
-    try {
-      const boardId = crypto.randomUUID();
+    const boardId = crypto.randomUUID();
 
-      const now = new Date();
-      const created_at = now.toISOString().slice(0, 19).replace("T", " ");
+    const now = new Date();
+    const created_at = now.toISOString().slice(0, 19).replace("T", " ");
 
-      await createBoardMutation({
-        boardId,
-        boardTitle:
-          values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
-        boardCreatedAt: created_at,
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      console.error("Failed to create board:", error);
-    }
+    await createBoardMutation({
+      boardId,
+      boardTitle:
+        values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
+      boardCreatedAt: created_at,
+    });
+
+    setOpen(false);
+
+    form.reset();
   };
 
   return (

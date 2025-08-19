@@ -44,30 +44,28 @@ export default function CreateListPopover({
   const onSubmit = async (values: CreateListForm) => {
     if (!lists) return;
 
-    try {
-      const listId = crypto.randomUUID();
+    const listId = crypto.randomUUID();
 
-      const lastList = lists.at(-1);
+    const lastList = lists.at(-1);
 
-      let listPosition;
-      if (lastList) {
-        listPosition = generateKeyBetween(lastList.position, null);
-      } else {
-        listPosition = generateKeyBetween(null, null);
-      }
-
-      await createListMutation({
-        boardId,
-        listId,
-        listTitle:
-          values.listTitle.length > 0 ? values.listTitle : "Untitled List",
-        listPosition,
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : "Unknown error");
+    let listPosition;
+    if (lastList) {
+      listPosition = generateKeyBetween(lastList.position, null);
+    } else {
+      listPosition = generateKeyBetween(null, null);
     }
+
+    await createListMutation({
+      boardId,
+      listId,
+      listTitle:
+        values.listTitle.length > 0 ? values.listTitle : "Untitled List",
+      listPosition,
+    });
+
+    setOpen(false);
+
+    form.reset();
   };
 
   return (

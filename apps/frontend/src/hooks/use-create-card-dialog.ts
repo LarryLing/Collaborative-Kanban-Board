@@ -34,31 +34,28 @@ export function useCreateCardDialog(
 
     if (!cards) return;
 
-    try {
-      const cardId = crypto.randomUUID();
+    const cardId = crypto.randomUUID();
 
-      const lastCard = cards.at(-1);
+    const lastCard = cards.at(-1);
 
-      let cardPosition;
-      if (lastCard) {
-        cardPosition = generateKeyBetween(lastCard.position, null);
-      } else {
-        cardPosition = generateKeyBetween(null, null);
-      }
-
-      await createCardMutation({
-        boardId,
-        listId,
-        cardId,
-        cardTitle:
-          values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
-        cardDescription: values.cardDescription,
-        cardPosition,
-      });
-      setOpen(false);
-    } catch (error) {
-      console.error("Failed to create card:", error);
+    let cardPosition;
+    if (lastCard) {
+      cardPosition = generateKeyBetween(lastCard.position, null);
+    } else {
+      cardPosition = generateKeyBetween(null, null);
     }
+
+    await createCardMutation({
+      boardId,
+      listId,
+      cardId,
+      cardTitle:
+        values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
+      cardDescription: values.cardDescription,
+      cardPosition,
+    });
+
+    setOpen(false);
   };
 
   const openCreateCardDialog = useCallback(

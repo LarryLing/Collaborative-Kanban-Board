@@ -5,6 +5,7 @@ import type {
   UseCardsReturnType,
   UseCreateCardDialogReturnType,
   UseListsReturnType,
+  UseUpdateCardDialogReturnType,
 } from "@/lib/types";
 import UpdateListPopover from "./update-list-popover";
 import { useState } from "react";
@@ -28,6 +29,7 @@ type ListProps = {
   deleteListMutation: UseListsReturnType["deleteListMutation"];
   deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
   openCreateCardDialog: UseCreateCardDialogReturnType["openCreateCardDialog"];
+  openUpdateCardDialog: UseUpdateCardDialogReturnType["openUpdateCardDialog"];
 };
 
 export default function List({
@@ -39,6 +41,7 @@ export default function List({
   deleteListMutation,
   deleteCardMutation,
   openCreateCardDialog,
+  openUpdateCardDialog,
 }: ListProps) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -109,6 +112,7 @@ export default function List({
             boardId={boardId}
             listId={listId}
             deleteCardMutation={deleteCardMutation}
+            openUpdateCardDialog={openUpdateCardDialog}
           />
         ))}
         <CreateCardButton

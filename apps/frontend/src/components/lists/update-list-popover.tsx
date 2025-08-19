@@ -49,17 +49,14 @@ export default function UpdateListPopover({
   });
 
   const onSubmit = async (values: UpdateListForm) => {
-    try {
-      await updateListMutation({
-        boardId,
-        listId,
-        listTitle:
-          values.listTitle.length > 0 ? values.listTitle : "Untitled List",
-      });
-      setOpen(false);
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : "Unknown error");
-    }
+    await updateListMutation({
+      boardId,
+      listId,
+      listTitle:
+        values.listTitle.length > 0 ? values.listTitle : "Untitled List",
+    });
+
+    setOpen(false);
   };
 
   return (

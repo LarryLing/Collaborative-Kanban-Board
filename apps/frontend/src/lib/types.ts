@@ -344,3 +344,27 @@ export type UseCreateCardDialogReturnType = {
   onSubmit: (values: CreateCardForm) => Promise<void>;
   openCreateCardDialog: (boardId: Board["id"], listId: List["id"]) => void;
 };
+
+export type UseUpdateCardDialogReturnType = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  form: UseFormReturn<
+    {
+      cardTitle: string;
+      cardDescription: string;
+    },
+    unknown,
+    {
+      cardTitle: string;
+      cardDescription: string;
+    }
+  >;
+  onSubmit: (values: UpdateCardForm) => Promise<void>;
+  openUpdateCardDialog: (
+    boardId: Board["id"],
+    listId: List["id"],
+    cardId: Card["id"],
+    cardTitle: Card["title"],
+    cardDescription: Card["description"],
+  ) => void;
+};

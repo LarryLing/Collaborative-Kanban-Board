@@ -20,11 +20,7 @@ export default function ListActionsDropdown({
   deleteListMutation,
 }: ListActionsDropdownProps) {
   const handleDeleteListMutation = async () => {
-    try {
-      await deleteListMutation({ boardId, listId });
-    } catch (error) {
-      console.error(error instanceof Error ? error.message : "Unknown error");
-    }
+    await deleteListMutation({ boardId, listId });
   };
 
   return (

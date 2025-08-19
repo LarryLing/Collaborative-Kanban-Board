@@ -22,6 +22,8 @@ import ListOverlay from "@/components/lists/list-overlay";
 import { useCards } from "@/hooks/use-cards";
 import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
 import { CreateCardDialog } from "@/components/cards/create-card-dialog";
+import { useUpdateCardDialog } from "@/hooks/use-update-card-dialog";
+import { UpdateCardDialog } from "@/components/cards/update-card-dialog";
 
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   component: DynamicBoards,
@@ -46,12 +48,15 @@ function DynamicBoards() {
     isLoading: isCardsLoading,
     createCardMutation,
     deleteCardMutation,
+    updateCardMutation,
   } = useCards(boardId);
 
   const useCreateCardDialogReturn = useCreateCardDialog(
     cardsMap,
     createCardMutation,
   );
+
+  const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
   const [activeList, setActiveList] = useState<ListType | null>(null);
 
@@ -151,6 +156,9 @@ function DynamicBoards() {
                 openCreateCardDialog={
                   useCreateCardDialogReturn.openCreateCardDialog
                 }
+                openUpdateCardDialog={
+                  useUpdateCardDialogReturn.openUpdateCardDialog
+                }
               />
             );
           })}
@@ -165,6 +173,7 @@ function DynamicBoards() {
         createListMutation={createListMutation}
       />
       <CreateCardDialog {...useCreateCardDialogReturn} />
+      <UpdateCardDialog {...useUpdateCardDialogReturn} />
     </div>
   );
 }
