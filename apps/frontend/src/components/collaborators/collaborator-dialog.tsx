@@ -56,7 +56,7 @@ export function CollaboratorDialog({
     [collaborators, user],
   );
 
-  const collaboratorList = useMemo(() => {
+  const collaboratorsList = useMemo(() => {
     if (!collaborators || !currentCollaborator) return [];
 
     return collaborators.map((collaborator) => {
@@ -153,7 +153,7 @@ export function CollaboratorDialog({
               </div>
             </div>
           ) : (
-            collaboratorList
+            collaboratorsList
           )}
         </div>
         {error && (

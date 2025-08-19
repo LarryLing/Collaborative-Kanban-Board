@@ -19,6 +19,9 @@ import { useState } from "react";
 import type { List as ListType } from "@/lib/types";
 import { LIST } from "@/lib/constants";
 import ListOverlay from "@/components/lists/list-overlay";
+import { useCards } from "@/hooks/use-cards";
+import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
+import { CreateCardDialog } from "@/components/cards/create-card-dialog";
 
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   component: DynamicBoards,
@@ -37,6 +40,17 @@ function DynamicBoards() {
     updateListMutation,
     updateListPositionMutation,
   } = useLists(boardId);
+
+  const {
+    cardsMap,
+    isLoading: isCardsLoading,
+    createCardMutation,
+  } = useCards(boardId);
+
+  const useCreateCardDialogReturn = useCreateCardDialog(
+    cardsMap,
+    createCardMutation,
+  );
 
   const [activeList, setActiveList] = useState<ListType | null>(null);
 
@@ -103,11 +117,11 @@ function DynamicBoards() {
 
   const board = boards?.find((board) => board.id === boardId);
 
-  if (isBoardsLoading || isListsLoading) {
+  if (isBoardsLoading || isListsLoading || isCardsLoading) {
     return <p>Loading board...</p>;
   }
 
-  if (!board || !lists) {
+  if (!board || !lists || !cardsMap) {
     return <p>Could not load board...</p>;
   }
 
@@ -122,16 +136,22 @@ function DynamicBoards() {
           items={lists.map((list) => list.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {lists.map((list) => (
-            <List
-              key={list.id}
-              boardId={boardId}
-              listId={list.id}
-              listTitle={list.title}
-              updateListMutation={updateListMutation}
-              deleteListMutation={deleteListMutation}
-            />
-          ))}
+          {lists.map((list) => {
+            return (
+              <List
+                key={list.id}
+                cards={cardsMap.get(list.id) || []}
+                boardId={boardId}
+                listId={list.id}
+                listTitle={list.title}
+                updateListMutation={updateListMutation}
+                deleteListMutation={deleteListMutation}
+                openCreateCardDialog={
+                  useCreateCardDialogReturn.openCreateCardDialog
+                }
+              />
+            );
+          })}
         </SortableContext>
         <DragOverlay className="cursor-grabbing">
           {activeList && <ListOverlay listTitle={activeList.title} />}
@@ -142,6 +162,7 @@ function DynamicBoards() {
         lists={lists}
         createListMutation={createListMutation}
       />
+      <CreateCardDialog {...useCreateCardDialogReturn} />
     </div>
   );
 }

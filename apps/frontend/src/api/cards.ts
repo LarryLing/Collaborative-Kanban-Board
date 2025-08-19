@@ -19,7 +19,7 @@ export async function createCard({
   boardId: Board["id"];
   listId: List["id"];
   cardId: Card["id"];
-  cardTitle: Card["id"];
+  cardTitle: Card["title"];
   cardDescription: Card["description"];
   cardPosition: Card["id"];
 }) {

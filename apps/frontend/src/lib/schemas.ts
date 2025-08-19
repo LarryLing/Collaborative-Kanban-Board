@@ -89,6 +89,16 @@ export const UpdateListSchema = z.object({
   listTitle: z.string(),
 });
 
+export const CreateCardSchema = z.object({
+  cardTitle: z.string(),
+  cardDescription: z.string(),
+});
+
+export const UpdateCardSchema = z.object({
+  cardTitle: z.string(),
+  cardDescription: z.string(),
+});
+
 export const DeleteAccountSchema = z
   .object({
     prompt: z.string(),

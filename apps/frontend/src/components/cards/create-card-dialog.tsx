@@ -7,12 +7,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useBoards } from "@/hooks/use-boards";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   FormField,
   FormItem,
@@ -21,61 +17,26 @@ import {
   FormMessage,
   Form,
 } from "../ui/form";
-import { Plus } from "lucide-react";
-import { SidebarMenuButton } from "../ui/sidebar";
-import { useState } from "react";
-import type { CreateBoardForm } from "@/lib/types";
-import { CreateBoardSchema } from "@/lib/schemas";
+import type { UseCreateCardDialogReturnType } from "@/lib/types";
 
-export function CreateBoardDialog() {
-  const [open, setOpen] = useState(false);
+type CreateCardDialogProps = Pick<
+  UseCreateCardDialogReturnType,
+  "open" | "setOpen" | "form" | "onSubmit"
+>;
 
-  const { createBoardMutation } = useBoards();
-
-  const form = useForm<CreateBoardForm>({
-    resolver: zodResolver(CreateBoardSchema),
-    defaultValues: {
-      boardTitle: "",
-    },
-  });
-
-  const onSubmit = async (values: CreateBoardForm) => {
-    try {
-      const boardId = crypto.randomUUID();
-
-      const now = new Date();
-      const created_at = now.toISOString().slice(0, 19).replace("T", " ");
-
-      await createBoardMutation({
-        boardId,
-        boardTitle:
-          values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
-        boardCreatedAt: created_at,
-      });
-      setOpen(false);
-      form.reset();
-    } catch (error) {
-      console.error("Failed to create board:", error);
-    }
-  };
-
+export function CreateCardDialog({
+  open,
+  setOpen,
+  form,
+  onSubmit,
+}: CreateCardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <SidebarMenuButton
-          tooltip="Quick Create"
-          className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
-          onClick={() => form.reset()}
-        >
-          <Plus />
-          <span>Create Board</span>
-        </SidebarMenuButton>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Create board</DialogTitle>
+          <DialogTitle>Create card</DialogTitle>
           <DialogDescription>
-            Enter the title of the new board here.
+            Enter the title and description of the new card here.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -85,12 +46,25 @@ export function CreateBoardDialog() {
           >
             <FormField
               control={form.control}
-              name="boardTitle"
+              name="cardTitle"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Untitled Board" {...field} />
+                    <Input placeholder="Untitled Card" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="cardDescription"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

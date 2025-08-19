@@ -3,6 +3,7 @@ import {
   AddCollaboratorSchema,
   ConfirmSignupSchema,
   CreateBoardSchema,
+  CreateCardSchema,
   CreateListSchema,
   DeleteAccountSchema,
   ForgotPasswordSchema,
@@ -10,6 +11,7 @@ import {
   ResetPasswordSchema,
   SignupSchema,
   UpdateBoardSchema,
+  UpdateCardSchema,
   UpdateListSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
@@ -39,6 +41,8 @@ export type UpdateBoardForm = z.infer<typeof UpdateBoardSchema>;
 export type DeleteAccountForm = z.infer<typeof DeleteAccountSchema>;
 export type CreateListForm = z.infer<typeof CreateListSchema>;
 export type UpdateListForm = z.infer<typeof UpdateListSchema>;
+export type CreateCardForm = z.infer<typeof CreateCardSchema>;
+export type UpdateCardForm = z.infer<typeof UpdateCardSchema>;
 export type AddCollaboratorForm = z.infer<typeof AddCollaboratorSchema>;
 
 export type EmailSearchBody = {
@@ -264,7 +268,7 @@ export type UseListsReturnType = {
 };
 
 export type UseCardsReturnType = {
-  cards: Card[] | undefined;
+  cardsMap: Map<string, Card[]> | undefined;
   isLoading: boolean;
   createCardMutation: UseMutateAsyncFunction<
     void,
@@ -273,9 +277,9 @@ export type UseCardsReturnType = {
       boardId: Board["id"];
       listId: List["id"];
       cardId: Card["id"];
-      cardTitle: Card["id"];
+      cardTitle: Card["title"];
       cardDescription: Card["description"];
-      cardPosition: Card["id"];
+      cardPosition: Card["position"];
     },
     {
       prevCards: Card[];
@@ -321,4 +325,22 @@ export type UseCardsReturnType = {
       prevCards: List[];
     }
   >;
+};
+
+export type UseCreateCardDialogReturnType = {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  form: UseFormReturn<
+    {
+      cardTitle: string;
+      cardDescription: string;
+    },
+    unknown,
+    {
+      cardTitle: string;
+      cardDescription: string;
+    }
+  >;
+  onSubmit: (values: CreateCardForm) => Promise<void>;
+  openCreateCardDialog: (boardId: Board["id"], listId: List["id"]) => void;
 };

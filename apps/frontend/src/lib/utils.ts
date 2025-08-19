@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { BACKEND_URL } from "./constants";
+import type { Card } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -35,4 +36,8 @@ export async function invokeAPI(
   }
 
   return response;
+}
+
+export function transformCards(cards: Card[] | undefined) {
+  if (!cards) return cards;
 }

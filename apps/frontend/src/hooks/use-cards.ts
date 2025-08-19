@@ -1,4 +1,4 @@
-import type { Board, List, Card, UseCardsReturnType } from "@/lib/types";
+import type { Board, Card, List, UseCardsReturnType } from "@/lib/types";
 import {
   getAllCards,
   createCard,
@@ -7,15 +7,38 @@ import {
   updateCardPosition,
 } from "@/api/cards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const queryClient = useQueryClient();
 
-  const { data: cards, isLoading } = useQuery({
-    queryKey: ["cards", { boardId }],
+  const { data: cardsMap, isLoading } = useQuery({
+    queryKey: ["cards", boardId],
     queryFn: async () => {
       return await getAllCards({ boardId });
     },
+    select: useCallback(
+      (data: Card[]) => {
+        const cardsMap = new Map<List["id"], Card[]>();
+
+        const lists: List[] | undefined = queryClient.getQueryData([
+          "lists",
+          boardId,
+        ]);
+
+        if (!lists) return lists;
+
+        lists.forEach((list) => {
+          cardsMap.set(
+            list.id,
+            data.filter((datum) => datum.list_id === list.id),
+          );
+        });
+
+        return cardsMap;
+      },
+      [boardId, queryClient],
+    ),
   });
 
   const { mutateAsync: createCardMutation } = useMutation({
@@ -23,12 +46,12 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     mutationFn: createCard,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
 
       const prevCards: Card[] | undefined = queryClient.getQueryData([
         "cards",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevCards) return prevCards;
@@ -44,10 +67,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
 
       const nextCards = [...prevCards, newCard];
 
-      queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
-        nextCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
       return { prevCards };
     },
@@ -55,13 +75,13 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       console.error("Failed to create card:", error.message);
 
       queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
+        ["cards", variables.boardId],
         context?.prevCards,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
     },
   });
@@ -71,12 +91,12 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     mutationFn: deleteCard,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
 
       const prevCards: Card[] | undefined = queryClient.getQueryData([
         "cards",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevCards) return prevCards;
@@ -85,10 +105,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         (prevCards) => prevCards.id !== variables.cardId,
       );
 
-      queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
-        nextCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
       return { prevCards };
     },
@@ -96,13 +113,13 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       console.error("Failed to delete card:", error.message);
 
       queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
+        ["cards", variables.boardId],
         context?.prevCards,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
     },
   });
@@ -112,12 +129,12 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     mutationFn: updateCard,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
 
       const prevCards: List[] | undefined = queryClient.getQueryData([
         "cards",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevCards) return prevCards;
@@ -132,10 +149,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
           : prevlist,
       );
 
-      queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
-        nextCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
       return { prevCards };
     },
@@ -143,13 +157,13 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       console.error("Failed to update card:", error.message);
 
       queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
+        ["cards", variables.boardId],
         context?.prevCards,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
     },
   });
@@ -159,12 +173,12 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     mutationFn: updateCardPosition,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
 
       const prevCards: List[] | undefined = queryClient.getQueryData([
         "cards",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevCards) return prevCards;
@@ -185,10 +199,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
           return 0;
         });
 
-      queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
-        nextCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
       return { prevCards };
     },
@@ -196,19 +207,19 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       console.error("Failed to update card position:", error.message);
 
       queryClient.setQueryData(
-        ["cards", { boardId: variables.boardId }],
+        ["cards", variables.boardId],
         context?.prevCards,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["cards", { boardId: variables.boardId }],
+        queryKey: ["cards", variables.boardId],
       });
     },
   });
 
   return {
-    cards,
+    cardsMap,
     isLoading,
     createCardMutation,
     deleteCardMutation,

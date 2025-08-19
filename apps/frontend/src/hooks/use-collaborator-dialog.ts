@@ -32,7 +32,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     isLoading,
     refetch,
   } = useQuery({
-    queryKey: ["collaborators", { boardId }],
+    queryKey: ["collaborators", boardId],
     queryFn: async () => {
       if (!boardId) return [];
       return await getAllCollaborators({ boardId });
@@ -44,7 +44,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     mutationFn: addCollaborator,
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["collaborators", { boardId: variables.boardId }],
+        queryKey: ["collaborators", variables.boardId],
       });
 
       setError(null);
@@ -63,11 +63,15 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     mutationFn: removeCollaborator,
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["boards"],
+        queryKey: ["collaborators", variables.boardId],
       });
 
       //TODO: dialog doesn't close when this condition is met
       if (user!.id === variables.collaboratorId) {
+        queryClient.invalidateQueries({
+          queryKey: ["boards"],
+        });
+
         setOpen(false);
         navigate({ to: "/boards" });
       }

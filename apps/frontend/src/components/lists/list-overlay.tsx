@@ -31,7 +31,7 @@ export default function ListOverlay({ listTitle }: ListOverlayProps) {
         </div>
       </div>
       <div className="flex-col gap-2">
-        <Button variant="outline" className="w-full">
+        <Button variant="ghost" className="w-full">
           <Plus />
           <p>Create Card</p>
         </Button>

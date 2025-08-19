@@ -12,7 +12,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
   const queryClient = useQueryClient();
 
   const { data: lists, isLoading } = useQuery({
-    queryKey: ["lists", { boardId }],
+    queryKey: ["lists", boardId],
     queryFn: async () => {
       return await getAllLists({ boardId });
     },
@@ -23,12 +23,12 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationFn: createList,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
 
       const prevLists: List[] | undefined = queryClient.getQueryData([
         "lists",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevLists) return prevLists;
@@ -42,10 +42,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
 
       const nextLists = [...prevLists, newList];
 
-      queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
-        nextLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], nextLists);
 
       return { prevLists };
     },
@@ -53,13 +50,13 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       console.error("Failed to create list:", error.message);
 
       queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
+        ["lists", variables.boardId],
         context?.prevLists,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
     },
   });
@@ -69,12 +66,12 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationFn: deleteList,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
 
       const prevLists: List[] | undefined = queryClient.getQueryData([
         "lists",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevLists) return prevLists;
@@ -83,10 +80,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         (prevLists) => prevLists.id !== variables.listId,
       );
 
-      queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
-        nextLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], nextLists);
 
       return { prevLists };
     },
@@ -94,13 +88,13 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       console.error("Failed to delete list:", error.message);
 
       queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
+        ["lists", variables.boardId],
         context?.prevLists,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
     },
   });
@@ -110,12 +104,12 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationFn: updateList,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
 
       const prevLists: List[] | undefined = queryClient.getQueryData([
         "lists",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevLists) return prevLists;
@@ -126,10 +120,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
           : prevlist,
       );
 
-      queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
-        nextLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], nextLists);
 
       return { prevLists };
     },
@@ -137,13 +128,13 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       console.error("Failed to update list:", error.message);
 
       queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
+        ["lists", variables.boardId],
         context?.prevLists,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
     },
   });
@@ -153,12 +144,12 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     mutationFn: updateListPosition,
     onMutate: async (variables) => {
       await queryClient.cancelQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
 
       const prevLists: List[] | undefined = queryClient.getQueryData([
         "lists",
-        { boardId: variables.boardId },
+        variables.boardId,
       ]);
 
       if (!prevLists) return prevLists;
@@ -175,10 +166,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
           return 0;
         });
 
-      queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
-        nextLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], nextLists);
 
       return { prevLists };
     },
@@ -186,13 +174,13 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       console.error("Failed to update list position:", error.message);
 
       queryClient.setQueryData(
-        ["lists", { boardId: variables.boardId }],
+        ["lists", variables.boardId],
         context?.prevLists,
       );
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["lists", { boardId: variables.boardId }],
+        queryKey: ["lists", variables.boardId],
       });
     },
   });

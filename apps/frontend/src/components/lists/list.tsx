@@ -1,5 +1,10 @@
-import type { Board, List, UseListsReturnType } from "@/lib/types";
-import { Card } from "../ui/card";
+import type {
+  Board,
+  Card as CardType,
+  List,
+  UseCreateCardDialogReturnType,
+  UseListsReturnType,
+} from "@/lib/types";
 import UpdateListPopover from "./update-list-popover";
 import { useState } from "react";
 import ListActionsDropdown from "./list-actions-dropdown";
@@ -10,21 +15,27 @@ import { LIST } from "@/lib/constants";
 import { Badge } from "../ui/badge";
 import CreateCardIconButton from "../cards/create-card-icon-button";
 import CreateCardButton from "../cards/create-card-button";
+import { Card } from "../ui/card";
+import CardButton from "../cards/card-button";
 
 type ListProps = {
   boardId: Board["id"];
+  cards: CardType[];
   listId: List["id"];
   listTitle: List["title"];
   updateListMutation: UseListsReturnType["updateListMutation"];
   deleteListMutation: UseListsReturnType["deleteListMutation"];
+  openCreateCardDialog: UseCreateCardDialogReturnType["openCreateCardDialog"];
 };
 
 export default function List({
   boardId,
+  cards,
   listId,
   listTitle,
   updateListMutation,
   deleteListMutation,
+  openCreateCardDialog,
 }: ListProps) {
   const [open, setOpen] = useState<boolean>(false);
 
@@ -71,11 +82,15 @@ export default function List({
             updateListMutation={updateListMutation}
           />
           <Badge variant="outline" className="size-5">
-            0
+            {cards.length}
           </Badge>
         </div>
         <div className="flex justify-center items-center gap-1">
-          <CreateCardIconButton />
+          <CreateCardIconButton
+            boardId={boardId}
+            listId={listId}
+            openCreateCardDialog={openCreateCardDialog}
+          />
           <ListActionsDropdown
             boardId={boardId}
             listId={listId}
@@ -83,8 +98,15 @@ export default function List({
           />
         </div>
       </div>
-      <div className="flex-col gap-2">
-        <CreateCardButton />
+      <div className="flex flex-col gap-y-2">
+        {cards.map((card) => (
+          <CardButton {...card} />
+        ))}
+        <CreateCardButton
+          boardId={boardId}
+          listId={listId}
+          openCreateCardDialog={openCreateCardDialog}
+        />
       </div>
     </Card>
   );
