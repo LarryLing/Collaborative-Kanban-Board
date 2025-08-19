@@ -45,6 +45,7 @@ function DynamicBoards() {
     cardsMap,
     isLoading: isCardsLoading,
     createCardMutation,
+    deleteCardMutation,
   } = useCards(boardId);
 
   const useCreateCardDialogReturn = useCreateCardDialog(
@@ -146,6 +147,7 @@ function DynamicBoards() {
                 listTitle={list.title}
                 updateListMutation={updateListMutation}
                 deleteListMutation={deleteListMutation}
+                deleteCardMutation={deleteCardMutation}
                 openCreateCardDialog={
                   useCreateCardDialogReturn.openCreateCardDialog
                 }

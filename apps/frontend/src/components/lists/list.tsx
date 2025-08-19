@@ -2,6 +2,7 @@ import type {
   Board,
   Card as CardType,
   List,
+  UseCardsReturnType,
   UseCreateCardDialogReturnType,
   UseListsReturnType,
 } from "@/lib/types";
@@ -25,6 +26,7 @@ type ListProps = {
   listTitle: List["title"];
   updateListMutation: UseListsReturnType["updateListMutation"];
   deleteListMutation: UseListsReturnType["deleteListMutation"];
+  deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
   openCreateCardDialog: UseCreateCardDialogReturnType["openCreateCardDialog"];
 };
 
@@ -35,6 +37,7 @@ export default function List({
   listTitle,
   updateListMutation,
   deleteListMutation,
+  deleteCardMutation,
   openCreateCardDialog,
 }: ListProps) {
   const [open, setOpen] = useState<boolean>(false);
@@ -100,7 +103,13 @@ export default function List({
       </div>
       <div className="flex flex-col gap-y-2">
         {cards.map((card) => (
-          <CardButton {...card} />
+          <CardButton
+            key={card.id}
+            {...card}
+            boardId={boardId}
+            listId={listId}
+            deleteCardMutation={deleteCardMutation}
+          />
         ))}
         <CreateCardButton
           boardId={boardId}
