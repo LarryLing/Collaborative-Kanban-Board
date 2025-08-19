@@ -21,14 +21,19 @@ export async function getAllCards(
     const [rows] = await db.execute(
       `SELECT *
       FROM cards
-      WHERE board_id = ?
-      ORDER BY list_id, position`,
+      WHERE board_id = ?`,
       [boardId],
     );
 
+    const sortedLists = (rows as Card[]).sort((a, b) => {
+      if (a.position < b.position) return -1;
+      if (a.position > b.position) return 1;
+      return 0;
+    });
+
     res
       .status(200)
-      .json({ message: "Successfully retrieved cards", data: rows as Card[] });
+      .json({ message: "Successfully retrieved cards", data: sortedLists });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -51,34 +56,16 @@ export async function createCard(
   res: Response,
 ) {
   const { boardId, listId } = req.params;
-  const { title, description, position } = req.body;
+  const { id, title, description, position } = req.body;
 
   try {
-    const cardId = crypto.randomUUID();
-
-    const card: Card = {
-      id: cardId,
-      board_id: boardId,
-      list_id: listId,
-      title: title,
-      description: description,
-      position: position,
-    };
-
     await db.execute(
       `INSERT INTO cards (id, board_id, list_id, title, description, position)
       VALUES (?, ?, ?, ?, ?, ?)`,
-      [
-        card.id,
-        card.board_id,
-        card.list_id,
-        card.title,
-        card.description,
-        card.position,
-      ],
+      [id, boardId, listId, title, description, position],
     );
 
-    res.status(201).json({ message: "Successfully created card", data: card });
+    res.status(201).json({ message: "Successfully created card" });
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
@@ -145,14 +132,14 @@ export async function updateCardPosition(
   res: Response,
 ) {
   const { boardId, listId, cardId } = req.params;
-  const { position } = req.body;
+  const { newListId, position } = req.body;
 
   try {
     const [result] = await db.execute<ResultSetHeader>(
       `UPDATE cards
-      SET position = ?
+      SET position = ?, list_id = ?
       WHERE id = ? AND list_id = ? AND board_id = ?`,
-      [position, cardId, listId, boardId],
+      [position, newListId, cardId, listId, boardId],
     );
 
     if (result.affectedRows === 0) {

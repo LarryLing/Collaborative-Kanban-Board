@@ -71,6 +71,15 @@ export type List = {
   position: string;
 };
 
+export type Card = {
+  id: string;
+  board_id: string;
+  list_id: string;
+  title: string;
+  description: string;
+  position: string;
+};
+
 export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;

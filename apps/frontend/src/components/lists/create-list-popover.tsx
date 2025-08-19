@@ -21,17 +21,17 @@ import { Input } from "../ui/input";
 import { useState } from "react";
 import { generateKeyBetween } from "fractional-indexing";
 
-type NewListPopoverProps = {
+type CreateListPopoverProps = {
   boardId: Board["id"];
   lists: UseListsReturnType["lists"];
   createListMutation: UseListsReturnType["createListMutation"];
 };
 
-export default function NewListPopover({
+export default function CreateListPopover({
   boardId,
   lists,
   createListMutation,
-}: NewListPopoverProps) {
+}: CreateListPopoverProps) {
   const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<CreateListForm>({
@@ -59,7 +59,8 @@ export default function NewListPopover({
       await createListMutation({
         boardId,
         listId,
-        listTitle: values.listTitle,
+        listTitle:
+          values.listTitle.length > 0 ? values.listTitle : "Untitled List",
         listPosition,
       });
       setOpen(false);

@@ -53,7 +53,8 @@ export default function UpdateListPopover({
       await updateListMutation({
         boardId,
         listId,
-        listTitle: values.listTitle,
+        listTitle:
+          values.listTitle.length > 0 ? values.listTitle : "Untitled List",
       });
       setOpen(false);
     } catch (error) {

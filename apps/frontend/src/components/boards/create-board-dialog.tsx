@@ -48,7 +48,8 @@ export function CreateBoardDialog() {
 
       await createBoardMutation({
         boardId,
-        boardTitle: values.boardTitle,
+        boardTitle:
+          values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
         boardCreatedAt: created_at,
       });
       setOpen(false);

@@ -22,7 +22,7 @@ export async function createBoard({
     "POST",
     JSON.stringify({
       id: boardId,
-      title: boardTitle.length > 0 ? boardTitle : "Untitled Board",
+      title: boardTitle,
       created_at: boardCreatedAt,
     }),
   );
@@ -43,7 +43,7 @@ export async function updateBoard({
     `/api/boards/${boardId}`,
     "PATCH",
     JSON.stringify({
-      title: boardTitle.length > 0 ? boardTitle : "Untitled Board",
+      title: boardTitle,
     }),
   );
 }

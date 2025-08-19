@@ -75,9 +75,15 @@ export type Card = {
   list_id: string;
   title: string;
   description: string;
-  position: number;
+  position: string;
 };
 
-export type CreateCardBody = Pick<Card, "title" | "description" | "position">;
+export type CreateCardBody = Pick<
+  Card,
+  "id" | "title" | "description" | "position"
+>;
 export type UpdateCardBody = Pick<Card, "title" | "description">;
-export type UpdateCardPositionBody = Pick<Card, "position">;
+export type UpdateCardPositionBody = { newListId: List["id"] } & Pick<
+  Card,
+  "position"
+>;

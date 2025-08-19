@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
 import { invokeAPI } from "@/lib/utils";
+import { useNavigate } from "@tanstack/react-router";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -12,6 +13,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const navigate = useNavigate();
 
   const loadUser = async () => {
     try {
@@ -39,6 +42,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       setUser(null);
       setIsAuthenticated(false);
+
+      navigate({ to: "/login" });
     } finally {
       setIsLoading(false);
     }

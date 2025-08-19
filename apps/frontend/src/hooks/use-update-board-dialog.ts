@@ -24,7 +24,11 @@ export function useUpdateBoardDialog(): UseUpdateBoardDialogReturnType {
 
   const onSubmit = async (values: UpdateBoardForm) => {
     try {
-      await updateBoardMutation({ boardId, boardTitle: values.boardTitle });
+      await updateBoardMutation({
+        boardId,
+        boardTitle:
+          values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
+      });
       setOpen(false);
     } catch (error) {
       console.error("Failed to update board:", error);
