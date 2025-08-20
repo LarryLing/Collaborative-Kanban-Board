@@ -7,11 +7,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export async function invokeAPI(
-  endpoint: string,
-  method: RequestInit["method"],
-  body?: BodyInit,
-) {
+export async function invokeAPI(endpoint: string, method: RequestInit["method"], body?: BodyInit) {
   const credentials: RequestCredentials = "include";
 
   const headers: HeadersInit = {

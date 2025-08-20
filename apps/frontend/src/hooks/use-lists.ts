@@ -1,11 +1,5 @@
 import type { Board, List, UseListsReturnType } from "@/lib/types";
-import {
-  getAllLists,
-  createList,
-  deleteList,
-  updateList,
-  updateListPosition,
-} from "@/api/lists";
+import { getAllLists, createList, deleteList, updateList, updateListPosition } from "@/api/lists";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
@@ -26,10 +20,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         queryKey: ["lists", variables.boardId],
       });
 
-      const prevLists: List[] | undefined = queryClient.getQueryData([
-        "lists",
-        variables.boardId,
-      ]);
+      const prevLists: List[] | undefined = queryClient.getQueryData(["lists", variables.boardId]);
 
       if (!prevLists) return prevLists;
 
@@ -49,10 +40,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to create list:", error.message);
 
-      queryClient.setQueryData(
-        ["lists", variables.boardId],
-        context?.prevLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -69,16 +57,11 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         queryKey: ["lists", variables.boardId],
       });
 
-      const prevLists: List[] | undefined = queryClient.getQueryData([
-        "lists",
-        variables.boardId,
-      ]);
+      const prevLists: List[] | undefined = queryClient.getQueryData(["lists", variables.boardId]);
 
       if (!prevLists) return prevLists;
 
-      const nextLists = prevLists.filter(
-        (prevLists) => prevLists.id !== variables.listId,
-      );
+      const nextLists = prevLists.filter((prevLists) => prevLists.id !== variables.listId);
 
       queryClient.setQueryData(["lists", variables.boardId], nextLists);
 
@@ -87,10 +70,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to delete list:", error.message);
 
-      queryClient.setQueryData(
-        ["lists", variables.boardId],
-        context?.prevLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -107,17 +87,12 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         queryKey: ["lists", variables.boardId],
       });
 
-      const prevLists: List[] | undefined = queryClient.getQueryData([
-        "lists",
-        variables.boardId,
-      ]);
+      const prevLists: List[] | undefined = queryClient.getQueryData(["lists", variables.boardId]);
 
       if (!prevLists) return prevLists;
 
       const nextLists = prevLists.map((prevlist) =>
-        prevlist.id === variables.listId
-          ? { ...prevlist, title: variables.listTitle }
-          : prevlist,
+        prevlist.id === variables.listId ? { ...prevlist, title: variables.listTitle } : prevlist,
       );
 
       queryClient.setQueryData(["lists", variables.boardId], nextLists);
@@ -127,10 +102,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to update list:", error.message);
 
-      queryClient.setQueryData(
-        ["lists", variables.boardId],
-        context?.prevLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -147,18 +119,13 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         queryKey: ["lists", variables.boardId],
       });
 
-      const prevLists: List[] | undefined = queryClient.getQueryData([
-        "lists",
-        variables.boardId,
-      ]);
+      const prevLists: List[] | undefined = queryClient.getQueryData(["lists", variables.boardId]);
 
       if (!prevLists) return prevLists;
 
       const nextLists = prevLists
         .map((prevlist) =>
-          prevlist.id === variables.listId
-            ? { ...prevlist, position: variables.listPosition }
-            : prevlist,
+          prevlist.id === variables.listId ? { ...prevlist, position: variables.listPosition } : prevlist,
         )
         .sort((a, b) => {
           if (a.position < b.position) return -1;
@@ -173,10 +140,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to update list position:", error.message);
 
-      queryClient.setQueryData(
-        ["lists", variables.boardId],
-        context?.prevLists,
-      );
+      queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({

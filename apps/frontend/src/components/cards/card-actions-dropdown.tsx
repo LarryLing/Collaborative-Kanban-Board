@@ -15,12 +15,7 @@ type CardActionsDropdownProps = {
   deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
 };
 
-export default function CardActionsDropdown({
-  boardId,
-  listId,
-  cardId,
-  deleteCardMutation,
-}: CardActionsDropdownProps) {
+export default function CardActionsDropdown({ boardId, listId, cardId, deleteCardMutation }: CardActionsDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

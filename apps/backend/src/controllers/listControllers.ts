@@ -1,19 +1,9 @@
 import type { Response } from "express";
-import {
-  Board,
-  CreateListBody,
-  List,
-  UpdateListBody,
-  UpdateListPositionBody,
-  CollaboratorRequest,
-} from "../types";
+import { Board, CreateListBody, List, UpdateListBody, UpdateListPositionBody, CollaboratorRequest } from "../types";
 import type { ResultSetHeader } from "mysql2/promise";
 import db from "../config/db";
 
-export async function getAllLists(
-  req: CollaboratorRequest<{ boardId: Board["id"] }>,
-  res: Response,
-) {
+export async function getAllLists(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;
 
   try {
@@ -30,12 +20,9 @@ export async function getAllLists(
       return 0;
     });
 
-    res
-      .status(200)
-      .json({ message: "Successfully retrieved lists", data: sortedLists });
+    res.status(200).json({ message: "Successfully retrieved lists", data: sortedLists });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to retrieve lists", errorMessage);
 
@@ -62,8 +49,7 @@ export async function createList(
 
     res.status(201).json({ message: "Successfully created list" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to create list", errorMessage);
 
@@ -75,11 +61,7 @@ export async function createList(
 }
 
 export async function updateList(
-  req: CollaboratorRequest<
-    { boardId: Board["id"]; listId: List["id"] },
-    object,
-    UpdateListBody
-  >,
+  req: CollaboratorRequest<{ boardId: Board["id"]; listId: List["id"] }, object, UpdateListBody>,
   res: Response,
 ) {
   const { boardId, listId } = req.params;
@@ -106,8 +88,7 @@ export async function updateList(
 
     res.status(200).json({ message: "Successfully updated list" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to update list", errorMessage);
 
@@ -119,11 +100,7 @@ export async function updateList(
 }
 
 export async function updateListPosition(
-  req: CollaboratorRequest<
-    { boardId: Board["id"]; listId: List["id"] },
-    object,
-    UpdateListPositionBody
-  >,
+  req: CollaboratorRequest<{ boardId: Board["id"]; listId: List["id"] }, object, UpdateListPositionBody>,
   res: Response,
 ) {
   const { boardId, listId } = req.params;
@@ -138,9 +115,7 @@ export async function updateListPosition(
     );
 
     if (result.affectedRows === 0) {
-      console.error(
-        "Failed to update list position: Could not find list in database",
-      );
+      console.error("Failed to update list position: Could not find list in database");
 
       res.status(404).json({
         message: "Failed to update list position",
@@ -152,8 +127,7 @@ export async function updateListPosition(
 
     res.status(200).json({ message: "Successfully updated list position" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to update list position", errorMessage);
 
@@ -179,8 +153,7 @@ export async function deleteList(
 
     res.status(200).json({ message: "Successfully deleted list" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Error deleting list", errorMessage);
 

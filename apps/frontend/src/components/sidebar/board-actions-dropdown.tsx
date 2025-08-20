@@ -1,8 +1,4 @@
-import type {
-  Board,
-  UseCollaboratorDialogReturnType,
-  UseUpdateBoardDialogReturnType,
-} from "@/lib/types";
+import type { Board, UseCollaboratorDialogReturnType, UseUpdateBoardDialogReturnType } from "@/lib/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,10 +40,7 @@ export default function BoardActionsDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <SidebarMenuAction
-          showOnHover
-          className="data-[state=open]:bg-accent rounded-sm"
-        >
+        <SidebarMenuAction showOnHover className="data-[state=open]:bg-accent rounded-sm">
           <EllipsisVertical />
           <span className="sr-only">More</span>
         </SidebarMenuAction>
@@ -66,10 +59,7 @@ export default function BoardActionsDropdown({
           <span>Share</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={handleDeleteBoardMutation}
-        >
+        <DropdownMenuItem variant="destructive" onClick={handleDeleteBoardMutation}>
           <Trash />
           <span>Delete</span>
         </DropdownMenuItem>

@@ -1,26 +1,10 @@
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import { Button } from "../ui/button";
-import type {
-  Board,
-  UseListsReturnType,
-  UpdateListForm,
-  List,
-} from "@/lib/types";
+import type { Board, UseListsReturnType, UpdateListForm, List } from "@/lib/types";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { UpdateListSchema } from "@/lib/schemas";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form";
 import { Input } from "../ui/input";
 import { Badge } from "../ui/badge";
 
@@ -52,8 +36,7 @@ export default function UpdateListPopover({
     await updateListMutation({
       boardId,
       listId,
-      listTitle:
-        values.listTitle.length > 0 ? values.listTitle : "Untitled List",
+      listTitle: values.listTitle.length > 0 ? values.listTitle : "Untitled List",
     });
 
     setOpen(false);
@@ -62,19 +45,13 @@ export default function UpdateListPopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Badge
-          variant="secondary"
-          className="max-w-[150px] hover:bg-secondary/70 cursor-pointer"
-        >
+        <Badge variant="secondary" className="max-w-[150px] hover:bg-secondary/70 cursor-pointer">
           <p className="truncate">{listTitle}</p>
         </Badge>
       </PopoverTrigger>
       <PopoverContent>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col items-center gap-y-2"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-y-2">
             <FormField
               control={form.control}
               name="listTitle"

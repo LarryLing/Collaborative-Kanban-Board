@@ -1,11 +1,5 @@
 import type { Board, Card, List, UseCardsReturnType } from "@/lib/types";
-import {
-  getAllCards,
-  createCard,
-  deleteCard,
-  updateCard,
-  updateCardPosition,
-} from "@/api/cards";
+import { getAllCards, createCard, deleteCard, updateCard, updateCardPosition } from "@/api/cards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 // import { useCallback } from "react";
 
@@ -49,10 +43,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: Card[] | undefined = queryClient.getQueryData([
-        "cards",
-        variables.boardId,
-      ]);
+      const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
@@ -74,10 +65,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to create card:", error.message);
 
-      queryClient.setQueryData(
-        ["cards", variables.boardId],
-        context?.prevCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -94,16 +82,11 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: Card[] | undefined = queryClient.getQueryData([
-        "cards",
-        variables.boardId,
-      ]);
+      const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
-      const nextCards = prevCards.filter(
-        (prevCards) => prevCards.id !== variables.cardId,
-      );
+      const nextCards = prevCards.filter((prevCards) => prevCards.id !== variables.cardId);
 
       queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
@@ -112,10 +95,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to delete card:", error.message);
 
-      queryClient.setQueryData(
-        ["cards", variables.boardId],
-        context?.prevCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -132,10 +112,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: List[] | undefined = queryClient.getQueryData([
-        "cards",
-        variables.boardId,
-      ]);
+      const prevCards: List[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
@@ -156,10 +133,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to update card:", error.message);
 
-      queryClient.setQueryData(
-        ["cards", variables.boardId],
-        context?.prevCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
@@ -176,10 +150,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: List[] | undefined = queryClient.getQueryData([
-        "cards",
-        variables.boardId,
-      ]);
+      const prevCards: List[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
@@ -206,10 +177,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     onError: (error, variables, context) => {
       console.error("Failed to update card position:", error.message);
 
-      queryClient.setQueryData(
-        ["cards", variables.boardId],
-        context?.prevCards,
-      );
+      queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({

@@ -15,11 +15,7 @@ import {
   UpdateListSchema,
 } from "./schemas";
 import type { JwtPayload } from "jwt-decode";
-import type {
-  QueryObserverResult,
-  RefetchOptions,
-  UseMutateAsyncFunction,
-} from "@tanstack/react-query";
+import type { QueryObserverResult, RefetchOptions, UseMutateAsyncFunction } from "@tanstack/react-query";
 import type { UseFormReturn } from "react-hook-form";
 import type { COLLABORATOR, OWNER } from "./constants";
 
@@ -101,18 +97,11 @@ export type AuthContextType = {
     password: string,
   ) => Promise<void>;
   resendSignUp: (email: User["email"]) => Promise<void>;
-  confirmSignUp: (
-    email: User["email"],
-    confirmationCode: string,
-  ) => Promise<void>;
+  confirmSignUp: (email: User["email"], confirmationCode: string) => Promise<void>;
   login: (email: User["email"], password: string) => Promise<void>;
   logout: () => Promise<void>;
   requestPasswordReset: (email: User["email"]) => Promise<void>;
-  resetPassword: (
-    email: User["email"],
-    password: string,
-    confirmationCode: string,
-  ) => Promise<void>;
+  resetPassword: (email: User["email"], password: string, confirmationCode: string) => Promise<void>;
   deleteAccount: () => Promise<void>;
 };
 
@@ -134,18 +123,13 @@ export type UpdateBoardDialogContextType = {
     }
   >;
   onSubmit: (values: UpdateBoardForm) => Promise<void>;
-  openUpdateBoardDialog: (
-    boardId: Board["id"],
-    boardTitle: Board["title"],
-  ) => void;
+  openUpdateBoardDialog: (boardId: Board["id"], boardTitle: Board["title"]) => void;
 };
 
 export type UseBoardsReturnType = {
   boards: Board[] | undefined;
   isLoading: boolean;
-  refetch: (
-    options?: RefetchOptions,
-  ) => Promise<QueryObserverResult<Board[], Error>>;
+  refetch: (options?: RefetchOptions) => Promise<QueryObserverResult<Board[], Error>>;
   createBoardMutation: UseMutateAsyncFunction<
     void,
     Error,
@@ -219,10 +203,7 @@ export type UseUpdateBoardDialogReturnType = {
     }
   >;
   onSubmit: (values: UpdateBoardForm) => Promise<void>;
-  openUpdateBoardDialog: (
-    boardId: Board["id"],
-    boardTitle: Board["title"],
-  ) => void;
+  openUpdateBoardDialog: (boardId: Board["id"], boardTitle: Board["title"]) => void;
 };
 
 export type UseListsReturnType = {

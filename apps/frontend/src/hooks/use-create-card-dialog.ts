@@ -1,10 +1,4 @@
-import type {
-  Board,
-  CreateCardForm,
-  List,
-  UseCardsReturnType,
-  UseCreateCardDialogReturnType,
-} from "@/lib/types";
+import type { Board, CreateCardForm, List, UseCardsReturnType, UseCreateCardDialogReturnType } from "@/lib/types";
 import { useCallback, useState } from "react";
 import { CreateCardSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
@@ -46,8 +40,7 @@ export function useCreateCardDialog(
       boardId,
       listId,
       cardId,
-      cardTitle:
-        values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
+      cardTitle: values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
       cardDescription: values.cardDescription,
       cardPosition,
     });

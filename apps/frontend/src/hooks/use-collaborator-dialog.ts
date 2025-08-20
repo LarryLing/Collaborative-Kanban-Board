@@ -1,15 +1,7 @@
 import { useCallback, useState } from "react";
-import type {
-  AddCollaboratorForm,
-  Board,
-  UseCollaboratorDialogReturnType,
-} from "@/lib/types";
+import type { AddCollaboratorForm, Board, UseCollaboratorDialogReturnType } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  addCollaborator,
-  getAllCollaborators,
-  removeCollaborator,
-} from "@/api/collaborators";
+import { addCollaborator, getAllCollaborators, removeCollaborator } from "@/api/collaborators";
 import { AddCollaboratorSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

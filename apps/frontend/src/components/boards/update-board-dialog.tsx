@@ -9,41 +9,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import type { UseUpdateBoardDialogReturnType } from "@/lib/types";
 
-type UpdateBoardDialogProps = Pick<
-  UseUpdateBoardDialogReturnType,
-  "open" | "setOpen" | "form" | "onSubmit"
->;
+type UpdateBoardDialogProps = Pick<UseUpdateBoardDialogReturnType, "open" | "setOpen" | "form" | "onSubmit">;
 
-export function UpdateBoardDialog({
-  open,
-  setOpen,
-  form,
-  onSubmit,
-}: UpdateBoardDialogProps) {
+export function UpdateBoardDialog({ open, setOpen, form, onSubmit }: UpdateBoardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Rename board</DialogTitle>
-          <DialogDescription>
-            Enter the new title of the board here.
-          </DialogDescription>
+          <DialogDescription>Enter the new title of the board here.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="boardTitle"

@@ -13,14 +13,7 @@ import { Input } from "@/components/ui/input";
 import { useBoards } from "@/hooks/use-boards";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Plus } from "lucide-react";
 import { SidebarMenuButton } from "../ui/sidebar";
 import { useState } from "react";
@@ -47,8 +40,7 @@ export function CreateBoardDialog() {
 
     await createBoardMutation({
       boardId,
-      boardTitle:
-        values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
+      boardTitle: values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
       boardCreatedAt: created_at,
     });
 
@@ -72,15 +64,10 @@ export function CreateBoardDialog() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create board</DialogTitle>
-          <DialogDescription>
-            Enter the title of the new board here.
-          </DialogDescription>
+          <DialogDescription>Enter the title of the new board here.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="boardTitle"

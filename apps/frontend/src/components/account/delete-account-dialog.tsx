@@ -12,14 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import type { DeleteAccountForm } from "@/lib/types";
 import { DeleteAccountSchema } from "@/lib/schemas";
 import { useAuth } from "@/hooks/use-auth";
@@ -56,23 +49,17 @@ export function DeleteAccountDialog() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
-          <DialogDescription>
-            This action is permanent and cannot be undone.
-          </DialogDescription>
+          <DialogDescription>This action is permanent and cannot be undone.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="prompt"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>
-                    Please enter the prompt{" "}
-                    <b className="font-bold">i understand</b> to continue
+                    Please enter the prompt <b className="font-bold">i understand</b> to continue
                   </FormLabel>
                   <FormControl>
                     <Input placeholder="i understand" {...field} />
@@ -83,19 +70,11 @@ export function DeleteAccountDialog() {
             />
             <DialogFooter>
               <DialogClose asChild>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => form.reset()}
-                >
+                <Button type="button" variant="outline" onClick={() => form.reset()}>
                   Cancel
                 </Button>
               </DialogClose>
-              <Button
-                variant="destructive"
-                type="submit"
-                disabled={form.formState.isSubmitting}
-              >
+              <Button variant="destructive" type="submit" disabled={form.formState.isSubmitting}>
                 {form.formState.isSubmitting ? "Deleting..." : "Delete Account"}
               </Button>
             </DialogFooter>

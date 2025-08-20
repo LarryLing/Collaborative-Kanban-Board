@@ -8,22 +8,13 @@ type CreateCardButtonProps = {
   openCreateCardDialog: UseCreateCardDialogReturnType["openCreateCardDialog"];
 };
 
-export default function CreateCardButton({
-  boardId,
-  listId,
-  openCreateCardDialog,
-}: CreateCardButtonProps) {
+export default function CreateCardButton({ boardId, listId, openCreateCardDialog }: CreateCardButtonProps) {
   const handleOpenCreateCardDialog = () => {
     openCreateCardDialog(boardId, listId);
   };
 
   return (
-    <Button
-      variant="ghost"
-      className="w-full"
-      size="sm"
-      onClick={handleOpenCreateCardDialog}
-    >
+    <Button variant="ghost" className="w-full" size="sm" onClick={handleOpenCreateCardDialog}>
       <Plus />
       <p className="text-xs">Create Card</p>
     </Button>

@@ -4,23 +4,9 @@ import { useForm } from "react-hook-form";
 import type { SignupForm } from "@/lib/types";
 import { SignupSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardTitle,
-  CardHeader,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardTitle, CardHeader, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import ErrorAlert from "@/components/misc/error-alert";
@@ -49,12 +35,7 @@ function SignUp() {
 
   const onSubmit = async (values: SignupForm) => {
     try {
-      await signUp(
-        values.givenName,
-        values.familyName,
-        values.email,
-        values.password,
-      );
+      await signUp(values.givenName, values.familyName, values.email, values.password);
       navigate({ to: "/confirm-signup", search: { email: values.email } });
     } catch (error) {
       setError(error instanceof Error ? error.message : "Unknown error");
@@ -66,19 +47,12 @@ function SignUp() {
       <div className="flex h-full items-center justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-center font-semibold">
-              Sign up
-            </CardTitle>
-            <CardDescription className="text-center">
-              Enter your credentials to create a new account.
-            </CardDescription>
+            <CardTitle className="text-xl text-center font-semibold">Sign up</CardTitle>
+            <CardDescription className="text-center">Enter your credentials to create a new account.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col items-center gap-y-5"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-y-5">
                 <FormField
                   control={form.control}
                   name="givenName"
@@ -125,11 +99,7 @@ function SignUp() {
                     <FormItem className="w-full">
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          {...field}
-                        />
+                        <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -142,11 +112,7 @@ function SignUp() {
                     <FormItem className="w-full">
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          {...field}
-                        />
+                        <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,21 +121,13 @@ function SignUp() {
                 <Button type="submit" className="w-full">
                   Sign Up
                 </Button>
-                {error && (
-                  <ErrorAlert
-                    title="Failed to sign up new user"
-                    error={error}
-                  />
-                )}
+                {error && <ErrorAlert title="Failed to sign up new user" error={error} />}
               </form>
             </Form>
           </CardContent>
           <CardFooter className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Already a user?</p>
-            <Link
-              to="/login"
-              className="text-primary font-medium hover:underline"
-            >
+            <Link to="/login" className="text-primary font-medium hover:underline">
               Login
             </Link>
           </CardFooter>

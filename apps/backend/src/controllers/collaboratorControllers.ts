@@ -1,19 +1,10 @@
 import type { Response } from "express";
-import type {
-  AddCollaboratorBody,
-  Board,
-  Collaborator,
-  CollaboratorRequest,
-  User,
-} from "../types";
+import type { AddCollaboratorBody, Board, Collaborator, CollaboratorRequest, User } from "../types";
 import db from "../config/db";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import { COLLABORATOR, OWNER } from "../constants";
 
-export async function getAllCollaborators(
-  req: CollaboratorRequest<{ boardId: Board["id"] }>,
-  res: Response,
-) {
+export async function getAllCollaborators(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;
 
   try {
@@ -37,8 +28,7 @@ export async function getAllCollaborators(
       data: rows as Collaborator[],
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to retrieve collaborators:", errorMessage);
 
@@ -50,17 +40,11 @@ export async function getAllCollaborators(
 }
 
 export async function addCollaborator(
-  req: CollaboratorRequest<
-    { boardId: Board["id"] },
-    object,
-    AddCollaboratorBody
-  >,
+  req: CollaboratorRequest<{ boardId: Board["id"] }, object, AddCollaboratorBody>,
   res: Response,
 ) {
   if (!req.role) {
-    console.error(
-      "Failed to add collaborator: User is not a board owner or collaborator",
-    );
+    console.error("Failed to add collaborator: User is not a board owner or collaborator");
 
     res.status(401).json({
       message: "Failed to add collaborator",
@@ -75,9 +59,7 @@ export async function addCollaborator(
   const { email } = req.body;
 
   if (role === COLLABORATOR) {
-    console.error(
-      "Failed to add collaborator: Cannot add collaborators without board ownership",
-    );
+    console.error("Failed to add collaborator: Cannot add collaborators without board ownership");
 
     res.status(401).json({
       message: "Failed to add collaborator",
@@ -118,9 +100,7 @@ export async function addCollaborator(
     );
 
     if (collaboratorRows && collaboratorRows.length > 0) {
-      console.error(
-        "Failed to add collaborator: Collaborator has already been added",
-      );
+      console.error("Failed to add collaborator: Collaborator has already been added");
 
       res.status(409).json({
         message: "Failed to add collaborator",
@@ -150,8 +130,7 @@ export async function addCollaborator(
       data: collaborator,
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to add collaborator:", errorMessage);
 
@@ -170,9 +149,7 @@ export async function removeCollaborator(
   res: Response,
 ) {
   if (!req.auth) {
-    console.error(
-      "Failed to remove collaborator: User is not authorized to make request",
-    );
+    console.error("Failed to remove collaborator: User is not authorized to make request");
 
     res.status(401).json({
       message: "Failed to remove collaborator",
@@ -183,9 +160,7 @@ export async function removeCollaborator(
   }
 
   if (!req.role) {
-    console.error(
-      "Failed to remove collaborator: User is not a board owner or collaborator",
-    );
+    console.error("Failed to remove collaborator: User is not a board owner or collaborator");
 
     res.status(401).json({
       message: "Failed to remove collaborator",
@@ -206,13 +181,8 @@ export async function removeCollaborator(
       [collaboratorId, boardId],
     );
 
-    if (
-      targetUserRows.length > 0 &&
-      (targetUserRows[0].role as Collaborator["role"]) === OWNER
-    ) {
-      console.error(
-        "Failed to remove collaborator: Cannot leave board as the owner",
-      );
+    if (targetUserRows.length > 0 && (targetUserRows[0].role as Collaborator["role"]) === OWNER) {
+      console.error("Failed to remove collaborator: Cannot leave board as the owner");
 
       res.status(403).json({
         message: "Failed to remove collaborator",
@@ -224,9 +194,7 @@ export async function removeCollaborator(
 
     if (role === COLLABORATOR) {
       if (id !== collaboratorId) {
-        console.error(
-          "Failed to remove collaborator: Cannot remove collaborators without board ownership",
-        );
+        console.error("Failed to remove collaborator: Cannot remove collaborators without board ownership");
 
         res.status(403).json({
           message: "Failed to remove collaborator",
@@ -245,8 +213,7 @@ export async function removeCollaborator(
 
     res.status(200).json({ message: "Successfully removed collaborator" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to remove collaborator:", errorMessage);
 

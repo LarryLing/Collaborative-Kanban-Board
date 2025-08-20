@@ -1,10 +1,5 @@
 import type { Board, UseBoardsReturnType } from "@/lib/types";
-import {
-  getAllBoards,
-  createBoard,
-  deleteBoard,
-  updateBoard,
-} from "@/api/boards";
+import { getAllBoards, createBoard, deleteBoard, updateBoard } from "@/api/boards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "./use-auth";
@@ -33,9 +28,7 @@ export function useBoards(): UseBoardsReturnType {
         queryKey: ["boards"],
       });
 
-      const prevBoards: Board[] | undefined = queryClient.getQueryData([
-        "boards",
-      ]);
+      const prevBoards: Board[] | undefined = queryClient.getQueryData(["boards"]);
 
       if (!prevBoards) return prevBoards;
 
@@ -77,15 +70,11 @@ export function useBoards(): UseBoardsReturnType {
         queryKey: ["boards"],
       });
 
-      const prevBoards: Board[] | undefined = queryClient.getQueryData([
-        "boards",
-      ]);
+      const prevBoards: Board[] | undefined = queryClient.getQueryData(["boards"]);
 
       if (!prevBoards) return prevBoards;
 
-      const nextBoards = prevBoards.filter(
-        (prevBoards) => prevBoards.id !== variables.boardId,
-      );
+      const nextBoards = prevBoards.filter((prevBoards) => prevBoards.id !== variables.boardId);
 
       queryClient.setQueryData(["board"], nextBoards);
 
@@ -113,16 +102,12 @@ export function useBoards(): UseBoardsReturnType {
         queryKey: ["boards"],
       });
 
-      const prevBoards: Board[] | undefined = queryClient.getQueryData([
-        "boards",
-      ]);
+      const prevBoards: Board[] | undefined = queryClient.getQueryData(["boards"]);
 
       if (!prevBoards) return prevBoards;
 
       const nextBoards = prevBoards.map((prevBoard) =>
-        prevBoard.id === variables.boardId
-          ? { ...prevBoard, title: variables.boardTitle }
-          : prevBoard,
+        prevBoard.id === variables.boardId ? { ...prevBoard, title: variables.boardTitle } : prevBoard,
       );
 
       queryClient.setQueryData(["boards"], nextBoards);

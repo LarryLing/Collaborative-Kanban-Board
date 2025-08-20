@@ -11,11 +11,7 @@ import UpdateListPopover from "./update-list-popover";
 import { useState } from "react";
 import ListActionsDropdown from "./list-actions-dropdown";
 import { GripVertical } from "lucide-react";
-import {
-  verticalListSortingStrategy,
-  SortableContext,
-  useSortable,
-} from "@dnd-kit/sortable";
+import { verticalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { LIST } from "@/lib/constants";
 import { Badge } from "../ui/badge";
@@ -49,14 +45,7 @@ export default function List({
 }: ListProps) {
   const [open, setOpen] = useState<boolean>(false);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
     data: {
       type: LIST,
@@ -78,12 +67,7 @@ export default function List({
     <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border" style={style}>
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2">
-          <div
-            ref={setNodeRef}
-            {...attributes}
-            {...listeners}
-            className="cursor-grab"
-          >
+          <div ref={setNodeRef} {...attributes} {...listeners} className="cursor-grab">
             <GripVertical className="size-4" />
           </div>
           <UpdateListPopover
@@ -99,28 +83,15 @@ export default function List({
           </Badge>
         </div>
         <div className="flex justify-center items-center gap-1">
-          <CreateCardIconButton
-            boardId={boardId}
-            listId={id}
-            openCreateCardDialog={openCreateCardDialog}
-          />
-          <ListActionsDropdown
-            boardId={boardId}
-            listId={id}
-            deleteListMutation={deleteListMutation}
-          />
+          <CreateCardIconButton boardId={boardId} listId={id} openCreateCardDialog={openCreateCardDialog} />
+          <ListActionsDropdown boardId={boardId} listId={id} deleteListMutation={deleteListMutation} />
         </div>
       </div>
       <div className="flex flex-col gap-y-2">
         {isDragging ? (
-          cards.map((card) => (
-            <CardButtonOverlay key={card.id} title={card.title} />
-          ))
+          cards.map((card) => <CardButtonOverlay key={card.id} title={card.title} />)
         ) : (
-          <SortableContext
-            items={cards.map((card) => card.id)}
-            strategy={verticalListSortingStrategy}
-          >
+          <SortableContext items={cards.map((card) => card.id)} strategy={verticalListSortingStrategy}>
             {cards.map((card) => (
               <CardButton
                 key={card.id}
@@ -133,11 +104,7 @@ export default function List({
             ))}
           </SortableContext>
         )}
-        <CreateCardButton
-          boardId={boardId}
-          listId={id}
-          openCreateCardDialog={openCreateCardDialog}
-        />
+        <CreateCardButton boardId={boardId} listId={id} openCreateCardDialog={openCreateCardDialog} />
       </div>
     </Card>
   );

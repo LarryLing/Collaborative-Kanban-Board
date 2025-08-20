@@ -8,16 +8,14 @@ export interface IDTokenPayload extends JwtPayload {
   family_name: string;
 }
 
-export interface AuthRequest<P = any, ResBody = any, ReqBody = any>
-  extends Request<P, ResBody, ReqBody> {
+export interface AuthRequest<P = any, ResBody = any, ReqBody = any> extends Request<P, ResBody, ReqBody> {
   auth?: {
     id: User["id"];
     accessToken: string;
   };
 }
 
-export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
-  extends AuthRequest<P, ResBody, ReqBody> {
+export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any> extends AuthRequest<P, ResBody, ReqBody> {
   role?: Collaborator["role"];
 }
 
@@ -78,12 +76,6 @@ export type Card = {
   position: string;
 };
 
-export type CreateCardBody = Pick<
-  Card,
-  "id" | "title" | "description" | "position"
->;
+export type CreateCardBody = Pick<Card, "id" | "title" | "description" | "position">;
 export type UpdateCardBody = Pick<Card, "title" | "description">;
-export type UpdateCardPositionBody = { newListId: List["id"] } & Pick<
-  Card,
-  "position"
->;
+export type UpdateCardPositionBody = { newListId: List["id"] } & Pick<Card, "position">;

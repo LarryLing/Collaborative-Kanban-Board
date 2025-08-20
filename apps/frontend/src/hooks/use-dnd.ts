@@ -1,12 +1,6 @@
 import { LIST, CARD } from "@/lib/constants";
 import type { Card, Container, List } from "@/lib/types";
-import type {
-  Active,
-  Over,
-  DragStartEvent,
-  DragOverEvent,
-  DragEndEvent,
-} from "@dnd-kit/core";
+import type { Active, Over, DragStartEvent, DragOverEvent, DragEndEvent } from "@dnd-kit/core";
 import { arrayMove } from "@dnd-kit/sortable";
 import { generateKeyBetween } from "fractional-indexing";
 import { useState, useEffect } from "react";
@@ -31,15 +25,9 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
 
   const findContainer = (object: Active | Over) => {
     if (object.data.current?.type === LIST) {
-      return containers.find(
-        (container) =>
-          container.list.id === (object.data.current?.list as List).id,
-      );
+      return containers.find((container) => container.list.id === (object.data.current?.list as List).id);
     } else if (object.data.current?.type === CARD) {
-      return containers.find(
-        (container) =>
-          container.list.id === (object.data.current?.card as Card).list_id,
-      );
+      return containers.find((container) => container.list.id === (object.data.current?.card as Card).list_id);
     }
   };
 
@@ -66,21 +54,14 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
 
     if (!activeContainer || !overContainer) return;
 
-    const activeContainerIndex = containers.findIndex(
-      (container) => container.list.id === activeContainer.list.id,
-    );
-    const overContainerIndex = containers.findIndex(
-      (container) => container.list.id === overContainer.list.id,
-    );
+    const activeContainerIndex = containers.findIndex((container) => container.list.id === activeContainer.list.id);
+    const overContainerIndex = containers.findIndex((container) => container.list.id === overContainer.list.id);
 
     if (active.data.current?.type === LIST) {
       let newListPosition;
       if (activeContainerIndex < overContainerIndex) {
         if (overContainerIndex + 1 >= containers.length) {
-          newListPosition = generateKeyBetween(
-            containers[overContainerIndex].list.position,
-            null,
-          );
+          newListPosition = generateKeyBetween(containers[overContainerIndex].list.position, null);
         } else {
           newListPosition = generateKeyBetween(
             containers[overContainerIndex].list.position,
@@ -89,10 +70,7 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
         }
       } else if (activeContainerIndex > overContainerIndex) {
         if (overContainerIndex - 1 < 0) {
-          newListPosition = generateKeyBetween(
-            null,
-            containers[overContainerIndex].list.position,
-          );
+          newListPosition = generateKeyBetween(null, containers[overContainerIndex].list.position);
         } else {
           newListPosition = generateKeyBetween(
             containers[overContainerIndex - 1].list.position,
@@ -104,11 +82,7 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
       }
 
       setContainers((prevContainers) => {
-        return arrayMove(
-          prevContainers,
-          activeContainerIndex,
-          overContainerIndex,
-        ).map((container) => {
+        return arrayMove(prevContainers, activeContainerIndex, overContainerIndex).map((container) => {
           if (container.list.id !== activeContainer.list.id) {
             return {
               ...container,
@@ -125,50 +99,31 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
         });
       });
     } else if (active.data.current?.type === CARD) {
-      const activeCard = activeContainer.cards.find(
-        (card) => card.id === active.id,
-      );
-      const overCard = activeContainer.cards.find(
-        (card) => card.id === over.id,
-      );
+      const activeCard = activeContainer.cards.find((card) => card.id === active.id);
+      const overCard = activeContainer.cards.find((card) => card.id === over.id);
 
       if (!activeCard || !overCard) return;
 
-      const activeCardIndex = activeContainer.cards.findIndex(
-        (card) => card.id === activeCard.id,
-      );
-      const overCardIndex = activeContainer.cards.findIndex(
-        (card) => card.id === overCard.id,
-      );
+      const activeCardIndex = activeContainer.cards.findIndex((card) => card.id === activeCard.id);
+      const overCardIndex = activeContainer.cards.findIndex((card) => card.id === overCard.id);
 
       if (activeContainerIndex === overContainerIndex) {
         let newCardPosition;
         if (activeCardIndex < overCardIndex) {
-          if (
-            overCardIndex + 1 >=
-            containers[activeContainerIndex].cards.length
-          ) {
-            newCardPosition = generateKeyBetween(
-              containers[activeContainerIndex].cards[overCardIndex].position,
-              null,
-            );
+          if (overCardIndex + 1 >= containers[activeContainerIndex].cards.length) {
+            newCardPosition = generateKeyBetween(containers[activeContainerIndex].cards[overCardIndex].position, null);
           } else {
             newCardPosition = generateKeyBetween(
               containers[activeContainerIndex].cards[overCardIndex].position,
-              containers[activeContainerIndex].cards[overCardIndex + 1]
-                .position,
+              containers[activeContainerIndex].cards[overCardIndex + 1].position,
             );
           }
         } else if (activeCardIndex > overCardIndex) {
           if (overCardIndex - 1 < 0) {
-            newCardPosition = generateKeyBetween(
-              null,
-              containers[activeContainerIndex].cards[overCardIndex].position,
-            );
+            newCardPosition = generateKeyBetween(null, containers[activeContainerIndex].cards[overCardIndex].position);
           } else {
             newCardPosition = generateKeyBetween(
-              containers[activeContainerIndex].cards[overCardIndex - 1]
-                .position,
+              containers[activeContainerIndex].cards[overCardIndex - 1].position,
               containers[activeContainerIndex].cards[overCardIndex].position,
             );
           }
@@ -184,11 +139,7 @@ export function useDND(lists: List[] | undefined, cards: Card[] | undefined) {
               };
             }
 
-            const updatedCards = arrayMove(
-              prevContainer.cards,
-              activeCardIndex,
-              overCardIndex,
-            ).map((card) => {
+            const updatedCards = arrayMove(prevContainer.cards, activeCardIndex, overCardIndex).map((card) => {
               if (card.id !== activeCard.id) {
                 return {
                   ...card,

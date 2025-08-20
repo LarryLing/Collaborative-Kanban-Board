@@ -32,13 +32,7 @@ export async function deleteBoard({ boardId }: { boardId: Board["id"] }) {
   await invokeAPI(`/api/boards/${boardId}`, "DELETE");
 }
 
-export async function updateBoard({
-  boardId,
-  boardTitle,
-}: {
-  boardId: Board["id"];
-  boardTitle: Board["title"];
-}) {
+export async function updateBoard({ boardId, boardTitle }: { boardId: Board["id"]; boardTitle: Board["title"] }) {
   await invokeAPI(
     `/api/boards/${boardId}`,
     "PATCH",

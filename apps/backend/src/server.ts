@@ -19,10 +19,7 @@ const app: Application = express();
 app.use(express.json());
 
 interface CorsOptions {
-  origin: (
-    origin: string | undefined,
-    callback: (err: Error | null, allow?: boolean) => void,
-  ) => void;
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => void;
   methods: string[];
   allowedHeaders: string[];
   credentials: boolean;

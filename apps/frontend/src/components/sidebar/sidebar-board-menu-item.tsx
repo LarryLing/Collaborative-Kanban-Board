@@ -1,11 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { SidebarMenuButton, SidebarMenuItem } from "../ui/sidebar";
 import BoardActionsDropdown from "./board-actions-dropdown";
-import type {
-  Board,
-  UseCollaboratorDialogReturnType,
-  UseUpdateBoardDialogReturnType,
-} from "@/lib/types";
+import type { Board, UseCollaboratorDialogReturnType, UseUpdateBoardDialogReturnType } from "@/lib/types";
 import { SquareKanban } from "lucide-react";
 import { memo } from "react";
 
@@ -16,12 +12,7 @@ type SidebarBoardMenuItemProps = Pick<Board, "id" | "title"> & {
   openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
 };
 
-function SidebarBoardMenuItem({
-  id,
-  title,
-  openUpdateBoardDialog,
-  openCollaboratorDialog,
-}: SidebarBoardMenuItemProps) {
+function SidebarBoardMenuItem({ id, title, openUpdateBoardDialog, openCollaboratorDialog }: SidebarBoardMenuItemProps) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>

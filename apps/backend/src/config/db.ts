@@ -1,11 +1,5 @@
 import mysql from "mysql2/promise";
-import {
-  RDS_HOSTNAME,
-  RDS_USERNAME,
-  RDS_PASSWORD,
-  RDS_PORT,
-  RDS_DB_NAME,
-} from "../constants";
+import { RDS_HOSTNAME, RDS_USERNAME, RDS_PASSWORD, RDS_PORT, RDS_DB_NAME } from "../constants";
 
 const db = mysql.createPool({
   host: RDS_HOSTNAME,

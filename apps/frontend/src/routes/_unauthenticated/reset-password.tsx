@@ -1,39 +1,16 @@
-import {
-  createFileRoute,
-  Link,
-  useNavigate,
-  useSearch,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import type { EmailSearchBody, ResetPasswordForm } from "@/lib/types";
 import { ResetPasswordSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardTitle,
-  CardDescription,
-  CardHeader,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card, CardTitle, CardDescription, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import ErrorAlert from "@/components/misc/error-alert";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
 export const Route = createFileRoute("/_unauthenticated/reset-password")({
@@ -78,20 +55,14 @@ function ResetPassword() {
       <div className="flex h-full items-center justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-center font-semibold">
-              Reset password
-            </CardTitle>
+            <CardTitle className="text-xl text-center font-semibold">Reset password</CardTitle>
             <CardDescription className="text-center">
-              Enter the confirmation code we sent you and your new password to
-              continue.
+              Enter the confirmation code we sent you and your new password to continue.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col items-center gap-y-5"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-y-5">
                 <FormField
                   control={form.control}
                   name="confirmationCode"
@@ -99,11 +70,7 @@ function ResetPassword() {
                     <FormItem className="w-full">
                       <FormLabel>Confirmation Code</FormLabel>
                       <FormControl>
-                        <InputOTP
-                          maxLength={6}
-                          {...field}
-                          pattern={REGEXP_ONLY_DIGITS}
-                        >
+                        <InputOTP maxLength={6} {...field} pattern={REGEXP_ONLY_DIGITS}>
                           <InputOTPGroup>
                             <InputOTPSlot index={0} />
                             <InputOTPSlot index={1} />
@@ -125,11 +92,7 @@ function ResetPassword() {
                     <FormItem className="w-full">
                       <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          {...field}
-                        />
+                        <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -142,11 +105,7 @@ function ResetPassword() {
                     <FormItem className="w-full">
                       <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="••••••••"
-                          type="password"
-                          {...field}
-                        />
+                        <Input placeholder="••••••••" type="password" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -155,18 +114,13 @@ function ResetPassword() {
                 <Button type="submit" className="w-full">
                   Continue to login
                 </Button>
-                {error && (
-                  <ErrorAlert title="Failed to reset password" error={error} />
-                )}
+                {error && <ErrorAlert title="Failed to reset password" error={error} />}
               </form>
             </Form>
           </CardContent>
           <CardFooter className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Remember your password?</p>
-            <Link
-              to="/login"
-              className="text-primary font-medium hover:underline"
-            >
+            <Link to="/login" className="text-primary font-medium hover:underline">
               Go back
             </Link>
           </CardFooter>

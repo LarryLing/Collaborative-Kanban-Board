@@ -4,23 +4,9 @@ import { useForm } from "react-hook-form";
 import type { ForgotPasswordForm } from "@/lib/types";
 import { ForgotPasswordSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import ErrorAlert from "@/components/misc/error-alert";
@@ -57,20 +43,14 @@ function ForgotPassword() {
       <div className="flex h-full items-center justify-center">
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-center font-semibold">
-              Forgot password
-            </CardTitle>
+            <CardTitle className="text-xl text-center font-semibold">Forgot password</CardTitle>
             <CardDescription className="text-center">
-              Enter your email and we'll send you a confirmation code to reset
-              your password.
+              Enter your email and we'll send you a confirmation code to reset your password.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col items-center gap-y-5"
-              >
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col items-center gap-y-5">
                 <FormField
                   control={form.control}
                   name="email"
@@ -87,21 +67,13 @@ function ForgotPassword() {
                 <Button type="submit" className="w-full">
                   Send password recovery
                 </Button>
-                {error && (
-                  <ErrorAlert
-                    title="Failed to request password reset"
-                    error={error}
-                  />
-                )}
+                {error && <ErrorAlert title="Failed to request password reset" error={error} />}
               </form>
             </Form>
           </CardContent>
           <CardFooter className="w-full text-muted-foreground flex justify-center gap-1 text-sm">
             <p>Remember your password?</p>
-            <Link
-              to="/login"
-              className="text-primary font-medium hover:underline"
-            >
+            <Link to="/login" className="text-primary font-medium hover:underline">
               Go back
             </Link>
           </CardFooter>

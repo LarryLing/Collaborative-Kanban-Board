@@ -1,9 +1,4 @@
-import {
-  EVENTS_ENDPOINT,
-  EVENTS_REGION,
-  EVENTS_DEFAULT_AUTH_MODE,
-  EVENTS_API_KEY,
-} from "@/lib/constants";
+import { EVENTS_ENDPOINT, EVENTS_REGION, EVENTS_DEFAULT_AUTH_MODE, EVENTS_API_KEY } from "@/lib/constants";
 import { Amplify } from "aws-amplify";
 
 Amplify.configure({

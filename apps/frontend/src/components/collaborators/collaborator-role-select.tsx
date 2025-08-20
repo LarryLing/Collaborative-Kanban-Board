@@ -1,16 +1,6 @@
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { COLLABORATOR, OWNER } from "@/lib/constants";
-import type {
-  Board,
-  Collaborator,
-  UseCollaboratorDialogReturnType,
-} from "@/lib/types";
+import type { Board, Collaborator, UseCollaboratorDialogReturnType } from "@/lib/types";
 
 type CollaboratorRoleSelectProps = {
   boardId: Board["id"];
@@ -34,11 +24,7 @@ export function CollaboratorRoleSelect({
   };
 
   return (
-    <Select
-      defaultValue={role}
-      onValueChange={handleValueChange}
-      disabled={isDisabled}
-    >
+    <Select defaultValue={role} onValueChange={handleValueChange} disabled={isDisabled}>
       <SelectTrigger>
         <SelectValue />
       </SelectTrigger>

@@ -1,8 +1,4 @@
-if (
-  !process.env.AWS_REGION ||
-  !process.env.AWS_ACCESS_KEY ||
-  !process.env.AWS_SECRET_ACCESS_KEY
-) {
+if (!process.env.AWS_REGION || !process.env.AWS_ACCESS_KEY || !process.env.AWS_SECRET_ACCESS_KEY) {
   throw new Error("Missing AWS environment variables!");
 }
 

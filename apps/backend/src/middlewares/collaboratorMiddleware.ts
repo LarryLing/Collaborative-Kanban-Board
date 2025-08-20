@@ -8,9 +8,7 @@ export async function verifyRole(
   next: NextFunction,
 ) {
   if (!req.auth) {
-    console.error(
-      "Failed to verify role: User is not authorized to make request",
-    );
+    console.error("Failed to verify role: User is not authorized to make request");
 
     res.status(401).json({
       message: "Failed to verify role",
@@ -47,8 +45,7 @@ export async function verifyRole(
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to verify role:", errorMessage);
 

@@ -9,8 +9,11 @@ if (
 
 export const EVENTS_ENDPOINT = import.meta.env.VITE_EVENTS_ENDPOINT as string;
 export const EVENTS_REGION = import.meta.env.VITE_EVENTS_REGION as string;
-export const EVENTS_DEFAULT_AUTH_MODE = import.meta.env
-  .VITE_EVENTS_DEFAULT_AUTH_MODE as "apiKey" | "iam" | "oidc" | "userPool";
+export const EVENTS_DEFAULT_AUTH_MODE = import.meta.env.VITE_EVENTS_DEFAULT_AUTH_MODE as
+  | "apiKey"
+  | "iam"
+  | "oidc"
+  | "userPool";
 export const EVENTS_API_KEY = import.meta.env.VITE_EVENTS_API_KEY as string;
 
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL

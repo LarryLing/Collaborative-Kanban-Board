@@ -30,13 +30,7 @@ export async function createList({
   );
 }
 
-export async function deleteList({
-  boardId,
-  listId,
-}: {
-  boardId: Board["id"];
-  listId: List["id"];
-}) {
+export async function deleteList({ boardId, listId }: { boardId: Board["id"]; listId: List["id"] }) {
   await invokeAPI(`/api/lists/${boardId}/${listId}`, "DELETE");
 }
 

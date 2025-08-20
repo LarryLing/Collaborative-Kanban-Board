@@ -9,41 +9,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import type { UseCreateCardDialogReturnType } from "@/lib/types";
 
-type CreateCardDialogProps = Pick<
-  UseCreateCardDialogReturnType,
-  "open" | "setOpen" | "form" | "onSubmit"
->;
+type CreateCardDialogProps = Pick<UseCreateCardDialogReturnType, "open" | "setOpen" | "form" | "onSubmit">;
 
-export function CreateCardDialog({
-  open,
-  setOpen,
-  form,
-  onSubmit,
-}: CreateCardDialogProps) {
+export function CreateCardDialog({ open, setOpen, form, onSubmit }: CreateCardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create card</DialogTitle>
-          <DialogDescription>
-            Enter the title and description of the new card here.
-          </DialogDescription>
+          <DialogDescription>Enter the title and description of the new card here.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="cardTitle"

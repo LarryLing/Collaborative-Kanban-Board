@@ -2,11 +2,7 @@ import type { NextFunction, Response } from "express";
 import type { AuthRequest } from "../types";
 import jwtVerifier from "../config/jwtVerifier";
 
-export async function verifyAuth(
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction,
-) {
+export async function verifyAuth(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const authHeader = req.headers.authorization;
 
@@ -24,9 +20,7 @@ export async function verifyAuth(
     const token = authHeader.split(" ")[1];
 
     if (!token) {
-      console.error(
-        "Failed to verify auth: Access token not provided in authorization bearer",
-      );
+      console.error("Failed to verify auth: Access token not provided in authorization bearer");
 
       res.status(401).json({
         message: "Failed to verify auth",
@@ -45,8 +39,7 @@ export async function verifyAuth(
 
     next();
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to verify auth:", errorMessage);
 

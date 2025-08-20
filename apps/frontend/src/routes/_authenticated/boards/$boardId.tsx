@@ -3,10 +3,7 @@ import { useBoards } from "@/hooks/use-boards";
 import { useLists } from "@/hooks/use-lists";
 import { createFileRoute } from "@tanstack/react-router";
 import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import List from "@/components/lists/list";
 import { useCards } from "@/hooks/use-cards";
 import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
@@ -45,21 +42,11 @@ function DynamicBoards() {
     // updateCardPositionMutation,
   } = useCards(boardId);
 
-  const useCreateCardDialogReturn = useCreateCardDialog(
-    cards,
-    createCardMutation,
-  );
+  const useCreateCardDialogReturn = useCreateCardDialog(cards, createCardMutation);
 
   const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
-  const {
-    containers,
-    activeList,
-    activeCard,
-    handleDragStart,
-    handleDragOver,
-    handleDragEnd,
-  } = useDND(lists, cards);
+  const { containers, activeList, activeCard, handleDragStart, handleDragOver, handleDragEnd } = useDND(lists, cards);
 
   const board = boards?.find((board) => board.id === boardId);
 
@@ -93,12 +80,8 @@ function DynamicBoards() {
                 updateListMutation={updateListMutation}
                 deleteListMutation={deleteListMutation}
                 deleteCardMutation={deleteCardMutation}
-                openCreateCardDialog={
-                  useCreateCardDialogReturn.openCreateCardDialog
-                }
-                openUpdateCardDialog={
-                  useUpdateCardDialogReturn.openUpdateCardDialog
-                }
+                openCreateCardDialog={useCreateCardDialogReturn.openCreateCardDialog}
+                openUpdateCardDialog={useUpdateCardDialogReturn.openUpdateCardDialog}
               />
             );
           })}
@@ -107,21 +90,13 @@ function DynamicBoards() {
           {activeList && (
             <ListOverlay
               listTitle={activeList.title}
-              cards={
-                containers.find(
-                  (container) => container.list.id === activeList.id,
-                )?.cards || []
-              }
+              cards={containers.find((container) => container.list.id === activeList.id)?.cards || []}
             />
           )}
           {activeCard && <CardButtonOverlay title={activeCard.title} />}
         </DragOverlay>
       </DndContext>
-      <CreateListPopover
-        boardId={boardId}
-        lists={lists}
-        createListMutation={createListMutation}
-      />
+      <CreateListPopover boardId={boardId} lists={lists} createListMutation={createListMutation} />
       <CreateCardDialog {...useCreateCardDialogReturn} />
       <UpdateCardDialog {...useUpdateCardDialogReturn} />
     </div>

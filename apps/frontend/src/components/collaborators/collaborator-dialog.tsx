@@ -9,14 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useAuth } from "@/hooks/use-auth";
 import { COLLABORATOR, OWNER } from "@/lib/constants";
@@ -61,10 +54,7 @@ export function CollaboratorDialog({
 
     return collaborators.map((collaborator) => {
       const { id, given_name, family_name, email, role } = collaborator;
-      const isDisabled =
-        currentCollaborator!.role === OWNER
-          ? id === user!.id && role === OWNER
-          : id !== user!.id;
+      const isDisabled = currentCollaborator!.role === OWNER ? id === user!.id && role === OWNER : id !== user!.id;
 
       return (
         <div key={id} className="flex justify-between items-center gap-2">
@@ -75,9 +65,7 @@ export function CollaboratorDialog({
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
               <span className="truncate font-medium">{`${given_name} ${family_name}`}</span>
-              <span className="text-muted-foreground truncate text-xs">
-                {email}
-              </span>
+              <span className="text-muted-foreground truncate text-xs">{email}</span>
             </div>
           </div>
           <CollaboratorRoleSelect
@@ -90,37 +78,21 @@ export function CollaboratorDialog({
         </div>
       );
     });
-  }, [
-    collaborators,
-    currentCollaborator,
-    user,
-    boardId,
-    removeCollaboratorMutation,
-    isLoading,
-  ]);
+  }, [collaborators, currentCollaborator, user, boardId, removeCollaboratorMutation, isLoading]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Manage collaborators</DialogTitle>
-          <DialogDescription>
-            Add and remove board collaborators here.
-          </DialogDescription>
+          <DialogDescription>Add and remove board collaborators here.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="email"
-              disabled={
-                (currentCollaborator &&
-                  currentCollaborator.role === COLLABORATOR) ||
-                isLoading
-              }
+              disabled={(currentCollaborator && currentCollaborator.role === COLLABORATOR) || isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>
@@ -133,11 +105,7 @@ export function CollaboratorDialog({
             />
             <Button
               type="submit"
-              disabled={
-                (currentCollaborator &&
-                  currentCollaborator.role === COLLABORATOR) ||
-                isLoading
-              }
+              disabled={(currentCollaborator && currentCollaborator.role === COLLABORATOR) || isLoading}
             >
               {form.formState.isSubmitting ? "Inviting..." : "Invite"}
             </Button>
@@ -156,9 +124,7 @@ export function CollaboratorDialog({
             collaboratorsList
           )}
         </div>
-        {error && (
-          <ErrorAlert title="Failed to add collaborator" error={error} />
-        )}
+        {error && <ErrorAlert title="Failed to add collaborator" error={error} />}
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline">

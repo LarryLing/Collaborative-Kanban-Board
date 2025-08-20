@@ -23,9 +23,7 @@ export const SignupSchema = z
       .regex(/[!@#$%^&*(),.?":{}|<>]/, {
         message: "Password must contain at least one special character",
       }),
-    confirmPassword: z
-      .string()
-      .min(1, { message: "Invalid password confirmation" }),
+    confirmPassword: z.string().min(1, { message: "Invalid password confirmation" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -33,9 +31,7 @@ export const SignupSchema = z
   });
 
 export const ConfirmSignupSchema = z.object({
-  confirmationCode: z
-    .string()
-    .length(6, { message: "Confirmation code must be 6 digits long" }),
+  confirmationCode: z.string().length(6, { message: "Confirmation code must be 6 digits long" }),
 });
 
 export const ForgotPasswordSchema = z.object({
@@ -44,9 +40,7 @@ export const ForgotPasswordSchema = z.object({
 
 export const ResetPasswordSchema = z
   .object({
-    confirmationCode: z
-      .string()
-      .length(6, { message: "Confirmation code must be 6 digits long" }),
+    confirmationCode: z.string().length(6, { message: "Confirmation code must be 6 digits long" }),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long" })
@@ -60,9 +54,7 @@ export const ResetPasswordSchema = z
       .regex(/[!@#$%^&*(),.?":{}|<>]/, {
         message: "Password must contain at least one special character",
       }),
-    confirmPassword: z
-      .string()
-      .min(1, { message: "Invalid password confirmation" }),
+    confirmPassword: z.string().min(1, { message: "Invalid password confirmation" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

@@ -1,8 +1,4 @@
-import type {
-  Board,
-  UpdateBoardForm,
-  UseUpdateBoardDialogReturnType,
-} from "@/lib/types";
+import type { Board, UpdateBoardForm, UseUpdateBoardDialogReturnType } from "@/lib/types";
 import { useCallback, useState } from "react";
 import { UpdateBoardSchema } from "@/lib/schemas";
 import { useBoards } from "@/hooks/use-boards";
@@ -25,8 +21,7 @@ export function useUpdateBoardDialog(): UseUpdateBoardDialogReturnType {
   const onSubmit = async (values: UpdateBoardForm) => {
     await updateBoardMutation({
       boardId,
-      boardTitle:
-        values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
+      boardTitle: values.boardTitle.length > 0 ? values.boardTitle : "Untitled Board",
     });
 
     setOpen(false);

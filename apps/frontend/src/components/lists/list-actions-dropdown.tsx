@@ -14,11 +14,7 @@ type ListActionsDropdownProps = {
   deleteListMutation: UseListsReturnType["deleteListMutation"];
 };
 
-export default function ListActionsDropdown({
-  boardId,
-  listId,
-  deleteListMutation,
-}: ListActionsDropdownProps) {
+export default function ListActionsDropdown({ boardId, listId, deleteListMutation }: ListActionsDropdownProps) {
   const handleDeleteListMutation = async () => {
     await deleteListMutation({ boardId, listId });
   };
@@ -32,10 +28,7 @@ export default function ListActionsDropdown({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-24 rounded-lg">
-        <DropdownMenuItem
-          variant="destructive"
-          onClick={handleDeleteListMutation}
-        >
+        <DropdownMenuItem variant="destructive" onClick={handleDeleteListMutation}>
           <Trash />
           <span>Delete</span>
         </DropdownMenuItem>

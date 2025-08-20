@@ -1,11 +1,4 @@
-import type {
-  Board,
-  UpdateCardForm,
-  List,
-  UseCardsReturnType,
-  UseUpdateCardDialogReturnType,
-  Card,
-} from "@/lib/types";
+import type { Board, UpdateCardForm, List, UseCardsReturnType, UseUpdateCardDialogReturnType, Card } from "@/lib/types";
 import { useCallback, useState } from "react";
 import { UpdateCardSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
@@ -32,8 +25,7 @@ export function useUpdateCardDialog(
       boardId,
       listId,
       cardId,
-      cardTitle:
-        values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
+      cardTitle: values.cardTitle.length > 0 ? values.cardTitle : "Untitled Card",
       cardDescription: values.cardDescription,
     });
 

@@ -9,41 +9,21 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import {
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-  Form,
-} from "../ui/form";
+import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import type { UseUpdateCardDialogReturnType } from "@/lib/types";
 
-type UpdateCardDialogProps = Pick<
-  UseUpdateCardDialogReturnType,
-  "open" | "setOpen" | "form" | "onSubmit"
->;
+type UpdateCardDialogProps = Pick<UseUpdateCardDialogReturnType, "open" | "setOpen" | "form" | "onSubmit">;
 
-export function UpdateCardDialog({
-  open,
-  setOpen,
-  form,
-  onSubmit,
-}: UpdateCardDialogProps) {
+export function UpdateCardDialog({ open, setOpen, form, onSubmit }: UpdateCardDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Update card</DialogTitle>
-          <DialogDescription>
-            Edit the title and description of the card here.
-          </DialogDescription>
+          <DialogDescription>Edit the title and description of the card here.</DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col gap-y-4"
-          >
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="cardTitle"

@@ -41,12 +41,8 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <NavMainMemo
-          openUpdateBoardDialog={
-            useUpdateBoardDialogReturn.openUpdateBoardDialog
-          }
-          openCollaboratorDialog={
-            useCollaboratorDialogReturn.openCollaboratorDialog
-          }
+          openUpdateBoardDialog={useUpdateBoardDialogReturn.openUpdateBoardDialog}
+          openCollaboratorDialog={useCollaboratorDialogReturn.openCollaboratorDialog}
         />
         <UpdateBoardDialog {...useUpdateBoardDialogReturn} />
         <CollaboratorDialog {...useCollaboratorDialogReturn} />

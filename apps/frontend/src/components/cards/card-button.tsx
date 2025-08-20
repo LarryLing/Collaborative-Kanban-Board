@@ -1,20 +1,11 @@
-import type {
-  Board,
-  Card,
-  List,
-  UseCardsReturnType,
-  UseUpdateCardDialogReturnType,
-} from "@/lib/types";
+import type { Board, Card, List, UseCardsReturnType, UseUpdateCardDialogReturnType } from "@/lib/types";
 import { GripVertical } from "lucide-react";
 import CardActionsDropdown from "./card-actions-dropdown";
 import { CARD } from "@/lib/constants";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-type CardButtonProps = Pick<
-  Card,
-  "id" | "title" | "description" | "position"
-> & {
+type CardButtonProps = Pick<Card, "id" | "title" | "description" | "position"> & {
   boardId: Board["id"];
   listId: List["id"];
   deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
@@ -31,21 +22,20 @@ export default function CardButton({
   deleteCardMutation,
   openUpdateCardDialog,
 }: CardButtonProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id,
-      data: {
-        type: CARD,
-        card: {
-          id,
-          board_id: boardId,
-          list_id: listId,
-          title,
-          description,
-          position,
-        },
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id,
+    data: {
+      type: CARD,
+      card: {
+        id,
+        board_id: boardId,
+        list_id: listId,
+        title,
+        description,
+        position,
       },
-    });
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -68,12 +58,7 @@ export default function CardButton({
         </div>
         <p className="max-w-[180px] truncate ">{title}</p>
       </div>
-      <CardActionsDropdown
-        boardId={boardId}
-        listId={listId}
-        cardId={id}
-        deleteCardMutation={deleteCardMutation}
-      />
+      <CardActionsDropdown boardId={boardId} listId={listId} cardId={id} deleteCardMutation={deleteCardMutation} />
     </div>
   );
 }

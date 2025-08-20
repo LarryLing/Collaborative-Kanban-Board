@@ -11,10 +11,7 @@ import type {
 import type { ResultSetHeader } from "mysql2/promise";
 import db from "../config/db";
 
-export async function getAllCards(
-  req: CollaboratorRequest<{ boardId: Board["id"] }>,
-  res: Response,
-) {
+export async function getAllCards(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;
 
   try {
@@ -31,12 +28,9 @@ export async function getAllCards(
       return 0;
     });
 
-    res
-      .status(200)
-      .json({ message: "Successfully retrieved cards", data: sortedLists });
+    res.status(200).json({ message: "Successfully retrieved cards", data: sortedLists });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to retrieve cards", errorMessage);
 
@@ -48,11 +42,7 @@ export async function getAllCards(
 }
 
 export async function createCard(
-  req: CollaboratorRequest<
-    { boardId: Board["id"]; listId: List["id"] },
-    object,
-    CreateCardBody
-  >,
+  req: CollaboratorRequest<{ boardId: Board["id"]; listId: List["id"] }, object, CreateCardBody>,
   res: Response,
 ) {
   const { boardId, listId } = req.params;
@@ -67,8 +57,7 @@ export async function createCard(
 
     res.status(201).json({ message: "Successfully created card" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to create card", errorMessage);
 
@@ -80,11 +69,7 @@ export async function createCard(
 }
 
 export async function updateCard(
-  req: CollaboratorRequest<
-    { boardId: Board["id"]; listId: List["id"]; cardId: Card["id"] },
-    object,
-    UpdateCardBody
-  >,
+  req: CollaboratorRequest<{ boardId: Board["id"]; listId: List["id"]; cardId: Card["id"] }, object, UpdateCardBody>,
   res: Response,
 ) {
   const { boardId, listId, cardId } = req.params;
@@ -111,8 +96,7 @@ export async function updateCard(
 
     res.status(200).json({ message: "Successfully updated card" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to update card", errorMessage);
 
@@ -143,9 +127,7 @@ export async function updateCardPosition(
     );
 
     if (result.affectedRows === 0) {
-      console.error(
-        "Failed to update card position: Could not find card in database",
-      );
+      console.error("Failed to update card position: Could not find card in database");
 
       res.status(404).json({
         message: "Failed to update card position",
@@ -157,8 +139,7 @@ export async function updateCardPosition(
 
     res.status(200).json({ message: "Successfully updated card position" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to update card position", errorMessage);
 
@@ -188,8 +169,7 @@ export async function deleteCard(
 
     res.status(200).json({ message: "Successfully deleted card" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to delete card", errorMessage);
 

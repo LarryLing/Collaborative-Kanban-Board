@@ -30,9 +30,7 @@ import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
 export async function getMe(req: AuthRequest, res: Response) {
   try {
     if (!req.auth) {
-      console.error(
-        "Failed to get user: User is not authorized to make request",
-      );
+      console.error("Failed to get user: User is not authorized to make request");
 
       res.status(401).json({
         message: "Failed to get user",
@@ -55,24 +53,18 @@ export async function getMe(req: AuthRequest, res: Response) {
       return;
     }
 
-    const getTokensFromRefreshTokenCommand =
-      new GetTokensFromRefreshTokenCommand({
-        ClientId: COGNITO_CLIENT_ID,
-        RefreshToken: refreshToken,
-      });
+    const getTokensFromRefreshTokenCommand = new GetTokensFromRefreshTokenCommand({
+      ClientId: COGNITO_CLIENT_ID,
+      RefreshToken: refreshToken,
+    });
 
-    const getTokensFromRefreshTokenResponse = await cognito.send(
-      getTokensFromRefreshTokenCommand,
-    );
+    const getTokensFromRefreshTokenResponse = await cognito.send(getTokensFromRefreshTokenCommand);
 
     if (!getTokensFromRefreshTokenResponse.AuthenticationResult) {
-      throw new Error(
-        "Could not regenerate tokens with the provided refresh token",
-      );
+      throw new Error("Could not regenerate tokens with the provided refresh token");
     }
 
-    const { IdToken, AccessToken, RefreshToken } =
-      getTokensFromRefreshTokenResponse.AuthenticationResult;
+    const { IdToken, AccessToken, RefreshToken } = getTokensFromRefreshTokenResponse.AuthenticationResult;
 
     if (!IdToken || !AccessToken || !RefreshToken) {
       throw new Error("User pool tokens were not generated");
@@ -93,8 +85,7 @@ export async function getMe(req: AuthRequest, res: Response) {
       },
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to get user:", errorMessage);
 
@@ -105,10 +96,7 @@ export async function getMe(req: AuthRequest, res: Response) {
   }
 }
 
-export async function resetPassword(
-  req: Request<object, object, PasswordResetBody>,
-  res: Response,
-) {
+export async function resetPassword(req: Request<object, object, PasswordResetBody>, res: Response) {
   try {
     const { email, confirmationCode, password } = req.body;
 
@@ -125,8 +113,7 @@ export async function resetPassword(
       message: "Successfully reset password",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to reset password:", errorMessage);
 
@@ -137,10 +124,7 @@ export async function resetPassword(
   }
 }
 
-export async function confirmSignUp(
-  req: Request<object, object, ConfirmSignUpBody>,
-  res: Response,
-) {
+export async function confirmSignUp(req: Request<object, object, ConfirmSignUpBody>, res: Response) {
   try {
     const { email, confirmationCode } = req.body;
 
@@ -156,8 +140,7 @@ export async function confirmSignUp(
       message: "Successfully logged in new user",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to login new user:", errorMessage);
 
@@ -168,10 +151,7 @@ export async function confirmSignUp(
   }
 }
 
-export async function signUp(
-  req: Request<object, object, SignUpBody>,
-  res: Response,
-) {
+export async function signUp(req: Request<object, object, SignUpBody>, res: Response) {
   try {
     const { given_name, family_name, email, password } = req.body;
 
@@ -207,8 +187,7 @@ export async function signUp(
       message: "Successfully signed up new user",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to sign up new user:", errorMessage);
 
@@ -219,10 +198,7 @@ export async function signUp(
   }
 }
 
-export async function resendSignUp(
-  req: Request<object, object, RequestConfirmationCode>,
-  res: Response,
-) {
+export async function resendSignUp(req: Request<object, object, RequestConfirmationCode>, res: Response) {
   try {
     const { email } = req.body;
 
@@ -237,8 +213,7 @@ export async function resendSignUp(
       message: "Successfully resent sign up confirmation code",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to resend sign up confirmation code:", errorMessage);
 
@@ -249,10 +224,7 @@ export async function resendSignUp(
   }
 }
 
-export async function login(
-  req: Request<object, object, LoginBody>,
-  res: Response,
-) {
+export async function login(req: Request<object, object, LoginBody>, res: Response) {
   try {
     const { email, password } = req.body;
     const admininitiateAuthCommand = new AdminInitiateAuthCommand({
@@ -271,8 +243,7 @@ export async function login(
       throw new Error("Could not initiate auth with the provided credentials");
     }
 
-    const { IdToken, AccessToken, RefreshToken } =
-      initiateAuthResponse.AuthenticationResult;
+    const { IdToken, AccessToken, RefreshToken } = initiateAuthResponse.AuthenticationResult;
 
     if (!IdToken || !AccessToken || !RefreshToken) {
       throw new Error("User pool tokens were not generated");
@@ -309,8 +280,7 @@ export async function login(
       },
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to login returning user:", errorMessage);
 
@@ -324,9 +294,7 @@ export async function login(
 export async function logout(req: AuthRequest, res: Response) {
   try {
     if (!req.auth) {
-      console.error(
-        "Failed to logout user: User is not authorized to make request",
-      );
+      console.error("Failed to logout user: User is not authorized to make request");
 
       res.status(401).json({
         message: "Failed to logout user",
@@ -369,8 +337,7 @@ export async function logout(req: AuthRequest, res: Response) {
       message: "Logged out successfully",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to logout user", errorMessage);
 
@@ -381,10 +348,7 @@ export async function logout(req: AuthRequest, res: Response) {
   }
 }
 
-export async function requestPasswordReset(
-  req: AuthRequest<object, object, RequestConfirmationCode>,
-  res: Response,
-) {
+export async function requestPasswordReset(req: AuthRequest<object, object, RequestConfirmationCode>, res: Response) {
   try {
     const { email } = req.body;
 
@@ -399,8 +363,7 @@ export async function requestPasswordReset(
       message: "Successfully request password reset",
     });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to request password reset:", errorMessage);
 
@@ -414,9 +377,7 @@ export async function requestPasswordReset(
 export async function deleteUser(req: AuthRequest, res: Response) {
   try {
     if (!req.auth) {
-      console.error(
-        "Failed to delete user: User is not authorized to make request",
-      );
+      console.error("Failed to delete user: User is not authorized to make request");
 
       res.status(401).json({
         message: "Failed to delete user",
@@ -463,13 +424,10 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
     res.status(200).json({ message: "Successfully deleted user" });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
     console.error("Failed to delete user:", errorMessage);
 
-    res
-      .status(500)
-      .json({ message: "Failed to delete user", error: errorMessage });
+    res.status(500).json({ message: "Failed to delete user", error: errorMessage });
   }
 }

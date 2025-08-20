@@ -19,8 +19,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { data } = await response.json();
       const { idToken, accessToken: newAccessToken } = data;
 
-      const { sub, email, given_name, family_name } =
-        jwtDecode<IDTokenPayload>(idToken);
+      const { sub, email, given_name, family_name } = jwtDecode<IDTokenPayload>(idToken);
 
       setUser({
         id: sub,
@@ -32,8 +31,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.setItem("accessToken", newAccessToken as string);
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to load user:", errorMessage);
 
@@ -44,20 +42,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const resetPassword = async (
-    email: string,
-    password: string,
-    confirmationCode: string,
-  ) => {
+  const resetPassword = async (email: string, password: string, confirmationCode: string) => {
     try {
-      await invokeAPI(
-        "/api/auth/reset-password",
-        "PUT",
-        JSON.stringify({ email, password, confirmationCode }),
-      );
+      await invokeAPI("/api/auth/reset-password", "PUT", JSON.stringify({ email, password, confirmationCode }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to reset password:", errorMessage);
 
@@ -67,14 +56,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const confirmSignUp = async (email: string, confirmationCode: string) => {
     try {
-      await invokeAPI(
-        "/api/auth/confirm-signup",
-        "POST",
-        JSON.stringify({ email, confirmationCode }),
-      );
+      await invokeAPI("/api/auth/confirm-signup", "POST", JSON.stringify({ email, confirmationCode }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to login new user:", errorMessage);
 
@@ -82,21 +66,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signUp = async (
-    given_name: string,
-    family_name: string,
-    email: string,
-    password: string,
-  ) => {
+  const signUp = async (given_name: string, family_name: string, email: string, password: string) => {
     try {
-      await invokeAPI(
-        "/api/auth/signup",
-        "POST",
-        JSON.stringify({ given_name, family_name, email, password }),
-      );
+      await invokeAPI("/api/auth/signup", "POST", JSON.stringify({ given_name, family_name, email, password }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to sign up new user:", errorMessage);
 
@@ -106,19 +80,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const resendSignUp = async (email: string) => {
     try {
-      await invokeAPI(
-        "/api/auth/signup/resend",
-        "POST",
-        JSON.stringify({ email }),
-      );
+      await invokeAPI("/api/auth/signup/resend", "POST", JSON.stringify({ email }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
-      console.error(
-        "Failed to resend sign up confirmation code:",
-        errorMessage,
-      );
+      console.error("Failed to resend sign up confirmation code:", errorMessage);
 
       throw error;
     }
@@ -126,11 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await invokeAPI(
-        "/api/auth/login",
-        "POST",
-        JSON.stringify({ email, password }),
-      );
+      const response = await invokeAPI("/api/auth/login", "POST", JSON.stringify({ email, password }));
       const { data } = await response.json();
       const { accessToken } = data;
 
@@ -138,8 +100,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       await loadUser();
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to login returning user:", errorMessage);
 
@@ -156,8 +117,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       localStorage.removeItem("accessToken");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to logout user", errorMessage);
 
@@ -167,14 +127,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const requestPasswordReset = async (email: string) => {
     try {
-      await invokeAPI(
-        "/api/auth/reset-password",
-        "POST",
-        JSON.stringify({ email }),
-      );
+      await invokeAPI("/api/auth/reset-password", "POST", JSON.stringify({ email }));
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to request password reset:", errorMessage);
 
@@ -186,8 +141,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/me", "DELETE");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Unknown error";
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
       console.error("Failed to delete user:", errorMessage);
 
@@ -217,9 +171,5 @@ export function AuthProvider({ children }: AuthProviderProps) {
     deleteAccount,
   };
 
-  return (
-    <AuthContext.Provider value={contextValue}>
-      {isLoading ? null : children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={contextValue}>{isLoading ? null : children}</AuthContext.Provider>;
 }

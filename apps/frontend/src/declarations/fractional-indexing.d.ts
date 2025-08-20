@@ -6,11 +6,7 @@ declare module "fractional-indexing" {
    * @param digits - Optional custom digits string
    * @returns A fractional index string between a and b
    */
-  export function generateKeyBetween(
-    a?: string | null,
-    b?: string | null,
-    digits?: string,
-  ): string;
+  export function generateKeyBetween(a?: string | null, b?: string | null, digits?: string): string;
 
   /**
    * Generate n fractional indices between two given indices
@@ -20,10 +16,5 @@ declare module "fractional-indexing" {
    * @param digits - Optional custom digits string
    * @returns An array of n fractional index strings between a and b
    */
-  export function generateNKeysBetween(
-    a: string | null,
-    b: string | null,
-    n: number,
-    digits?: string,
-  ): string[];
+  export function generateNKeysBetween(a: string | null, b: string | null, n: number, digits?: string): string[];
 }

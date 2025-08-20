@@ -26,9 +26,7 @@ function Account() {
           <Label htmlFor="theme" className="font-semibold">
             Delete Account
           </Label>
-          <p className="text-sm">
-            Permanently delete the account and remove access from all boards.
-          </p>
+          <p className="text-sm">Permanently delete the account and remove access from all boards.</p>
         </div>
         <DeleteAccountDialog />
       </div>

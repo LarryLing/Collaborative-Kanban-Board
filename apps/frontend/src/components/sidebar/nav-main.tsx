@@ -10,10 +10,7 @@ import { useBoards } from "@/hooks/use-boards";
 import { Link } from "@tanstack/react-router";
 import { Button } from "../ui/button";
 import { CreateBoardDialog } from "../boards/create-board-dialog";
-import type {
-  UseCollaboratorDialogReturnType,
-  UseUpdateBoardDialogReturnType,
-} from "@/lib/types";
+import type { UseCollaboratorDialogReturnType, UseUpdateBoardDialogReturnType } from "@/lib/types";
 import { memo } from "react";
 import { SidebarBoardMenuItemMemo } from "./sidebar-board-menu-item";
 
@@ -24,10 +21,7 @@ type NavMainProps = {
   openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
 };
 
-function NavMain({
-  openUpdateBoardDialog,
-  openCollaboratorDialog,
-}: NavMainProps) {
+function NavMain({ openUpdateBoardDialog, openCollaboratorDialog }: NavMainProps) {
   const { boards, isLoading, refetch } = useBoards();
 
   const handleRefetch = async () => {
@@ -40,12 +34,7 @@ function NavMain({
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
             <CreateBoardDialog />
-            <Button
-              size="icon"
-              className="size-8 group-data-[collapsible=icon]:opacity-0"
-              variant="outline"
-              asChild
-            >
+            <Button size="icon" className="size-8 group-data-[collapsible=icon]:opacity-0" variant="outline" asChild>
               <Link to="/boards">
                 <House />
                 <span className="sr-only">Boards</span>
