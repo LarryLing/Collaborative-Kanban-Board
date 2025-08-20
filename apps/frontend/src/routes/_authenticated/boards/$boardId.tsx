@@ -2,29 +2,22 @@ import CreateListPopover from "@/components/lists/create-list-popover";
 import { useBoards } from "@/hooks/use-boards";
 import { useLists } from "@/hooks/use-lists";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  closestCorners,
-  DndContext,
-  DragOverlay,
-  type DragEndEvent,
-  type DragStartEvent,
-} from "@dnd-kit/core";
+import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
 import {
   SortableContext,
   horizontalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { generateKeyBetween } from "fractional-indexing";
 import List from "@/components/lists/list";
-import { useState } from "react";
-import type { List as ListType } from "@/lib/types";
-import { LIST } from "@/lib/constants";
-import ListOverlay from "@/components/lists/list-overlay";
 import { useCards } from "@/hooks/use-cards";
 import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
 import { CreateCardDialog } from "@/components/cards/create-card-dialog";
 import { useUpdateCardDialog } from "@/hooks/use-update-card-dialog";
 import { UpdateCardDialog } from "@/components/cards/update-card-dialog";
+import CardButtonOverlay from "@/components/cards/card-button-overlay";
+import ListOverlay from "@/components/lists/list-overlay";
+import { useDND } from "@/hooks/use-dnd";
 
+//TODO: Add check for user access permissions before loading page
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   component: DynamicBoards,
 });
@@ -40,86 +33,33 @@ function DynamicBoards() {
     createListMutation,
     deleteListMutation,
     updateListMutation,
-    updateListPositionMutation,
+    // updateListPositionMutation,
   } = useLists(boardId);
 
   const {
-    cardsMap,
+    cards,
     isLoading: isCardsLoading,
     createCardMutation,
     deleteCardMutation,
     updateCardMutation,
+    // updateCardPositionMutation,
   } = useCards(boardId);
 
   const useCreateCardDialogReturn = useCreateCardDialog(
-    cardsMap,
+    cards,
     createCardMutation,
   );
 
   const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
-  const [activeList, setActiveList] = useState<ListType | null>(null);
-
-  const handleDragStart = (event: DragStartEvent) => {
-    if (!lists) return;
-
-    const { active } = event;
-
-    if (active.data.current?.type === LIST) {
-      setActiveList(() => {
-        return lists.find((list) => list.id === active.id) || null;
-      });
-    }
-  };
-
-  const handleDragEnd = async (event: DragEndEvent) => {
-    if (!lists) return;
-
-    const { active, over } = event;
-
-    if (!over) return;
-    if (active.id === over.id) return;
-
-    const activeListIndex = lists.findIndex((list) => list.id === active.id);
-    const overListIndex = lists.findIndex((list) => list.id === over.id);
-
-    let newListPosition;
-    if (activeListIndex < overListIndex) {
-      if (overListIndex + 1 >= lists.length) {
-        newListPosition = generateKeyBetween(
-          lists[overListIndex].position,
-          null,
-        );
-      } else {
-        newListPosition = generateKeyBetween(
-          lists[overListIndex].position,
-          lists[overListIndex + 1].position,
-        );
-      }
-    } else if (activeListIndex > overListIndex) {
-      if (overListIndex - 1 < 0) {
-        newListPosition = generateKeyBetween(
-          null,
-          lists[overListIndex].position,
-        );
-      } else {
-        newListPosition = generateKeyBetween(
-          lists[overListIndex - 1].position,
-          lists[overListIndex].position,
-        );
-      }
-    } else {
-      return;
-    }
-
-    setActiveList(null);
-
-    await updateListPositionMutation({
-      boardId,
-      listId: active.id as string,
-      listPosition: newListPosition,
-    });
-  };
+  const {
+    containers,
+    activeList,
+    activeCard,
+    handleDragStart,
+    handleDragOver,
+    handleDragEnd,
+  } = useDND(lists, cards);
 
   const board = boards?.find((board) => board.id === boardId);
 
@@ -134,22 +74,22 @@ function DynamicBoards() {
   return (
     <div className="flex justify-start items-start gap-3 overflow-auto text-sm">
       <DndContext
-        collisionDetection={closestCorners}
+        collisionDetection={closestCenter}
         onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={lists.map((list) => list.id)}
+          items={containers.map((container) => container.list.id)}
           strategy={horizontalListSortingStrategy}
         >
-          {lists.map((list) => {
+          {containers.map((container) => {
             return (
               <List
-                key={list.id}
-                cards={cardsMap?.get(list.id) || []}
+                key={container.list.id}
+                {...container.list}
                 boardId={boardId}
-                listId={list.id}
-                listTitle={list.title}
+                cards={container.cards}
                 updateListMutation={updateListMutation}
                 deleteListMutation={deleteListMutation}
                 deleteCardMutation={deleteCardMutation}
@@ -167,9 +107,14 @@ function DynamicBoards() {
           {activeList && (
             <ListOverlay
               listTitle={activeList.title}
-              cards={cardsMap?.get(activeList.id) || []}
+              cards={
+                containers.find(
+                  (container) => container.list.id === activeList.id,
+                )?.cards || []
+              }
             />
           )}
+          {activeCard && <CardButtonOverlay title={activeCard.title} />}
         </DragOverlay>
       </DndContext>
       <CreateListPopover

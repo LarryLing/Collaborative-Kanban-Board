@@ -12,13 +12,15 @@ type ListOverlayProps = {
 
 export default function ListOverlay({ listTitle, cards }: ListOverlayProps) {
   return (
-    <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border">
+    <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border opacity-50">
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2">
-          <GripVertical className="size-4" />
+          <div className="cursor-grab">
+            <GripVertical className="size-4" />
+          </div>
           <Badge variant="secondary">{listTitle}</Badge>
           <Badge variant="outline" className="size-5">
-            0
+            {cards.length}
           </Badge>
         </div>
         <div className="flex justify-center items-center gap-1">

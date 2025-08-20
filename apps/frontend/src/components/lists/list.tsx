@@ -11,7 +11,11 @@ import UpdateListPopover from "./update-list-popover";
 import { useState } from "react";
 import ListActionsDropdown from "./list-actions-dropdown";
 import { GripVertical } from "lucide-react";
-import { useSortable } from "@dnd-kit/sortable";
+import {
+  verticalListSortingStrategy,
+  SortableContext,
+  useSortable,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { LIST } from "@/lib/constants";
 import { Badge } from "../ui/badge";
@@ -19,12 +23,11 @@ import CreateCardIconButton from "../cards/create-card-icon-button";
 import CreateCardButton from "../cards/create-card-button";
 import { Card } from "../ui/card";
 import CardButton from "../cards/card-button";
+import CardButtonOverlay from "../cards/card-button-overlay";
 
-type ListProps = {
+type ListProps = Pick<List, "id" | "title" | "position"> & {
   boardId: Board["id"];
   cards: CardType[];
-  listId: List["id"];
-  listTitle: List["title"];
   updateListMutation: UseListsReturnType["updateListMutation"];
   deleteListMutation: UseListsReturnType["deleteListMutation"];
   deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
@@ -33,10 +36,11 @@ type ListProps = {
 };
 
 export default function List({
+  id,
+  title,
+  position,
   boardId,
   cards,
-  listId,
-  listTitle,
   updateListMutation,
   deleteListMutation,
   deleteCardMutation,
@@ -53,9 +57,15 @@ export default function List({
     transition,
     isDragging,
   } = useSortable({
-    id: listId,
+    id,
     data: {
       type: LIST,
+      list: {
+        id,
+        board_id: boardId,
+        title,
+        position,
+      },
     },
   });
 
@@ -65,10 +75,7 @@ export default function List({
   };
 
   return (
-    <Card
-      className={`flex-shrink-0 gap-3 w-[275px] p-2 border ${isDragging && "opacity-50"}`}
-      style={style}
-    >
+    <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border" style={style}>
       <div className="flex justify-between items-center gap-2">
         <div className="flex items-center gap-2">
           <div
@@ -83,8 +90,8 @@ export default function List({
             open={open}
             setOpen={setOpen}
             boardId={boardId}
-            listId={listId}
-            listTitle={listTitle}
+            listId={id}
+            listTitle={title}
             updateListMutation={updateListMutation}
           />
           <Badge variant="outline" className="size-5">
@@ -94,30 +101,41 @@ export default function List({
         <div className="flex justify-center items-center gap-1">
           <CreateCardIconButton
             boardId={boardId}
-            listId={listId}
+            listId={id}
             openCreateCardDialog={openCreateCardDialog}
           />
           <ListActionsDropdown
             boardId={boardId}
-            listId={listId}
+            listId={id}
             deleteListMutation={deleteListMutation}
           />
         </div>
       </div>
       <div className="flex flex-col gap-y-2">
-        {cards.map((card) => (
-          <CardButton
-            key={card.id}
-            {...card}
-            boardId={boardId}
-            listId={listId}
-            deleteCardMutation={deleteCardMutation}
-            openUpdateCardDialog={openUpdateCardDialog}
-          />
-        ))}
+        {isDragging ? (
+          cards.map((card) => (
+            <CardButtonOverlay key={card.id} title={card.title} />
+          ))
+        ) : (
+          <SortableContext
+            items={cards.map((card) => card.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {cards.map((card) => (
+              <CardButton
+                key={card.id}
+                {...card}
+                boardId={boardId}
+                listId={id}
+                deleteCardMutation={deleteCardMutation}
+                openUpdateCardDialog={openUpdateCardDialog}
+              />
+            ))}
+          </SortableContext>
+        )}
         <CreateCardButton
           boardId={boardId}
-          listId={listId}
+          listId={id}
           openCreateCardDialog={openCreateCardDialog}
         />
       </div>

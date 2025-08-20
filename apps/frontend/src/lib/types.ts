@@ -84,6 +84,11 @@ export type Card = {
   position: string;
 };
 
+export type Container = {
+  list: List;
+  cards: Card[];
+};
+
 export type AuthContextType = {
   user: User | null;
   isAuthenticated: boolean;
@@ -268,7 +273,7 @@ export type UseListsReturnType = {
 };
 
 export type UseCardsReturnType = {
-  cardsMap: Map<string, Card[]> | undefined;
+  cards: Card[] | undefined;
   isLoading: boolean;
   createCardMutation: UseMutateAsyncFunction<
     void,

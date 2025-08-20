@@ -12,7 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { generateKeyBetween } from "fractional-indexing";
 
 export function useCreateCardDialog(
-  cardsMap: UseCardsReturnType["cardsMap"],
+  cards: UseCardsReturnType["cards"],
   createCardMutation: UseCardsReturnType["createCardMutation"],
 ): UseCreateCardDialogReturnType {
   const [open, setOpen] = useState(false);
@@ -28,15 +28,10 @@ export function useCreateCardDialog(
   });
 
   const onSubmit = async (values: CreateCardForm) => {
-    if (!cardsMap) return;
-
-    const cards = cardsMap.get(listId);
-
     if (!cards) return;
 
-    const cardId = crypto.randomUUID();
-
-    const lastCard = cards.at(-1);
+    const filteredCards = cards.filter((card) => card.list_id === listId);
+    const lastCard = filteredCards.at(-1);
 
     let cardPosition;
     if (lastCard) {
@@ -44,6 +39,8 @@ export function useCreateCardDialog(
     } else {
       cardPosition = generateKeyBetween(null, null);
     }
+
+    const cardId = crypto.randomUUID();
 
     await createCardMutation({
       boardId,

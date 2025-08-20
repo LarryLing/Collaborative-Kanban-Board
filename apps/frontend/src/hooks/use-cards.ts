@@ -7,38 +7,38 @@ import {
   updateCardPosition,
 } from "@/api/cards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import { useCallback } from "react";
+// import { useCallback } from "react";
 
 export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const queryClient = useQueryClient();
 
-  const { data: cardsMap, isLoading } = useQuery({
+  const { data: cards, isLoading } = useQuery({
     queryKey: ["cards", boardId],
     queryFn: async () => {
       return await getAllCards({ boardId });
     },
-    select: useCallback(
-      (data: Card[]) => {
-        const cardsMap = new Map<List["id"], Card[]>();
+    // select: useCallback(
+    //   (data: Card[]) => {
+    //     const cardsMap = new Map<List["id"], Card[]>();
 
-        const lists: List[] | undefined = queryClient.getQueryData([
-          "lists",
-          boardId,
-        ]);
+    //     const lists: List[] | undefined = queryClient.getQueryData([
+    //       "lists",
+    //       boardId,
+    //     ]);
 
-        if (!lists) return lists;
+    //     if (!lists) return lists;
 
-        lists.forEach((list) => {
-          cardsMap.set(
-            list.id,
-            data.filter((datum) => datum.list_id === list.id),
-          );
-        });
+    //     lists.forEach((list) => {
+    //       cardsMap.set(
+    //         list.id,
+    //         data.filter((datum) => datum.list_id === list.id),
+    //       );
+    //     });
 
-        return cardsMap;
-      },
-      [boardId, queryClient],
-    ),
+    //     return cardsMap;
+    //   },
+    //   [boardId, queryClient],
+    // ),
   });
 
   const { mutateAsync: createCardMutation } = useMutation({
@@ -219,7 +219,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
   });
 
   return {
-    cardsMap,
+    cards,
     isLoading,
     createCardMutation,
     deleteCardMutation,
