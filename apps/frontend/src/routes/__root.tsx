@@ -1,13 +1,5 @@
-import type { AuthContextType, ThemeContextType } from "@/lib/types";
-import type { QueryClient } from "@tanstack/react-query";
-import { createRootRouteWithContext, Outlet } from "@tanstack/react-router";
+import { createRootRoute, Outlet } from "@tanstack/react-router";
 
-interface MyRouterContext {
-  auth: AuthContextType;
-  queryClient: QueryClient;
-  theme: ThemeContextType;
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRoute({
   component: () => <Outlet />,
 });

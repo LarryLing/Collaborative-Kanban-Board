@@ -2,17 +2,15 @@ import CreateListPopover from "@/components/lists/create-list-popover";
 import { useBoards } from "@/hooks/use-boards";
 import { useLists } from "@/hooks/use-lists";
 import { createFileRoute } from "@tanstack/react-router";
-import { closestCenter, DndContext, DragOverlay } from "@dnd-kit/core";
-import { SortableContext, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import List from "@/components/lists/list";
 import { useCards } from "@/hooks/use-cards";
 import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
 import { CreateCardDialog } from "@/components/cards/create-card-dialog";
 import { useUpdateCardDialog } from "@/hooks/use-update-card-dialog";
 import { UpdateCardDialog } from "@/components/cards/update-card-dialog";
-import CardButtonOverlay from "@/components/cards/card-button-overlay";
-import ListOverlay from "@/components/lists/list-overlay";
-import { useDND } from "@/hooks/use-dnd";
+import { useDnd } from "@/hooks/use-dnd";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import { LIST } from "@/lib/constants";
 
 //TODO: Add check for user access permissions before loading page
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
@@ -46,7 +44,7 @@ function DynamicBoards() {
 
   const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
-  const { containers, activeList, activeCard, handleDragStart, handleDragOver, handleDragEnd } = useDND(lists, cards);
+  const { data, handleDragEnd } = useDnd(lists, cards);
 
   const board = boards?.find((board) => board.id === boardId);
 
@@ -60,42 +58,39 @@ function DynamicBoards() {
 
   return (
     <div className="flex justify-start items-start gap-3 overflow-auto text-sm">
-      <DndContext
-        collisionDetection={closestCenter}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={containers.map((container) => container.list.id)}
-          strategy={horizontalListSortingStrategy}
-        >
-          {containers.map((container) => {
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable droppableId="all-lists" direction="horizontal" type={LIST}>
+          {(provided) => {
             return (
-              <List
-                key={container.list.id}
-                {...container.list}
-                boardId={boardId}
-                cards={container.cards}
-                updateListMutation={updateListMutation}
-                deleteListMutation={deleteListMutation}
-                deleteCardMutation={deleteCardMutation}
-                openCreateCardDialog={useCreateCardDialogReturn.openCreateCardDialog}
-                openUpdateCardDialog={useUpdateCardDialogReturn.openUpdateCardDialog}
-              />
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="flex justify-start items-start gap-3 overflow-auto text-sm"
+              >
+                {data.listOrder.map((listId, index) => {
+                  const list = data.lists[listId];
+                  const cards = list.cardIds.map((cardId) => data.cards[cardId]);
+
+                  return (
+                    <List
+                      key={list.id}
+                      {...list}
+                      cards={cards}
+                      index={index}
+                      updateListMutation={updateListMutation}
+                      deleteListMutation={deleteListMutation}
+                      deleteCardMutation={deleteCardMutation}
+                      openCreateCardDialog={useCreateCardDialogReturn.openCreateCardDialog}
+                      openUpdateCardDialog={useUpdateCardDialogReturn.openUpdateCardDialog}
+                    />
+                  );
+                })}
+                {provided.placeholder}
+              </div>
             );
-          })}
-        </SortableContext>
-        <DragOverlay className="cursor-grabbing">
-          {activeList && (
-            <ListOverlay
-              listTitle={activeList.title}
-              cards={containers.find((container) => container.list.id === activeList.id)?.cards || []}
-            />
-          )}
-          {activeCard && <CardButtonOverlay title={activeCard.title} />}
-        </DragOverlay>
-      </DndContext>
+          }}
+        </Droppable>
+      </DragDropContext>
       <CreateListPopover boardId={boardId} lists={lists} createListMutation={createListMutation} />
       <CreateCardDialog {...useCreateCardDialogReturn} />
       <UpdateCardDialog {...useUpdateCardDialogReturn} />

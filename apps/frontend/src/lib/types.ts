@@ -80,9 +80,16 @@ export type Card = {
   position: string;
 };
 
-export type Container = {
-  list: List;
-  cards: Card[];
+export type DndData = {
+  cards: {
+    [cardId: Card["id"]]: Card;
+  };
+  lists: {
+    [listId: List["id"]]: List & {
+      cardIds: Card["id"][];
+    };
+  };
+  listOrder: List["id"][];
 };
 
 export type AuthContextType = {

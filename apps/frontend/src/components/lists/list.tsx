@@ -1,5 +1,4 @@
 import type {
-  Board,
   Card as CardType,
   List,
   UseCardsReturnType,
@@ -11,19 +10,17 @@ import UpdateListPopover from "./update-list-popover";
 import { useState } from "react";
 import ListActionsDropdown from "./list-actions-dropdown";
 import { GripVertical } from "lucide-react";
-import { verticalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { LIST } from "@/lib/constants";
 import { Badge } from "../ui/badge";
 import CreateCardIconButton from "../cards/create-card-icon-button";
 import CreateCardButton from "../cards/create-card-button";
 import { Card } from "../ui/card";
 import CardButton from "../cards/card-button";
-import CardButtonOverlay from "../cards/card-button-overlay";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
+import { CARD } from "@/lib/constants";
 
-type ListProps = Pick<List, "id" | "title" | "position"> & {
-  boardId: Board["id"];
+type ListProps = Pick<List, "id" | "board_id" | "title"> & {
   cards: CardType[];
+  index: number;
   updateListMutation: UseListsReturnType["updateListMutation"];
   deleteListMutation: UseListsReturnType["deleteListMutation"];
   deleteCardMutation: UseCardsReturnType["deleteCardMutation"];
@@ -33,10 +30,10 @@ type ListProps = Pick<List, "id" | "title" | "position"> & {
 
 export default function List({
   id,
+  board_id,
   title,
-  position,
-  boardId,
   cards,
+  index,
   updateListMutation,
   deleteListMutation,
   deleteCardMutation,
@@ -45,67 +42,59 @@ export default function List({
 }: ListProps) {
   const [open, setOpen] = useState<boolean>(false);
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id,
-    data: {
-      type: LIST,
-      list: {
-        id,
-        board_id: boardId,
-        title,
-        position,
-      },
-    },
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-
   return (
-    <Card className="flex-shrink-0 gap-3 w-[275px] p-2 border" style={style}>
-      <div className="flex justify-between items-center gap-2">
-        <div className="flex items-center gap-2">
-          <div ref={setNodeRef} {...attributes} {...listeners} className="cursor-grab">
-            <GripVertical className="size-4" />
-          </div>
-          <UpdateListPopover
-            open={open}
-            setOpen={setOpen}
-            boardId={boardId}
-            listId={id}
-            listTitle={title}
-            updateListMutation={updateListMutation}
-          />
-          <Badge variant="outline" className="size-5">
-            {cards.length}
-          </Badge>
-        </div>
-        <div className="flex justify-center items-center gap-1">
-          <CreateCardIconButton boardId={boardId} listId={id} openCreateCardDialog={openCreateCardDialog} />
-          <ListActionsDropdown boardId={boardId} listId={id} deleteListMutation={deleteListMutation} />
-        </div>
-      </div>
-      <div className="flex flex-col gap-y-2">
-        {isDragging ? (
-          cards.map((card) => <CardButtonOverlay key={card.id} title={card.title} />)
-        ) : (
-          <SortableContext items={cards.map((card) => card.id)} strategy={verticalListSortingStrategy}>
-            {cards.map((card) => (
-              <CardButton
-                key={card.id}
-                {...card}
-                boardId={boardId}
-                listId={id}
-                deleteCardMutation={deleteCardMutation}
-                openUpdateCardDialog={openUpdateCardDialog}
-              />
-            ))}
-          </SortableContext>
-        )}
-        <CreateCardButton boardId={boardId} listId={id} openCreateCardDialog={openCreateCardDialog} />
-      </div>
-    </Card>
+    <Draggable draggableId={id} index={index}>
+      {(provided) => {
+        return (
+          <Card
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            className="flex-shrink-0 gap-2 w-[275px] p-2 border"
+          >
+            <div className="flex justify-between items-center gap-2">
+              <div className="flex items-center gap-2">
+                <div {...provided.dragHandleProps} className="cursor-grab">
+                  <GripVertical className="size-4" />
+                </div>
+                <UpdateListPopover
+                  open={open}
+                  setOpen={setOpen}
+                  boardId={board_id}
+                  listId={id}
+                  listTitle={title}
+                  updateListMutation={updateListMutation}
+                />
+                <Badge variant="outline" className="size-5">
+                  {cards.length}
+                </Badge>
+              </div>
+              <div className="flex justify-center items-center gap-1">
+                <CreateCardIconButton boardId={board_id} listId={id} openCreateCardDialog={openCreateCardDialog} />
+                <ListActionsDropdown boardId={board_id} listId={id} deleteListMutation={deleteListMutation} />
+              </div>
+            </div>
+            <Droppable droppableId={id} type={CARD}>
+              {(provided) => {
+                return (
+                  <div ref={provided.innerRef} {...provided.droppableProps} className="flex flex-col gap-y-2">
+                    {cards.map((card, index) => (
+                      <CardButton
+                        key={card.id}
+                        {...card}
+                        index={index}
+                        deleteCardMutation={deleteCardMutation}
+                        openUpdateCardDialog={openUpdateCardDialog}
+                      />
+                    ))}
+                    {provided.placeholder}
+                    <CreateCardButton boardId={board_id} listId={id} openCreateCardDialog={openCreateCardDialog} />
+                  </div>
+                );
+              }}
+            </Droppable>
+          </Card>
+        );
+      }}
+    </Draggable>
   );
 }
