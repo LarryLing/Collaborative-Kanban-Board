@@ -1,9 +1,16 @@
 import { LIST } from "@/lib/constants";
-import type { Card, DndData, List } from "@/lib/types";
-import type { DropResult } from "@hello-pangea/dnd";
+import type { Board, Card, DndData, List, UseCardsReturnType, UseListsReturnType } from "@/lib/types";
+import type { DragStart, DragUpdate, DropResult, ResponderProvided } from "@hello-pangea/dnd";
 import { useState, useEffect } from "react";
+import { generateKeyBetween } from "fractional-indexing";
 
-export function useDnd(lists: List[] | undefined, cards: Card[] | undefined) {
+export function useDnd(
+  boardId: Board["id"],
+  lists: List[] | undefined,
+  cards: Card[] | undefined,
+  updateCardPositionMutation: UseCardsReturnType["updateCardPositionMutation"],
+  updateListPositionMutation: UseListsReturnType["updateListPositionMutation"],
+) {
   const [data, setData] = useState<DndData>({
     cards: {},
     lists: {},
@@ -35,7 +42,24 @@ export function useDnd(lists: List[] | undefined, cards: Card[] | undefined) {
     });
   }, [lists, cards]);
 
-  const handleDragEnd = (result: DropResult) => {
+  const handleDragStart = (start: DragStart, provided: ResponderProvided) => {
+    const message = `You have lifted the card in position ${start.source.index + 1}`;
+    provided.announce(message);
+  };
+
+  const handleDragUpdate = (update: DragUpdate, provided: ResponderProvided) => {
+    const message = update.destination
+      ? `You have moved the card in position ${update.destination.index + 1}`
+      : `You are currently not over a droppable area`;
+    provided.announce(message);
+  };
+
+  const handleDragEnd = async (result: DropResult, provided: ResponderProvided) => {
+    const message = result.destination
+      ? `You have moved the card from position ${result.source.index + 1} to position ${result.destination.index + 1}`
+      : `You have returned the card to its original position of ${result.source.index + 1}`;
+    provided.announce(message);
+
     const { destination, source, draggableId, type } = result;
 
     if (!destination) return;
@@ -45,30 +69,34 @@ export function useDnd(lists: List[] | undefined, cards: Card[] | undefined) {
     }
 
     if (type === LIST) {
-      const newListOrder = Array.from(data.listOrder);
+      const newListOrder = [...data.listOrder];
       newListOrder.splice(source.index, 1);
       newListOrder.splice(destination.index, 0, draggableId);
 
-      const newData = {
-        ...data,
-        listOrder: newListOrder,
-      };
+      let newListPosition: string;
+      if (destination.index === 0) {
+        const afterListId = newListOrder[1];
+        const afterList = data.lists[afterListId];
 
-      setData(newData);
-      return;
-    }
+        newListPosition = generateKeyBetween(null, afterList.position);
+      } else if (destination.index === newListOrder.length - 1) {
+        const beforeListId = newListOrder[destination.index - 1];
+        const beforeList = data.lists[beforeListId];
 
-    const sourceList = data.lists[source.droppableId];
-    const destinationList = data.lists[destination.droppableId];
+        newListPosition = generateKeyBetween(beforeList.position, null);
+      } else {
+        const beforeListId = newListOrder[destination.index - 1];
+        const beforeList = data.lists[beforeListId];
 
-    if (sourceList.id === destinationList.id) {
-      const newCardIds = Array.from(sourceList.cardIds);
-      newCardIds.splice(source.index, 1);
-      newCardIds.splice(destination.index, 0, draggableId);
+        const afterListId = newListOrder[destination.index + 1];
+        const afterList = data.lists[afterListId];
+
+        newListPosition = generateKeyBetween(beforeList.position, afterList.position);
+      }
 
       const newList = {
-        ...sourceList,
-        cardIds: newCardIds,
+        ...data.lists[draggableId],
+        position: newListPosition,
       };
 
       const newData = {
@@ -77,28 +105,135 @@ export function useDnd(lists: List[] | undefined, cards: Card[] | undefined) {
           ...data.lists,
           [newList.id]: newList,
         },
+        listOrder: newListOrder,
       };
 
       setData(newData);
+
+      await updateListPositionMutation({
+        boardId,
+        listId: newList.id,
+        listPosition: newList.position,
+      });
+
       return;
     }
 
-    const sourceCardIds = Array.from(sourceList.cardIds);
+    const sourceList = data.lists[source.droppableId];
+    const destinationList = data.lists[destination.droppableId];
+
+    if (sourceList.id === destinationList.id) {
+      const newCardIds = [...sourceList.cardIds];
+      newCardIds.splice(source.index, 1);
+      newCardIds.splice(destination.index, 0, draggableId);
+
+      let newCardPosition: string;
+      if (destination.index === 0) {
+        const afterCardId = newCardIds[1];
+        const afterCard = data.cards[afterCardId];
+
+        newCardPosition = generateKeyBetween(null, afterCard.position);
+      } else if (destination.index === newCardIds.length - 1) {
+        const beforeCardId = newCardIds[destination.index - 1];
+        const beforeCard = data.cards[beforeCardId];
+
+        newCardPosition = generateKeyBetween(beforeCard.position, null);
+      } else {
+        const beforeCardId = newCardIds[destination.index - 1];
+        const beforeCard = data.cards[beforeCardId];
+
+        const afterCardId = newCardIds[destination.index + 1];
+        const afterCard = data.cards[afterCardId];
+
+        newCardPosition = generateKeyBetween(beforeCard.position, afterCard.position);
+      }
+
+      const newCard = {
+        ...data.cards[draggableId],
+        position: newCardPosition,
+      };
+
+      const newList = {
+        ...sourceList,
+        cardIds: newCardIds,
+      };
+
+      const newData = {
+        ...data,
+        cards: {
+          ...data.cards,
+          [newCard.id]: newCard,
+        },
+        lists: {
+          ...data.lists,
+          [newList.id]: newList,
+        },
+      };
+
+      setData(newData);
+
+      await updateCardPositionMutation({
+        boardId,
+        listId: newList.id,
+        cardId: newCard.id,
+        cardPosition: newCard.position,
+        newListId: newList.id,
+      });
+
+      return;
+    }
+
+    const sourceCardIds = [...sourceList.cardIds];
     sourceCardIds.splice(source.index, 1);
     const newSourceList = {
       ...sourceList,
       cardIds: sourceCardIds,
     };
 
-    const destinationCardIds = Array.from(destinationList.cardIds);
+    const destinationCardIds = [...destinationList.cardIds];
     destinationCardIds.splice(destination.index, 0, draggableId);
     const newDestinationList = {
       ...destinationList,
       cardIds: destinationCardIds,
     };
 
+    let newCardPosition: string;
+    if (newDestinationList.cardIds.length === 1) {
+      newCardPosition = generateKeyBetween(null, null);
+    } else {
+      if (destination.index === 0) {
+        const afterCardId = newDestinationList.cardIds[1];
+        const afterCard = data.cards[afterCardId];
+
+        newCardPosition = generateKeyBetween(null, afterCard.position);
+      } else if (destination.index === newDestinationList.cardIds.length - 1) {
+        const beforeCardId = newDestinationList.cardIds[destination.index - 1];
+        const beforeCard = data.cards[beforeCardId];
+
+        newCardPosition = generateKeyBetween(beforeCard.position, null);
+      } else {
+        const beforeCardId = newDestinationList.cardIds[destination.index - 1];
+        const beforeCard = data.cards[beforeCardId];
+
+        const afterCardId = newDestinationList.cardIds[destination.index + 1];
+        const afterCard = data.cards[afterCardId];
+
+        newCardPosition = generateKeyBetween(beforeCard.position, afterCard.position);
+      }
+    }
+
+    const newCard = {
+      ...data.cards[draggableId],
+      list_id: newDestinationList.id,
+      position: newCardPosition,
+    };
+
     const newData = {
       ...data,
+      cards: {
+        ...data.cards,
+        [newCard.id]: newCard,
+      },
       lists: {
         ...data.lists,
         [newSourceList.id]: newSourceList,
@@ -107,7 +242,15 @@ export function useDnd(lists: List[] | undefined, cards: Card[] | undefined) {
     };
 
     setData(newData);
+
+    await updateCardPositionMutation({
+      boardId,
+      listId: newSourceList.id,
+      cardId: newCard.id,
+      cardPosition: newCard.position,
+      newListId: newDestinationList.id,
+    });
   };
 
-  return { data, handleDragEnd };
+  return { data, handleDragStart, handleDragUpdate, handleDragEnd };
 }

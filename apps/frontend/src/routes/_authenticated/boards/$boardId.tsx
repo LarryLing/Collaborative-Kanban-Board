@@ -28,7 +28,7 @@ function DynamicBoards() {
     createListMutation,
     deleteListMutation,
     updateListMutation,
-    // updateListPositionMutation,
+    updateListPositionMutation,
   } = useLists(boardId);
 
   const {
@@ -37,14 +37,14 @@ function DynamicBoards() {
     createCardMutation,
     deleteCardMutation,
     updateCardMutation,
-    // updateCardPositionMutation,
+    updateCardPositionMutation,
   } = useCards(boardId);
 
   const useCreateCardDialogReturn = useCreateCardDialog(cards, createCardMutation);
 
   const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
-  const { data, handleDragEnd } = useDnd(lists, cards);
+  const { data, handleDragEnd } = useDnd(boardId, lists, cards, updateCardPositionMutation, updateListPositionMutation);
 
   const board = boards?.find((board) => board.id === boardId);
 
@@ -57,7 +57,7 @@ function DynamicBoards() {
   }
 
   return (
-    <div className="flex justify-start items-start gap-3 overflow-auto text-sm">
+    <>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="all-lists" direction="horizontal" type={LIST}>
           {(provided) => {
@@ -65,7 +65,7 @@ function DynamicBoards() {
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex justify-start items-start gap-3 overflow-auto text-sm"
+                className="flex justify-start items-start space-x-3 overflow-x-scroll text-sm"
               >
                 {data.listOrder.map((listId, index) => {
                   const list = data.lists[listId];
@@ -86,14 +86,14 @@ function DynamicBoards() {
                   );
                 })}
                 {provided.placeholder}
+                <CreateListPopover boardId={boardId} lists={lists} createListMutation={createListMutation} />
               </div>
             );
           }}
         </Droppable>
       </DragDropContext>
-      <CreateListPopover boardId={boardId} lists={lists} createListMutation={createListMutation} />
       <CreateCardDialog {...useCreateCardDialogReturn} />
       <UpdateCardDialog {...useUpdateCardDialogReturn} />
-    </div>
+    </>
   );
 }

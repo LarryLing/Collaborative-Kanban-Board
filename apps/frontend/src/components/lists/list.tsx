@@ -76,7 +76,7 @@ export default function List({
             <Droppable droppableId={id} type={CARD}>
               {(provided) => {
                 return (
-                  <div ref={provided.innerRef} {...provided.droppableProps} className="flex flex-col gap-y-2">
+                  <div ref={provided.innerRef} {...provided.droppableProps} className="space-y-2">
                     {cards.map((card, index) => (
                       <CardButton
                         key={card.id}
