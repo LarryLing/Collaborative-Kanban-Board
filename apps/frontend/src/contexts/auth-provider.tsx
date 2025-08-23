@@ -1,10 +1,11 @@
-import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
 import { useEffect, useState, type ReactNode } from "react";
-import { AuthContext } from "./auth-context";
-import { jwtDecode } from "jwt-decode";
-import { invokeAPI } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { jwtDecode } from "jwt-decode";
 import { toast } from "sonner";
+
+import type { AuthContextType, IDTokenPayload, User } from "@/lib/types";
+import { invokeAPI } from "@/lib/utils";
+import { AuthContext } from "./auth-context";
 
 type AuthProviderProps = {
   children: ReactNode;

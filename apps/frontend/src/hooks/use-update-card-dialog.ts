@@ -1,8 +1,9 @@
-import type { Board, UpdateCardForm, List, UseCardsReturnType, UseUpdateCardDialogReturnType, Card } from "@/lib/types";
 import { useCallback, useState } from "react";
-import { UpdateCardSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import type { Board, Card, List, UpdateCardForm, UseCardsReturnType, UseUpdateCardDialogReturnType } from "@/lib/types";
+import { UpdateCardSchema } from "@/lib/schemas";
 
 export function useUpdateCardDialog(
   updateCardMutation: UseCardsReturnType["updateCardMutation"],

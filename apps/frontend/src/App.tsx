@@ -1,4 +1,5 @@
 import { RouterProvider } from "@tanstack/react-router";
+
 import { router } from "./main";
 import { useAuth } from "./hooks/use-auth";
 import { AuthProvider } from "./contexts/auth-provider";

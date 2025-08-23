@@ -1,7 +1,8 @@
-import type { Board, List, UseListsReturnType } from "@/lib/types";
-import { getAllLists, createList, deleteList, updateList, updateListPosition } from "@/api/lists";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import { getAllLists, createList, deleteList, updateList, updateListPosition } from "@/api/lists";
+import type { Board, List, UseListsReturnType } from "@/lib/types";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
   const queryClient = useQueryClient();

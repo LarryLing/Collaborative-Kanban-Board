@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { getAllCollaborators, addCollaborator, removeCollaborator } from "../controllers/collaboratorControllers";
 import { verifyAuth } from "../middlewares/authMiddleware";
 import { verifyRole } from "../middlewares/collaboratorMiddleware";

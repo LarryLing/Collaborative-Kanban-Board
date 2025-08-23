@@ -1,15 +1,5 @@
 import type { Response, Request } from "express";
-import type {
-  AuthRequest,
-  LoginBody,
-  RequestConfirmationCode,
-  PasswordResetBody,
-  SignUpBody,
-  User,
-  IDTokenPayload,
-  ConfirmSignUpBody,
-} from "../types";
-import { RowDataPacket, type ResultSetHeader } from "mysql2/promise";
+import type { RowDataPacket } from "mysql2/promise";
 import {
   AuthFlowType,
   GetTokensFromRefreshTokenCommand,
@@ -22,9 +12,19 @@ import {
   ConfirmSignUpCommand,
   ResendConfirmationCodeCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { jwtDecode } from "jwt-decode";
+
+import type {
+  AuthRequest,
+  LoginBody,
+  RequestConfirmationCode,
+  PasswordResetBody,
+  SignUpBody,
+  IDTokenPayload,
+  ConfirmSignUpBody,
+} from "../types";
 import cognito from "../config/cognito";
 import db from "../config/db";
-import { jwtDecode } from "jwt-decode";
 import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
 
 export async function getMe(req: AuthRequest, res: Response) {
@@ -98,20 +98,18 @@ export async function getMe(req: AuthRequest, res: Response) {
 
 export async function resetPassword(req: Request<object, object, PasswordResetBody>, res: Response) {
   try {
-    const { email, confirmationCode, password } = req.body;
+    const { email, password, confirmationCode } = req.body;
 
-    const confirmForgotPasswordConfirm = new ConfirmForgotPasswordCommand({
+    const confirmForgotPasswordCommand = new ConfirmForgotPasswordCommand({
       ClientId: COGNITO_CLIENT_ID,
       Username: email,
       ConfirmationCode: confirmationCode,
       Password: password,
     });
 
-    await cognito.send(confirmForgotPasswordConfirm);
+    await cognito.send(confirmForgotPasswordCommand);
 
-    res.status(200).json({
-      message: "Successfully reset password",
-    });
+    res.status(200).json({ message: "Successfully reset password" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
@@ -129,23 +127,21 @@ export async function confirmSignUp(req: Request<object, object, ConfirmSignUpBo
     const { email, confirmationCode } = req.body;
 
     const confirmSignUpCommand = new ConfirmSignUpCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
+      ClientId: COGNITO_CLIENT_ID,
       Username: email,
       ConfirmationCode: confirmationCode,
     });
 
     await cognito.send(confirmSignUpCommand);
 
-    res.status(200).json({
-      message: "Successfully logged in new user",
-    });
+    res.status(200).json({ message: "Successfully confirmed sign up" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
-    console.error("Failed to login new user:", errorMessage);
+    console.error("Failed to confirm sign up:", errorMessage);
 
     res.status(500).json({
-      message: "Failed to login new user",
+      message: "Failed to confirm sign up",
       error: errorMessage,
     });
   }
@@ -161,10 +157,6 @@ export async function signUp(req: Request<object, object, SignUpBody>, res: Resp
       Password: password,
       UserAttributes: [
         {
-          Name: "email",
-          Value: email,
-        },
-        {
           Name: "given_name",
           Value: given_name,
         },
@@ -172,20 +164,25 @@ export async function signUp(req: Request<object, object, SignUpBody>, res: Resp
           Name: "family_name",
           Value: family_name,
         },
+        {
+          Name: "email",
+          Value: email,
+        },
       ],
     });
 
-    const signUpResponse = await cognito.send(signUpCommand);
+    await cognito.send(signUpCommand);
 
-    const { UserSub } = signUpResponse;
+    const now = new Date();
+    const currentTimestamp = now.toISOString().slice(0, 19).replace("T", " ");
 
-    if (!UserSub) {
-      throw new Error("User ID was not generated");
-    }
+    await db.execute(
+      `INSERT INTO users (id, given_name, family_name, email, created_at)
+      VALUES (?, ?, ?, ?, ?)`,
+      [email, given_name, family_name, email, currentTimestamp],
+    );
 
-    res.status(201).json({
-      message: "Successfully signed up new user",
-    });
+    res.status(201).json({ message: "Successfully signed up new user" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
@@ -203,15 +200,13 @@ export async function resendSignUp(req: Request<object, object, RequestConfirmat
     const { email } = req.body;
 
     const resendConfirmationCodeCommand = new ResendConfirmationCodeCommand({
-      ClientId: process.env.COGNITO_CLIENT_ID,
+      ClientId: COGNITO_CLIENT_ID,
       Username: email,
     });
 
     await cognito.send(resendConfirmationCodeCommand);
 
-    res.status(200).json({
-      message: "Successfully resent sign up confirmation code",
-    });
+    res.status(200).json({ message: "Successfully resent sign up confirmation code" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
@@ -227,7 +222,8 @@ export async function resendSignUp(req: Request<object, object, RequestConfirmat
 export async function login(req: Request<object, object, LoginBody>, res: Response) {
   try {
     const { email, password } = req.body;
-    const admininitiateAuthCommand = new AdminInitiateAuthCommand({
+
+    const adminInitiateAuthCommand = new AdminInitiateAuthCommand({
       UserPoolId: COGNITO_USER_POOL_ID,
       ClientId: COGNITO_CLIENT_ID,
       AuthFlow: AuthFlowType.ADMIN_NO_SRP_AUTH,
@@ -237,32 +233,36 @@ export async function login(req: Request<object, object, LoginBody>, res: Respon
       },
     });
 
-    const initiateAuthResponse = await cognito.send(admininitiateAuthCommand);
+    const adminInitiateAuthResponse = await cognito.send(adminInitiateAuthCommand);
 
-    if (!initiateAuthResponse.AuthenticationResult) {
-      throw new Error("Could not initiate auth with the provided credentials");
+    if (!adminInitiateAuthResponse.AuthenticationResult) {
+      throw new Error("Authentication failed");
     }
 
-    const { IdToken, AccessToken, RefreshToken } = initiateAuthResponse.AuthenticationResult;
+    const { IdToken, AccessToken, RefreshToken } = adminInitiateAuthResponse.AuthenticationResult;
 
     if (!IdToken || !AccessToken || !RefreshToken) {
       throw new Error("User pool tokens were not generated");
     }
 
-    const { sub, given_name, family_name } = jwtDecode<IDTokenPayload>(IdToken);
+    const { sub, email: userEmail, given_name, family_name } = jwtDecode<IDTokenPayload>(IdToken);
 
-    const [rows] = await db.execute(
-      `SELECT 1
+    const [userRows] = await db.execute<RowDataPacket[]>(
+      `SELECT *
       FROM users
-      WHERE id = ?`,
+      WHERE id = ?
+      LIMIT 1`,
       [sub],
     );
 
-    if (!rows || (rows as User[]).length === 0) {
+    if (!userRows || userRows.length === 0) {
+      const now = new Date();
+      const currentTimestamp = now.toISOString().slice(0, 19).replace("T", " ");
+
       await db.execute(
-        `INSERT INTO users (id, given_name, family_name, email)
-        VALUES (?, ?, ?, ?)`,
-        [sub, given_name, family_name, email],
+        `INSERT INTO users (id, given_name, family_name, email, created_at)
+        VALUES (?, ?, ?, ?, ?)`,
+        [sub, given_name, family_name, userEmail, currentTimestamp],
       );
     }
 
@@ -276,6 +276,7 @@ export async function login(req: Request<object, object, LoginBody>, res: Respon
     res.status(200).json({
       message: "Successfully logged in returning user",
       data: {
+        idToken: IdToken,
         accessToken: AccessToken,
       },
     });
@@ -306,40 +307,20 @@ export async function logout(req: AuthRequest, res: Response) {
 
     const { id } = req.auth;
 
-    const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT email
-      FROM users
-      WHERE id = ?`,
-      [id],
-    );
-
-    if (!rows || rows.length === 0) {
-      res.status(404).json({
-        message: "Failed to logout user",
-        error: "Could not find user email in database",
-      });
-    }
-
     const adminUserGlobalSignOutCommand = new AdminUserGlobalSignOutCommand({
       UserPoolId: COGNITO_USER_POOL_ID,
-      Username: rows[0].email as User["email"],
+      Username: id,
     });
 
     await cognito.send(adminUserGlobalSignOutCommand);
 
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
+    res.clearCookie("refreshToken");
 
-    res.status(200).json({
-      message: "Logged out successfully",
-    });
+    res.status(200).json({ message: "Successfully logged out user" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
-    console.error("Failed to logout user", errorMessage);
+    console.error("Failed to logout user:", errorMessage);
 
     res.status(500).json({
       message: "Failed to logout user",
@@ -359,9 +340,7 @@ export async function requestPasswordReset(req: AuthRequest<object, object, Requ
 
     await cognito.send(forgotPasswordCommand);
 
-    res.status(200).json({
-      message: "Successfully request password reset",
-    });
+    res.status(200).json({ message: "Successfully requested password reset" });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
 
@@ -389,38 +368,14 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
     const { id } = req.auth;
 
-    const [rows] = await db.execute<RowDataPacket[]>(
-      `SELECT email
-      FROM users
-      WHERE id = ?`,
-      [id],
-    );
-
-    if (!rows || rows.length === 0) {
-      res.status(404).json({
-        message: "Failed to delete user",
-        error: "Could not find user email in database",
-      });
-    }
-
     const adminDeleteUserCommand = new AdminDeleteUserCommand({
       UserPoolId: COGNITO_USER_POOL_ID,
-      Username: rows[0].email as User["email"],
+      Username: id,
     });
 
     await cognito.send(adminDeleteUserCommand);
 
-    await db.execute<ResultSetHeader>(
-      `DELETE FROM users
-      WHERE id = ?`,
-      [id],
-    );
-
-    res.clearCookie("refreshToken", {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
+    res.clearCookie("refreshToken");
 
     res.status(200).json({ message: "Successfully deleted user" });
   } catch (error) {
@@ -428,6 +383,9 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
     console.error("Failed to delete user:", errorMessage);
 
-    res.status(500).json({ message: "Failed to delete user", error: errorMessage });
+    res.status(500).json({
+      message: "Failed to delete user",
+      error: errorMessage,
+    });
   }
 }

@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import {
   confirmSignUp,
   deleteUser,

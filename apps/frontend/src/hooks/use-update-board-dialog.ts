@@ -1,9 +1,10 @@
-import type { Board, UpdateBoardForm, UseUpdateBoardDialogReturnType } from "@/lib/types";
 import { useCallback, useState } from "react";
-import { UpdateBoardSchema } from "@/lib/schemas";
-import { useBoards } from "@/hooks/use-boards";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import type { Board, UpdateBoardForm, UseUpdateBoardDialogReturnType } from "@/lib/types";
+import { UpdateBoardSchema } from "@/lib/schemas";
+import { useBoards } from "@/hooks/use-boards";
 
 export function useUpdateBoardDialog(): UseUpdateBoardDialogReturnType {
   const [open, setOpen] = useState(false);

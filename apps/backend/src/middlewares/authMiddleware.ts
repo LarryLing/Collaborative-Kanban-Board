@@ -1,4 +1,5 @@
 import type { NextFunction, Response } from "express";
+
 import type { AuthRequest } from "../types";
 import jwtVerifier from "../config/jwtVerifier";
 

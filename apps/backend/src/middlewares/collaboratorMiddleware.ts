@@ -1,4 +1,5 @@
 import type { NextFunction, Response } from "express";
+
 import type { Board, Collaborator, CollaboratorRequest } from "../types";
 import db from "../config/db";
 

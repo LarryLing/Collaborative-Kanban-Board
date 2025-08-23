@@ -19,14 +19,7 @@ import { useMemo } from "react";
 
 type CollaboratorDialogProps = Pick<
   UseCollaboratorDialogReturnType,
-  | "open"
-  | "setOpen"
-  | "boardId"
-  | "collaborators"
-  | "isLoading"
-  | "removeCollaboratorMutation"
-  | "form"
-  | "onSubmit"
+  "open" | "setOpen" | "boardId" | "collaborators" | "isLoading" | "removeCollaboratorMutation" | "form" | "onSubmit"
 >;
 
 export function CollaboratorDialog({

@@ -1,15 +1,14 @@
-import type { Board, UseBoardsReturnType } from "@/lib/types";
-import { getAllBoards, createBoard, deleteBoard, updateBoard } from "@/api/boards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useAuth } from "./use-auth";
 import { toast } from "sonner";
+
+import type { Board, UseBoardsReturnType } from "@/lib/types";
+import { getAllBoards, createBoard, deleteBoard, updateBoard } from "@/api/boards";
+import { useAuth } from "./use-auth";
 
 export function useBoards(): UseBoardsReturnType {
   const { user } = useAuth();
-
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const {

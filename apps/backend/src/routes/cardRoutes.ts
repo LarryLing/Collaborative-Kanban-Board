@@ -1,4 +1,5 @@
 import { Router } from "express";
+
 import { getAllCards, createCard, updateCard, updateCardPosition, deleteCard } from "../controllers/cardControllers";
 import { verifyAuth } from "../middlewares/authMiddleware";
 import { verifyRole } from "../middlewares/collaboratorMiddleware";

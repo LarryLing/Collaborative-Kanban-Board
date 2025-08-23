@@ -1,9 +1,10 @@
-import type { Board, CreateCardForm, List, UseCardsReturnType, UseCreateCardDialogReturnType } from "@/lib/types";
 import { useCallback, useState } from "react";
-import { CreateCardSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { generateKeyBetween } from "fractional-indexing";
+
+import type { Board, CreateCardForm, List, UseCardsReturnType, UseCreateCardDialogReturnType } from "@/lib/types";
+import { CreateCardSchema } from "@/lib/schemas";
 
 export function useCreateCardDialog(
   cards: UseCardsReturnType["cards"],

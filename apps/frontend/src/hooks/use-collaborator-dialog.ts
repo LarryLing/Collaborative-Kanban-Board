@@ -1,22 +1,21 @@
 import { useCallback, useState } from "react";
-import type { AddCollaboratorForm, Board, UseCollaboratorDialogReturnType } from "@/lib/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { addCollaborator, getAllCollaborators, removeCollaborator } from "@/api/collaborators";
-import { AddCollaboratorSchema } from "@/lib/schemas";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "./use-auth";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
+
+import { AddCollaboratorSchema } from "@/lib/schemas";
+import type { AddCollaboratorForm, Board, UseCollaboratorDialogReturnType } from "@/lib/types";
+import { addCollaborator, getAllCollaborators, removeCollaborator } from "@/api/collaborators";
+import { useAuth } from "./use-auth";
 
 export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const [open, setOpen] = useState(false);
   const [boardId, setBoardId] = useState<Board["id"] | null>(null);
 
   const { user } = useAuth();
-
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const {
