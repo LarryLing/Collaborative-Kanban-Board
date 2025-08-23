@@ -8,6 +8,13 @@ export async function getAllBoards() {
   return data as Board[];
 }
 
+export async function getBoardById({ boardId }: { boardId: Board["id"] }) {
+  const response = await invokeAPI(`/api/boards/${boardId}`, "GET");
+  const { data } = await response.json();
+
+  return data as Board;
+}
+
 export async function createBoard({
   boardId,
   boardTitle,

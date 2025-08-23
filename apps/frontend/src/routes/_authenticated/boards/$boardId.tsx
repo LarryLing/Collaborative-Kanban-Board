@@ -1,7 +1,6 @@
 import CreateListPopover from "@/components/lists/create-list-popover";
-import { useBoards } from "@/hooks/use-boards";
 import { useLists } from "@/hooks/use-lists";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import List from "@/components/lists/list";
 import { useCards } from "@/hooks/use-cards";
 import { useCreateCardDialog } from "@/hooks/use-create-card-dialog";
@@ -11,16 +10,25 @@ import { UpdateCardDialog } from "@/components/cards/update-card-dialog";
 import { useDnd } from "@/hooks/use-dnd";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { LIST } from "@/lib/constants";
+import { getBoardById } from "@/api/boards";
 
 //TODO: Add check for user access permissions before loading page
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
+  beforeLoad: async ({ params }) => {
+    try {
+      const board = await getBoardById({ boardId: params.boardId });
+      return { board };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Failed to retrieve board:", errorMessage);
+      throw redirect({ to: "/boards" });
+    }
+  },
   component: DynamicBoards,
 });
 
 function DynamicBoards() {
   const { boardId } = Route.useParams();
-
-  const { boards, isLoading: isBoardsLoading } = useBoards();
 
   const {
     lists,
@@ -44,15 +52,19 @@ function DynamicBoards() {
 
   const useUpdateCardDialogReturn = useUpdateCardDialog(updateCardMutation);
 
-  const { data, handleDragEnd } = useDnd(boardId, lists, cards, updateCardPositionMutation, updateListPositionMutation);
+  const { dndData, handleDragEnd } = useDnd(
+    boardId,
+    lists,
+    cards,
+    updateCardPositionMutation,
+    updateListPositionMutation,
+  );
 
-  const board = boards?.find((board) => board.id === boardId);
-
-  if (isBoardsLoading || isListsLoading || isCardsLoading) {
+  if (isListsLoading || isCardsLoading) {
     return <p>Loading board...</p>;
   }
 
-  if (!board || !lists) {
+  if (!lists || !cards) {
     return <p>Could not load board...</p>;
   }
 
@@ -67,9 +79,9 @@ function DynamicBoards() {
                 {...provided.droppableProps}
                 className="flex justify-start items-start space-x-3 overflow-x-scroll text-sm"
               >
-                {data.listOrder.map((listId, index) => {
-                  const list = data.lists[listId];
-                  const cards = list.cardIds.map((cardId) => data.cards[cardId]);
+                {dndData.listOrder.map((listId, index) => {
+                  const list = dndData.lists[listId];
+                  const cards = list.cardIds.map((cardId) => dndData.cards[cardId]);
 
                   return (
                     <List

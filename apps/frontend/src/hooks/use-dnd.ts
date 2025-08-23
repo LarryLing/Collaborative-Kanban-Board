@@ -11,7 +11,7 @@ export function useDnd(
   updateCardPositionMutation: UseCardsReturnType["updateCardPositionMutation"],
   updateListPositionMutation: UseListsReturnType["updateListPositionMutation"],
 ) {
-  const [data, setData] = useState<DndData>({
+  const [dndData, setDndData] = useState<DndData>({
     cards: {},
     lists: {},
     listOrder: [],
@@ -20,7 +20,7 @@ export function useDnd(
   useEffect(() => {
     if (!lists || !cards) return;
 
-    setData({
+    setDndData({
       cards: cards.reduce(
         (acc, card) => {
           acc[card.id] = card;
@@ -69,46 +69,46 @@ export function useDnd(
     }
 
     if (type === LIST) {
-      const newListOrder = [...data.listOrder];
+      const newListOrder = [...dndData.listOrder];
       newListOrder.splice(source.index, 1);
       newListOrder.splice(destination.index, 0, draggableId);
 
       let newListPosition: string;
       if (destination.index === 0) {
         const afterListId = newListOrder[1];
-        const afterList = data.lists[afterListId];
+        const afterList = dndData.lists[afterListId];
 
         newListPosition = generateKeyBetween(null, afterList.position);
       } else if (destination.index === newListOrder.length - 1) {
         const beforeListId = newListOrder[destination.index - 1];
-        const beforeList = data.lists[beforeListId];
+        const beforeList = dndData.lists[beforeListId];
 
         newListPosition = generateKeyBetween(beforeList.position, null);
       } else {
         const beforeListId = newListOrder[destination.index - 1];
-        const beforeList = data.lists[beforeListId];
+        const beforeList = dndData.lists[beforeListId];
 
         const afterListId = newListOrder[destination.index + 1];
-        const afterList = data.lists[afterListId];
+        const afterList = dndData.lists[afterListId];
 
         newListPosition = generateKeyBetween(beforeList.position, afterList.position);
       }
 
       const newList = {
-        ...data.lists[draggableId],
+        ...dndData.lists[draggableId],
         position: newListPosition,
       };
 
       const newData = {
-        ...data,
+        ...dndData,
         lists: {
-          ...data.lists,
+          ...dndData.lists,
           [newList.id]: newList,
         },
         listOrder: newListOrder,
       };
 
-      setData(newData);
+      setDndData(newData);
 
       await updateListPositionMutation({
         boardId,
@@ -119,8 +119,8 @@ export function useDnd(
       return;
     }
 
-    const sourceList = data.lists[source.droppableId];
-    const destinationList = data.lists[destination.droppableId];
+    const sourceList = dndData.lists[source.droppableId];
+    const destinationList = dndData.lists[destination.droppableId];
 
     if (sourceList.id === destinationList.id) {
       const newCardIds = [...sourceList.cardIds];
@@ -130,26 +130,26 @@ export function useDnd(
       let newCardPosition: string;
       if (destination.index === 0) {
         const afterCardId = newCardIds[1];
-        const afterCard = data.cards[afterCardId];
+        const afterCard = dndData.cards[afterCardId];
 
         newCardPosition = generateKeyBetween(null, afterCard.position);
       } else if (destination.index === newCardIds.length - 1) {
         const beforeCardId = newCardIds[destination.index - 1];
-        const beforeCard = data.cards[beforeCardId];
+        const beforeCard = dndData.cards[beforeCardId];
 
         newCardPosition = generateKeyBetween(beforeCard.position, null);
       } else {
         const beforeCardId = newCardIds[destination.index - 1];
-        const beforeCard = data.cards[beforeCardId];
+        const beforeCard = dndData.cards[beforeCardId];
 
         const afterCardId = newCardIds[destination.index + 1];
-        const afterCard = data.cards[afterCardId];
+        const afterCard = dndData.cards[afterCardId];
 
         newCardPosition = generateKeyBetween(beforeCard.position, afterCard.position);
       }
 
       const newCard = {
-        ...data.cards[draggableId],
+        ...dndData.cards[draggableId],
         position: newCardPosition,
       };
 
@@ -159,18 +159,18 @@ export function useDnd(
       };
 
       const newData = {
-        ...data,
+        ...dndData,
         cards: {
-          ...data.cards,
+          ...dndData.cards,
           [newCard.id]: newCard,
         },
         lists: {
-          ...data.lists,
+          ...dndData.lists,
           [newList.id]: newList,
         },
       };
 
-      setData(newData);
+      setDndData(newData);
 
       await updateCardPositionMutation({
         boardId,
@@ -203,45 +203,45 @@ export function useDnd(
     } else {
       if (destination.index === 0) {
         const afterCardId = newDestinationList.cardIds[1];
-        const afterCard = data.cards[afterCardId];
+        const afterCard = dndData.cards[afterCardId];
 
         newCardPosition = generateKeyBetween(null, afterCard.position);
       } else if (destination.index === newDestinationList.cardIds.length - 1) {
         const beforeCardId = newDestinationList.cardIds[destination.index - 1];
-        const beforeCard = data.cards[beforeCardId];
+        const beforeCard = dndData.cards[beforeCardId];
 
         newCardPosition = generateKeyBetween(beforeCard.position, null);
       } else {
         const beforeCardId = newDestinationList.cardIds[destination.index - 1];
-        const beforeCard = data.cards[beforeCardId];
+        const beforeCard = dndData.cards[beforeCardId];
 
         const afterCardId = newDestinationList.cardIds[destination.index + 1];
-        const afterCard = data.cards[afterCardId];
+        const afterCard = dndData.cards[afterCardId];
 
         newCardPosition = generateKeyBetween(beforeCard.position, afterCard.position);
       }
     }
 
     const newCard = {
-      ...data.cards[draggableId],
+      ...dndData.cards[draggableId],
       list_id: newDestinationList.id,
       position: newCardPosition,
     };
 
     const newData = {
-      ...data,
+      ...dndData,
       cards: {
-        ...data.cards,
+        ...dndData.cards,
         [newCard.id]: newCard,
       },
       lists: {
-        ...data.lists,
+        ...dndData.lists,
         [newSourceList.id]: newSourceList,
         [newDestinationList.id]: newDestinationList,
       },
     };
 
-    setData(newData);
+    setDndData(newData);
 
     await updateCardPositionMutation({
       boardId,
@@ -252,5 +252,5 @@ export function useDnd(
     });
   };
 
-  return { data, handleDragStart, handleDragUpdate, handleDragEnd };
+  return { dndData, handleDragStart, handleDragUpdate, handleDragEnd };
 }

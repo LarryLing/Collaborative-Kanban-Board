@@ -19,16 +19,13 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
 
   const queryClient = useQueryClient();
 
-  const {
-    data: collaborators,
-    isLoading,
-    refetch,
-  } = useQuery({
+  const { data: collaborators, isLoading } = useQuery({
     queryKey: ["collaborators", boardId],
     queryFn: async () => {
-      if (!boardId) return;
+      if (!boardId) return [];
       return await getAllCollaborators({ boardId });
     },
+    enabled: !!boardId,
   });
 
   const { mutateAsync: addCollaboratorMutation } = useMutation({
@@ -58,7 +55,6 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         queryKey: ["collaborators", variables.boardId],
       });
 
-      //TODO: dialog doesn't close when this condition is met
       if (user!.id === variables.collaboratorId) {
         queryClient.invalidateQueries({
           queryKey: ["boards"],
@@ -67,6 +63,8 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         setOpen(false);
         navigate({ to: "/boards" });
       }
+
+      setError(null);
     },
     onError: (error) => {
       console.error("Failed to remove collaborator:", error.message);
@@ -92,9 +90,8 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
       form.reset();
       setBoardId(boardId);
       setOpen(true);
-      await refetch();
     },
-    [form, refetch],
+    [form],
   );
 
   return {

@@ -43,11 +43,6 @@ export function useBoards(): UseBoardsReturnType {
 
       queryClient.setQueryData(["board"], nextBoards);
 
-      navigate({
-        to: "/boards/$boardId",
-        params: { boardId: variables.boardId },
-      });
-
       return { prevBoards };
     },
     onError: (error, _variables, context) => {
@@ -55,13 +50,19 @@ export function useBoards(): UseBoardsReturnType {
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },
-    onSettled: () => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["boards"],
+      });
+
+      navigate({
+        to: "/boards/$boardId",
+        params: { boardId: variables.boardId },
       });
     },
   });
 
+  //TODO: refetch boards and relavent content after deleting a board. query keys need to be restructured
   const { mutateAsync: deleteBoardMutation } = useMutation({
     mutationKey: ["deleteBoard"],
     mutationFn: deleteBoard,
@@ -78,8 +79,6 @@ export function useBoards(): UseBoardsReturnType {
 
       queryClient.setQueryData(["board"], nextBoards);
 
-      navigate({ to: "/boards" });
-
       return { prevBoards };
     },
     onError: (error, _variables, context) => {
@@ -91,6 +90,8 @@ export function useBoards(): UseBoardsReturnType {
       queryClient.invalidateQueries({
         queryKey: ["boards"],
       });
+
+      navigate({ to: "/boards" });
     },
   });
 

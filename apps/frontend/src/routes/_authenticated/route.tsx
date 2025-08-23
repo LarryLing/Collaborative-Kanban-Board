@@ -2,26 +2,19 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { HomeSidebar } from "@/components/sidebar/home-sidebar";
 import { HomeHeader } from "@/components/sidebar/home-header";
-import { useAuth } from "@/hooks/use-auth";
-import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated")({
+  beforeLoad: ({ context }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+  },
   component: AuthenticatedLayout,
 });
 
 function AuthenticatedLayout() {
-  const auth = useAuth();
-
-  useEffect(() => {
-    if (!auth.isAuthenticated) {
-      window.location.href = "/login";
-    }
-  }, [auth.isAuthenticated]);
-
-  if (!auth.isAuthenticated) {
-    return null;
-  }
-
   return (
     <SidebarProvider
       style={
