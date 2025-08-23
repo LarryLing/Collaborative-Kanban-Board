@@ -41,7 +41,7 @@ export function useBoards(): UseBoardsReturnType {
 
       const nextBoards = [newBoard, ...prevBoards];
 
-      queryClient.setQueryData(["board"], nextBoards);
+      queryClient.setQueryData(["boards"], nextBoards);
 
       return { prevBoards };
     },
@@ -62,7 +62,6 @@ export function useBoards(): UseBoardsReturnType {
     },
   });
 
-  //TODO: refetch boards and relavent content after deleting a board. query keys need to be restructured
   const { mutateAsync: deleteBoardMutation } = useMutation({
     mutationKey: ["deleteBoard"],
     mutationFn: deleteBoard,
@@ -77,7 +76,7 @@ export function useBoards(): UseBoardsReturnType {
 
       const nextBoards = prevBoards.filter((prevBoards) => prevBoards.id !== variables.boardId);
 
-      queryClient.setQueryData(["board"], nextBoards);
+      queryClient.setQueryData(["boards"], nextBoards);
 
       return { prevBoards };
     },
@@ -86,9 +85,21 @@ export function useBoards(): UseBoardsReturnType {
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },
-    onSettled: () => {
+    onSettled: (_data, _error, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["boards"],
+      });
+
+      queryClient.removeQueries({
+        queryKey: ["lists", variables.boardId],
+      });
+
+      queryClient.removeQueries({
+        queryKey: ["cards", variables.boardId],
+      });
+
+      queryClient.removeQueries({
+        queryKey: ["collaborators", variables.boardId],
       });
 
       navigate({ to: "/boards" });

@@ -76,6 +76,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       queryClient.invalidateQueries({
         queryKey: ["lists", variables.boardId],
       });
+
+      queryClient.removeQueries({
+        queryKey: ["cards", variables.boardId],
+      });
     },
   });
 

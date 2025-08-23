@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
 import { invokeAPI } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -12,6 +13,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const queryClient = useQueryClient();
 
   const loadUser = async () => {
     try {
@@ -116,6 +119,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticated(false);
 
       localStorage.removeItem("accessToken");
+
+      queryClient.clear();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Unknown error";
 

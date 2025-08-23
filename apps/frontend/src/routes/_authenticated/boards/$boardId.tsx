@@ -12,7 +12,6 @@ import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { LIST } from "@/lib/constants";
 import { getBoardById } from "@/api/boards";
 
-//TODO: Add check for user access permissions before loading page
 export const Route = createFileRoute("/_authenticated/boards/$boardId")({
   beforeLoad: async ({ params }) => {
     try {

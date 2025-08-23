@@ -19,7 +19,11 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
 
   const queryClient = useQueryClient();
 
-  const { data: collaborators, isLoading } = useQuery({
+  const {
+    data: collaborators,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["collaborators", boardId],
     queryFn: async () => {
       if (!boardId) return [];
@@ -87,11 +91,12 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
 
   const openCollaboratorDialog = useCallback(
     async (boardId: Board["id"]) => {
+      refetch();
       form.reset();
       setBoardId(boardId);
       setOpen(true);
     },
-    [form],
+    [form, refetch],
   );
 
   return {
