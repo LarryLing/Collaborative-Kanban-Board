@@ -3,6 +3,7 @@ import { getAllBoards, createBoard, deleteBoard, updateBoard } from "@/api/board
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuth } from "./use-auth";
+import { toast } from "sonner";
 
 export function useBoards(): UseBoardsReturnType {
   const { user } = useAuth();
@@ -46,7 +47,10 @@ export function useBoards(): UseBoardsReturnType {
       return { prevBoards };
     },
     onError: (error, _variables, context) => {
-      console.error("Failed to create board:", error.message);
+      toast.error("Failed to create board", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },
@@ -81,7 +85,10 @@ export function useBoards(): UseBoardsReturnType {
       return { prevBoards };
     },
     onError: (error, _variables, context) => {
-      console.error("Failed to delete board:", error.message);
+      toast.error("Failed to delete board", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },
@@ -127,7 +134,10 @@ export function useBoards(): UseBoardsReturnType {
       return { prevBoards };
     },
     onError: (error, _variables, context) => {
-      console.error("Failed to update board:", error.message);
+      toast.error("Failed to update board", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },

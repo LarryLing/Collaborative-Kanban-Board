@@ -172,7 +172,6 @@ export type UseCollaboratorDialogReturnType = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   boardId: string | null;
-  error: string | null;
   collaborators: Collaborator[] | undefined;
   isLoading: boolean;
   removeCollaboratorMutation: UseMutateAsyncFunction<

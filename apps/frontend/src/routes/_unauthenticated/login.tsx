@@ -8,16 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
-import ErrorAlert from "@/components/misc/error-alert";
 
 export const Route = createFileRoute("/_unauthenticated/login")({
   component: Login,
 });
 
 function Login() {
-  const [error, setError] = useState<string | null>(null);
-
   const { login } = useAuth();
 
   const navigate = useNavigate();
@@ -31,12 +27,8 @@ function Login() {
   });
 
   const onSubmit = async (values: LoginForm) => {
-    try {
-      await login(values.email, values.password);
-      navigate({ to: "/" });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unknown error");
-    }
+    await login(values.email, values.password);
+    navigate({ to: "/" });
   };
 
   return (
@@ -86,7 +78,6 @@ function Login() {
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
-                {error && <ErrorAlert title="Failed to login user" error={error} />}
               </form>
             </Form>
           </CardContent>

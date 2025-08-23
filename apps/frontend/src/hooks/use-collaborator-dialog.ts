@@ -7,11 +7,11 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "./use-auth";
 import { useNavigate } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const [open, setOpen] = useState(false);
   const [boardId, setBoardId] = useState<Board["id"] | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const { user } = useAuth();
 
@@ -40,13 +40,13 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         queryKey: ["collaborators", variables.boardId],
       });
 
-      setError(null);
       form.reset();
     },
     onError: (error) => {
-      console.error("Failed to add collaborator:", error.message);
-
-      setError(error.message);
+      toast.error("Failed to add collaborator", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
       form.reset();
     },
   });
@@ -67,13 +67,12 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         setOpen(false);
         navigate({ to: "/boards" });
       }
-
-      setError(null);
     },
     onError: (error) => {
-      console.error("Failed to remove collaborator:", error.message);
-
-      setError(error.message);
+      toast.error("Failed to remove collaborator", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     },
   });
 
@@ -103,7 +102,6 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     open,
     setOpen,
     boardId,
-    error,
     collaborators,
     isLoading,
     removeCollaboratorMutation,

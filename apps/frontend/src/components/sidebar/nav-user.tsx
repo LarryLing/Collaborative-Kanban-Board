@@ -26,12 +26,8 @@ function NavUser({ given_name, family_name, email }: NavUserProps) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
-    try {
-      await logout();
-      navigate({ to: "/login" });
-    } catch (error) {
-      console.error("Failed to logout user", error instanceof Error ? error.message : "Unknown error");
-    }
+    await logout();
+    navigate({ to: "/login" });
   };
 
   return (

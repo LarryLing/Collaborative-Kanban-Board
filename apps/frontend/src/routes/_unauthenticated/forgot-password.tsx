@@ -8,16 +8,12 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
-import ErrorAlert from "@/components/misc/error-alert";
 
 export const Route = createFileRoute("/_unauthenticated/forgot-password")({
   component: ForgotPassword,
 });
 
 function ForgotPassword() {
-  const [error, setError] = useState<string | null>(null);
-
   const { requestPasswordReset } = useAuth();
 
   const navigate = useNavigate();
@@ -30,12 +26,8 @@ function ForgotPassword() {
   });
 
   const onSubmit = async (values: ForgotPasswordForm) => {
-    try {
-      await requestPasswordReset(values.email);
-      navigate({ to: "/reset-password", search: { email: values.email } });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unknown error");
-    }
+    await requestPasswordReset(values.email);
+    navigate({ to: "/reset-password", search: { email: values.email } });
   };
 
   return (
@@ -67,7 +59,6 @@ function ForgotPassword() {
                 <Button type="submit" className="w-full">
                   Send password recovery
                 </Button>
-                {error && <ErrorAlert title="Failed to request password reset" error={error} />}
               </form>
             </Form>
           </CardContent>

@@ -4,6 +4,7 @@ import { AuthContext } from "./auth-context";
 import { jwtDecode } from "jwt-decode";
 import { invokeAPI } from "@/lib/utils";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -49,11 +50,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/reset-password", "PUT", JSON.stringify({ email, password, confirmationCode }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to reset password:", errorMessage);
-
-      throw error;
+      toast.error("Failed to reset password", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -61,11 +61,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/confirm-signup", "POST", JSON.stringify({ email, confirmationCode }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to login new user:", errorMessage);
-
-      throw error;
+      toast.error("Failed to confirm sign up", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -73,11 +72,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/signup", "POST", JSON.stringify({ given_name, family_name, email, password }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to sign up new user:", errorMessage);
-
-      throw error;
+      toast.error("Failed to sign up new user", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -85,11 +83,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/signup/resend", "POST", JSON.stringify({ email }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to resend sign up confirmation code:", errorMessage);
-
-      throw error;
+      toast.error("Failed to resend sign up confirmation code", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -103,11 +100,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       await loadUser();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to login returning user:", errorMessage);
-
-      throw error;
+      toast.error("Failed to login returning user", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -122,11 +118,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       queryClient.clear();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to logout user", errorMessage);
-
-      throw error;
+      toast.error("Failed to logout user", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
@@ -134,23 +129,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       await invokeAPI("/api/auth/reset-password", "POST", JSON.stringify({ email }));
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to request password reset:", errorMessage);
-
-      throw error;
+      toast.error("Failed to request password reset", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 
   const deleteAccount = async () => {
     try {
       await invokeAPI("/api/auth/me", "DELETE");
+
+      setUser(null);
+      setIsAuthenticated(false);
+
+      localStorage.removeItem("accessToken");
+
+      queryClient.clear();
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Unknown error";
-
-      console.error("Failed to delete user:", errorMessage);
-
-      throw error;
+      toast.error("Failed to delete user", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
     }
   };
 

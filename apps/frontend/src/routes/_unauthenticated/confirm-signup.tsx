@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
-import ErrorAlert from "@/components/misc/error-alert";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
@@ -17,8 +15,6 @@ export const Route = createFileRoute("/_unauthenticated/confirm-signup")({
 });
 
 function ConfirmSignup() {
-  const [error, setError] = useState<string | null>(null);
-
   const { confirmSignUp, resendSignUp } = useAuth();
 
   const navigate = useNavigate();
@@ -39,12 +35,8 @@ function ConfirmSignup() {
       throw new Error("Email has not been provided");
     }
 
-    try {
-      await confirmSignUp(email, values.confirmationCode);
-      navigate({ to: "/login" });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unknown error");
-    }
+    await confirmSignUp(email, values.confirmationCode);
+    navigate({ to: "/login" });
   };
 
   const handleResendCode = async () => {
@@ -52,11 +44,7 @@ function ConfirmSignup() {
       throw new Error("Email has not been provided");
     }
 
-    try {
-      await resendSignUp(email);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unknown error");
-    }
+    await resendSignUp(email);
   };
 
   return (
@@ -97,7 +85,6 @@ function ConfirmSignup() {
                 <Button type="submit" className="w-full">
                   Continue to login
                 </Button>
-                {error && <ErrorAlert title="Failed to confirm sign up" error={error} />}
               </form>
             </Form>
           </CardContent>

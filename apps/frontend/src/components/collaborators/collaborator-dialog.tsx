@@ -16,14 +16,12 @@ import { COLLABORATOR, OWNER } from "@/lib/constants";
 import { CollaboratorRoleSelect } from "./collaborator-role-select";
 import type { UseCollaboratorDialogReturnType } from "@/lib/types";
 import { useMemo } from "react";
-import ErrorAlert from "../misc/error-alert";
 
 type CollaboratorDialogProps = Pick<
   UseCollaboratorDialogReturnType,
   | "open"
   | "setOpen"
   | "boardId"
-  | "error"
   | "collaborators"
   | "isLoading"
   | "removeCollaboratorMutation"
@@ -35,7 +33,6 @@ export function CollaboratorDialog({
   open,
   setOpen,
   boardId,
-  error,
   collaborators,
   isLoading,
   removeCollaboratorMutation,
@@ -124,7 +121,6 @@ export function CollaboratorDialog({
             collaboratorsList
           )}
         </div>
-        {error && <ErrorAlert title="Failed to add collaborator" error={error} />}
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline">

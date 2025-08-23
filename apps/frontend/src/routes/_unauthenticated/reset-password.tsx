@@ -8,8 +8,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Card, CardTitle, CardDescription, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { useState } from "react";
-import ErrorAlert from "@/components/misc/error-alert";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 
@@ -18,8 +16,6 @@ export const Route = createFileRoute("/_unauthenticated/reset-password")({
 });
 
 function ResetPassword() {
-  const [error, setError] = useState<string | null>(null);
-
   const { resetPassword } = useAuth();
 
   const navigate = useNavigate();
@@ -42,12 +38,8 @@ function ResetPassword() {
       throw new Error("Email has not been provided");
     }
 
-    try {
-      await resetPassword(email, values.password, values.confirmationCode);
-      navigate({ to: "/login" });
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Unknown error");
-    }
+    await resetPassword(email, values.password, values.confirmationCode);
+    navigate({ to: "/login" });
   };
 
   return (
@@ -114,7 +106,6 @@ function ResetPassword() {
                 <Button type="submit" className="w-full">
                   Continue to login
                 </Button>
-                {error && <ErrorAlert title="Failed to reset password" error={error} />}
               </form>
             </Form>
           </CardContent>

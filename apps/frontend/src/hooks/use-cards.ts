@@ -1,6 +1,7 @@
 import type { Board, Card, List, UseCardsReturnType } from "@/lib/types";
 import { getAllCards, createCard, deleteCard, updateCard, updateCardPosition } from "@/api/cards";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const queryClient = useQueryClient();
@@ -40,7 +41,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       return { prevCards };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to create card:", error.message);
+      toast.error("Failed to create card", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
@@ -70,7 +74,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       return { prevCards };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to delete card:", error.message);
+      toast.error("Failed to delete card", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
@@ -108,7 +115,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       return { prevCards };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to update card:", error.message);
+      toast.error("Failed to update card", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
@@ -152,7 +162,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
       return { prevCards };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to update card position:", error.message);
+      toast.error("Failed to update card position", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },

@@ -1,6 +1,7 @@
 import type { Board, List, UseListsReturnType } from "@/lib/types";
 import { getAllLists, createList, deleteList, updateList, updateListPosition } from "@/api/lists";
 import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
   const queryClient = useQueryClient();
@@ -38,7 +39,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       return { prevLists };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to create list:", error.message);
+      toast.error("Failed to create list", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
@@ -68,7 +72,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       return { prevLists };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to delete list:", error.message);
+      toast.error("Failed to delete list", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
@@ -104,7 +111,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       return { prevLists };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to update list:", error.message);
+      toast.error("Failed to update list", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
@@ -142,7 +152,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       return { prevLists };
     },
     onError: (error, variables, context) => {
-      console.error("Failed to update list position:", error.message);
+      toast.error("Failed to update list position", {
+        description: error instanceof Error ? error.message : "Unknown error",
+        duration: 5000,
+      });
 
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },

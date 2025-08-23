@@ -31,12 +31,8 @@ export function DeleteAccountDialog() {
   });
 
   const onSubmit = async () => {
-    try {
-      await deleteAccount();
-      navigate({ to: "/login" });
-    } catch (error) {
-      console.error("Failed to delete account:", error);
-    }
+    await deleteAccount();
+    navigate({ to: "/login" });
   };
 
   return (
