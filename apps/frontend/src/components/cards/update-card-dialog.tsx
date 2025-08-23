@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from "../ui/form";
 import type { UseUpdateCardDialogReturnType } from "@/lib/types";
+import { Textarea } from "../ui/textarea";
 
 type UpdateCardDialogProps = Pick<UseUpdateCardDialogReturnType, "open" | "setOpen" | "form" | "onSubmit">;
 
@@ -44,7 +45,7 @@ export function UpdateCardDialog({ open, setOpen, form, onSubmit }: UpdateCardDi
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Textarea placeholder="Add a description..." className="resize-none h-24" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

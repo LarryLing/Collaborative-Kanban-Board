@@ -112,11 +112,6 @@ export type AuthContextType = {
   deleteAccount: () => Promise<void>;
 };
 
-export type BoardContextType = {
-  board: Board | null;
-  handleSetBoard: (boardId: Board["id"] | null) => Promise<void>;
-};
-
 export type ThemeContextType = {
   theme: Theme;
   setTheme: (theme: Theme) => void;

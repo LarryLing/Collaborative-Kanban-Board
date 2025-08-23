@@ -78,7 +78,7 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
       });
 
       queryClient.invalidateQueries({
-        queryKey: ["cards", variables.boardId]
+        queryKey: ["cards", variables.boardId],
       });
     },
   });

@@ -34,8 +34,8 @@ export function HomeSidebar({ ...props }: HomeSidebarProps) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem className="flex items-center gap-2">
-            <Album className="!size-5" />
-            <span className="text-base font-semibold">{`Hello ${user.given_name}!`}</span>
+            <Album className="!size-7" />
+            <span className="text-xl font-semibold">{`Hello ${user.given_name}!`}</span>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
