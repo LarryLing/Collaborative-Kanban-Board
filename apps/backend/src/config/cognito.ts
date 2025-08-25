@@ -1,0 +1,13 @@
+import { CognitoIdentityProviderClient } from "@aws-sdk/client-cognito-identity-provider";
+
+import { AWS_ACCESS_KEY_ID, AWS_REGION, AWS_SECRET_ACCESS_KEY } from "../constants";
+
+const cognito = new CognitoIdentityProviderClient({
+  region: AWS_REGION,
+  credentials: {
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
+  },
+});
+
+export default cognito;

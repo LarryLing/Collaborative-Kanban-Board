@@ -1,0 +1,42 @@
+{
+  "name": "Collaborative Kanban Board API",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "exec prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.863.0",
+    "aws-jwt-verify": "^5.1.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jwt-decode": "^4.0.0",
+    "mysql2": "^3.14.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "latest",
+    "@types/cookie-parser": "^1.4.9",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22.15.3",
+    "eslint": "^9.34.0",
+    "eslint-plugin": "^1.0.1",
+    "globals": "^16.3.0",
+    "jiti": "^2.5.1",
+    "nodemon": "^3.1.10",
+    "prettier": "3.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.40.0"
+  }
+}
