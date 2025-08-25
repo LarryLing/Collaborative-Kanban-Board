@@ -10,7 +10,6 @@
     "lint": "eslint api/**/*.ts",
     "format": "exec prettier --write ."
   },
-  "type": "module",
   "keywords": [],
   "author": "",
   "license": "ISC",
