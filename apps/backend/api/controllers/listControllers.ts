@@ -1,8 +1,15 @@
 import type { Response } from "express";
 import type { ResultSetHeader } from "mysql2/promise";
 
-import { Board, CreateListBody, List, UpdateListBody, UpdateListPositionBody, CollaboratorRequest } from "../types";
 import db from "../config/db";
+import type {
+  CollaboratorRequest,
+  Board,
+  List,
+  CreateListBody,
+  UpdateListBody,
+  UpdateListPositionBody,
+} from "../types";
 
 export async function getAllLists(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;

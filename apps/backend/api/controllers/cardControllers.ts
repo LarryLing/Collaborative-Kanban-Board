@@ -1,16 +1,16 @@
 import type { Response } from "express";
 import type { ResultSetHeader } from "mysql2/promise";
+
+import db from "../config/db";
 import type {
+  CollaboratorRequest,
   Board,
   Card,
-  CollaboratorRequest,
-  CreateCardBody,
   List,
+  CreateCardBody,
   UpdateCardBody,
   UpdateCardPositionBody,
 } from "../types";
-
-import db from "../config/db";
 
 export async function getAllCards(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;

@@ -14,18 +14,18 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { jwtDecode } from "jwt-decode";
 
-import type {
-  AuthRequest,
-  LoginBody,
-  RequestConfirmationCode,
-  PasswordResetBody,
-  SignUpBody,
-  IDTokenPayload,
-  ConfirmSignUpBody,
-} from "../types";
 import cognito from "../config/cognito";
 import db from "../config/db";
 import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
+import {
+  AuthRequest,
+  PasswordResetBody,
+  ConfirmSignUpBody,
+  SignUpBody,
+  RequestConfirmationCode,
+  LoginBody,
+  IDTokenPayload,
+} from "../types";
 
 export async function getMe(req: AuthRequest, res: Response) {
   try {
