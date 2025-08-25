@@ -62,3 +62,5 @@ app.listen(config.port, () => {
   startTime = Date.now();
   console.log(`Server running on port ${config.port}`);
 });
+
+export default app;

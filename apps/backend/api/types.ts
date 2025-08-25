@@ -1,6 +1,5 @@
 import { Request } from "express";
 import type { JwtPayload } from "jwt-decode";
-
 import { COLLABORATOR, OWNER } from "./constants";
 
 export interface IDTokenPayload extends JwtPayload {
