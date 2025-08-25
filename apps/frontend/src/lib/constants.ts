@@ -24,3 +24,8 @@ export const OWNER = "Owner" as const;
 export const COLLABORATOR = "Collaborator" as const;
 export const LIST = "List" as const;
 export const CARD = "Card" as const;
+
+export const EVENT_TYPE_CREATE = "create" as const;
+export const EVENT_TYPE_UPDATE = "update" as const;
+export const EVENT_TYPE_UPDATE_POSITION = "update_position" as const;
+export const EVENT_TYPE_DELETE = "delete" as const;

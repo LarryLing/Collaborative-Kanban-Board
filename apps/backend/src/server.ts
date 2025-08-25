@@ -20,12 +20,14 @@ const app: Application = express();
 app.use(express.json());
 
 if (NODE_ENV === "development") {
-  app.use(cors({
-    origin: FRONTEND_URL || "http://localhost:5173",
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }));
+  app.use(
+    cors({
+      origin: FRONTEND_URL || "http://localhost:5173",
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    }),
+  );
 }
 
 app.use(cookieParser());
