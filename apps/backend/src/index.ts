@@ -6,29 +6,27 @@ import express, { Application, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+import db from "./config/db";
+import authRouter from "./routes/authRoutes";
 import boardRoutes from "./routes/boardRoutes";
-import listRoutes from "./routes/listRoutes";
 import cardRoutes from "./routes/cardRoutes";
 import collaboratorRoutes from "./routes/collaboratorRoutes";
-import authRouter from "./routes/authRoutes";
+import listRoutes from "./routes/listRoutes";
+import { FRONTEND_URL } from "./constants";
 import config from "./config/config";
-import db from "./config/db";
-import { FRONTEND_URL, NODE_ENV } from "./constants";
 
 const app: Application = express();
 
 app.use(express.json());
 
-if (NODE_ENV === "development") {
-  app.use(
-    cors({
-      origin: FRONTEND_URL || "http://localhost:5173",
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-    }),
-  );
-}
+app.use(
+  cors({
+    origin: FRONTEND_URL || "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
 
 app.use(cookieParser());
 

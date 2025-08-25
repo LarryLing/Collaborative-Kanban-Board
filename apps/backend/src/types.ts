@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import type { JwtPayload } from "jwt-decode";
-import { COLLABORATOR, OWNER } from "./constants";
+import { OWNER, COLLABORATOR } from "./constants";
 
 export interface IDTokenPayload extends JwtPayload {
   email: string;
