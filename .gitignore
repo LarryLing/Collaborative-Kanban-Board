@@ -1,5 +1,5 @@
 .DS_Store
-**/node_modules
+node_modules
 .turbo
 *.log
 dist
@@ -7,5 +7,3 @@ dist-ssr
 *.local
 *.env
 .cache
-apps/backend/dist
-apps/frontend/dist
