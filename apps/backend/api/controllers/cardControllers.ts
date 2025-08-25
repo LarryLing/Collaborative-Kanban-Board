@@ -1,4 +1,3 @@
-import type { Response } from "express";
 import type { ResultSetHeader } from "mysql2/promise";
 
 import db from "../config/db";
@@ -10,6 +9,7 @@ import type {
   CreateCardBody,
   UpdateCardBody,
   UpdateCardPositionBody,
+  Response,
 } from "../types";
 
 export async function getAllCards(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {

@@ -1,9 +1,8 @@
-import type { Response } from "express";
 import type { ResultSetHeader } from "mysql2/promise";
 
 import db from "../config/db";
 import { COLLABORATOR, OWNER } from "../constants";
-import type { AuthRequest, Board, CollaboratorRequest, CreateBoardBody, UpdateBoardBody } from "../types";
+import type { AuthRequest, Board, CollaboratorRequest, CreateBoardBody, UpdateBoardBody, Response } from "../types";
 
 export async function getAllBoards(req: AuthRequest, res: Response) {
   if (!req.auth) {

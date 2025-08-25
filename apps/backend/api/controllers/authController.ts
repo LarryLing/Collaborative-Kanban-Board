@@ -1,4 +1,4 @@
-import type { Response, Request } from "express";
+import type { Request } from "express";
 import type { RowDataPacket } from "mysql2/promise";
 import {
   AuthFlowType,
@@ -25,6 +25,7 @@ import {
   RequestConfirmationCode,
   LoginBody,
   IDTokenPayload,
+  Response,
 } from "../types";
 
 export async function getMe(req: AuthRequest, res: Response) {

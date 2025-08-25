@@ -1,4 +1,4 @@
-import { Request } from "express";
+import { Request, Response } from "express";
 import type { JwtPayload } from "jwt-decode";
 import { COLLABORATOR, OWNER } from "./constants";
 
@@ -8,17 +8,19 @@ export interface IDTokenPayload extends JwtPayload {
   family_name: string;
 }
 
-export interface AuthRequest<P = unknown, ResBody = unknown, ReqBody = unknown> extends Request<P, ResBody, ReqBody> {
+export interface AuthRequest<P = any, ResBody = any, ReqBody = any> extends Request<P, ResBody, ReqBody> {
   auth?: {
     id: User["id"];
     accessToken: string;
   };
 }
 
-export interface CollaboratorRequest<P = unknown, ResBody = unknown, ReqBody = unknown>
+export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
   extends AuthRequest<P, ResBody, ReqBody> {
   role?: Collaborator["role"];
 }
+
+export type { Response };
 
 export type User = {
   id: string;
