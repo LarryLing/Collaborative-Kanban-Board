@@ -1,16 +1,18 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-import type { AddCollaboratorForm, Board, UseCollaboratorDialogReturnType } from "@/lib/types";
+import type { AddCollaboratorForm, Board, Collaborator, UseCollaboratorDialogReturnType } from "@/lib/types";
 
 import { addCollaborator, getAllCollaborators, removeCollaborator } from "@/api/collaborators";
 import { AddCollaboratorSchema } from "@/lib/schemas";
 
 import { useAuth } from "./use-auth";
+import { events } from "aws-amplify/api";
+import { EVENT_TYPE_ADD_COLLABORATOR, EVENT_TYPE_REMOVE_COLLABORATOR } from "@/lib/constants";
 
 export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
   const [open, setOpen] = useState(false);
@@ -33,6 +35,68 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     queryKey: ["collaborators", boardId],
   });
 
+  useEffect(() => {
+    const channel = events.connect(`/default/collaborators/${boardId}`);
+    channel.then((ch) => {
+      ch.subscribe({
+        next: (data) => {
+          if (data.type === EVENT_TYPE_ADD_COLLABORATOR) {
+            const prevCollaborators: Collaborator[] | undefined = queryClient.getQueryData(["collaborators", boardId]);
+
+            if (!prevCollaborators) return prevCollaborators;
+
+            const nextCollaborators = [...prevCollaborators, data.new as Collaborator];
+
+            queryClient.setQueryData(["collaborators", boardId], nextCollaborators);
+          } else if (data.type === EVENT_TYPE_REMOVE_COLLABORATOR) {
+            const prevCollaborators: Collaborator[] | undefined = queryClient.getQueryData(["collaborators", boardId]);
+
+            if (!prevCollaborators) return prevCollaborators;
+
+            const { id } = data.old as Pick<Collaborator, "id">;
+
+            if (user!.id === id) {
+              queryClient.invalidateQueries({
+                queryKey: ["boards"],
+              });
+
+              queryClient.removeQueries({
+                queryKey: ["lists", boardId],
+              });
+
+              queryClient.removeQueries({
+                queryKey: ["cards", boardId],
+              });
+
+              queryClient.removeQueries({
+                queryKey: ["collaborators", boardId],
+              });
+
+              navigate({ to: "/boards" });
+              setOpen(false);
+              return;
+            }
+
+            const nextCollaborators = prevCollaborators.filter((prevCollaborator) => prevCollaborator.id !== id);
+
+            queryClient.setQueryData(["collaborators", boardId], nextCollaborators);
+          }
+
+          queryClient.invalidateQueries({
+            queryKey: ["collaborators", boardId],
+          });
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+    });
+
+    return () => {
+      channel?.then((ch) => ch?.close());
+    };
+  }, [boardId, queryClient]);
+
   const { mutateAsync: addCollaboratorMutation } = useMutation({
     mutationFn: addCollaborator,
     mutationKey: ["addCollaborator"],
@@ -43,7 +107,12 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
       });
       form.reset();
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: async (data, variables) => {
+      await events.post(`/default/collaborators/${variables.boardId}`, {
+        new: data,
+        type: EVENT_TYPE_ADD_COLLABORATOR,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["collaborators", variables.boardId],
       });
@@ -61,7 +130,14 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         duration: 5000,
       });
     },
-    onSuccess: (_data, variables) => {
+    onSuccess: async (_data, variables) => {
+      await events.post(`/default/collaborators/${variables.boardId}`, {
+        old: {
+          id: variables.collaboratorId,
+        },
+        type: EVENT_TYPE_REMOVE_COLLABORATOR,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["collaborators", variables.boardId],
       });
@@ -71,8 +147,20 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
           queryKey: ["boards"],
         });
 
-        setOpen(false);
+        queryClient.removeQueries({
+          queryKey: ["lists", variables.boardId],
+        });
+
+        queryClient.removeQueries({
+          queryKey: ["cards", variables.boardId],
+        });
+
+        queryClient.removeQueries({
+          queryKey: ["collaborators", variables.boardId],
+        });
+
         navigate({ to: "/boards" });
+        setOpen(false);
       }
     },
   });

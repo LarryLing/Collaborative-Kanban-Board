@@ -77,7 +77,7 @@ function DynamicBoards() {
               <div
                 ref={provided.innerRef}
                 {...provided.droppableProps}
-                className="flex justify-start items-start space-x-3 overflow-x-scroll text-sm"
+                className="flex justify-start items-start space-x-3 text-sm overflow-scroll no-scrollbar"
               >
                 {dndData.listOrder.map((listId, index) => {
                   const list = dndData.lists[listId];

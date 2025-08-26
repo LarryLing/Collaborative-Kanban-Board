@@ -29,3 +29,5 @@ export const EVENT_TYPE_CREATE = "create" as const;
 export const EVENT_TYPE_UPDATE = "update" as const;
 export const EVENT_TYPE_UPDATE_POSITION = "update_position" as const;
 export const EVENT_TYPE_DELETE = "delete" as const;
+export const EVENT_TYPE_ADD_COLLABORATOR = "add_collaborator" as const;
+export const EVENT_TYPE_REMOVE_COLLABORATOR = "remove_collaborator" as const;
