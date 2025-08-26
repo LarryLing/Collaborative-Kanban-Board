@@ -1,8 +1,14 @@
 import { Router } from "express";
 
-import { getAllCards, createCard, updateCard, updateCardPosition, deleteCard } from "../controllers/cardControllers";
-import { verifyAuth } from "../middlewares/authMiddleware";
-import { verifyRole } from "../middlewares/collaboratorMiddleware";
+import {
+  getAllCards,
+  createCard,
+  updateCard,
+  updateCardPosition,
+  deleteCard,
+} from "../controllers/cardControllers.js";
+import { verifyAuth } from "../middlewares/authMiddleware.js";
+import { verifyRole } from "../middlewares/collaboratorMiddleware.js";
 
 const cardRouter: Router = Router();
 

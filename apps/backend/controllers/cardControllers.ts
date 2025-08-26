@@ -1,7 +1,7 @@
-import type { ResultSetHeader } from "mysql2/promise";
+import { ResultSetHeader } from "mysql2/promise";
 
-import db from "../config/db";
-import type {
+import db from "../config/db.js";
+import {
   CollaboratorRequest,
   Board,
   Card,
@@ -10,7 +10,7 @@ import type {
   UpdateCardBody,
   UpdateCardPositionBody,
   Response,
-} from "../types";
+} from "../types.js";
 
 export async function getAllCards(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;

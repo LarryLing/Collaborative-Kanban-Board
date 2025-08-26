@@ -10,8 +10,8 @@ import {
   resendSignUp,
   resetPassword,
   signUp,
-} from "../controllers/authController";
-import { verifyAuth } from "../middlewares/authMiddleware";
+} from "../controllers/authController.js";
+import { verifyAuth } from "../middlewares/authMiddleware.js";
 
 const authRouter: Router = Router();
 

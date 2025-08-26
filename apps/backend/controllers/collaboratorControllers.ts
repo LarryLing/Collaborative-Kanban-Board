@@ -1,8 +1,8 @@
-import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
-import db from "../config/db";
-import { COLLABORATOR, OWNER } from "../constants";
-import type { CollaboratorRequest, Board, Collaborator, AddCollaboratorBody, User, Response } from "../types";
+import db from "../config/db.js";
+import { COLLABORATOR, OWNER } from "../constants.js";
+import { CollaboratorRequest, Board, Collaborator, AddCollaboratorBody, User, Response } from "../types.js";
 
 export async function getAllCollaborators(req: CollaboratorRequest<{ boardId: Board["id"] }>, res: Response) {
   const { boardId } = req.params;

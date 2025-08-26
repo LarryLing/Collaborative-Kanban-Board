@@ -1,7 +1,7 @@
-import type { NextFunction } from "express";
+import { NextFunction } from "express";
 
-import db from "../config/db";
-import type { CollaboratorRequest, Board, Collaborator, Response } from "../types";
+import db from "../config/db.js";
+import { CollaboratorRequest, Board, Collaborator, Response } from "../types.js";
 
 export async function verifyRole(
   req: CollaboratorRequest<{ boardId: Board["id"] }>,

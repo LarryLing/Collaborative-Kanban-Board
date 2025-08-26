@@ -1,6 +1,6 @@
 import { CognitoJwtVerifier } from "aws-jwt-verify";
 
-import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
+import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants.js";
 
 const jwtVerifier = CognitoJwtVerifier.create({
   userPoolId: COGNITO_USER_POOL_ID,

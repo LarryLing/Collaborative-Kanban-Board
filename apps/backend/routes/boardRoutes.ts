@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { getAllBoards, getBoardById, createBoard, updateBoard, deleteBoard } from "../controllers/boardControllers";
-import { verifyAuth } from "../middlewares/authMiddleware";
-import { verifyRole } from "../middlewares/collaboratorMiddleware";
+import { getAllBoards, getBoardById, createBoard, updateBoard, deleteBoard } from "../controllers/boardControllers.js";
+import { verifyAuth } from "../middlewares/authMiddleware.js";
+import { verifyRole } from "../middlewares/collaboratorMiddleware.js";
 
 const boardRouter: Router = Router();
 

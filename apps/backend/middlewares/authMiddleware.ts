@@ -1,7 +1,7 @@
-import type { NextFunction } from "express";
+import { NextFunction } from "express";
 
-import jwtVerifier from "../config/jwtVerifier";
-import type { AuthRequest, Response } from "../types";
+import jwtVerifier from "../config/jwtVerifier.js";
+import { AuthRequest, Response } from "../types.js";
 
 export async function verifyAuth(req: AuthRequest, res: Response, next: NextFunction) {
   try {

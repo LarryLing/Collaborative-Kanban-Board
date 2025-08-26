@@ -1,5 +1,5 @@
-import type { Request } from "express";
-import type { RowDataPacket } from "mysql2/promise";
+import { Request } from "express";
+import { RowDataPacket } from "mysql2/promise";
 import {
   AuthFlowType,
   GetTokensFromRefreshTokenCommand,
@@ -14,9 +14,9 @@ import {
 } from "@aws-sdk/client-cognito-identity-provider";
 import { jwtDecode } from "jwt-decode";
 
-import cognito from "../config/cognito";
-import db from "../config/db";
-import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants";
+import cognito from "../config/cognito.js";
+import db from "../config/db.js";
+import { COGNITO_CLIENT_ID, COGNITO_USER_POOL_ID } from "../constants.js";
 import {
   AuthRequest,
   PasswordResetBody,
@@ -26,7 +26,7 @@ import {
   LoginBody,
   IDTokenPayload,
   Response,
-} from "../types";
+} from "../types.js";
 
 export async function getMe(req: AuthRequest, res: Response) {
   try {

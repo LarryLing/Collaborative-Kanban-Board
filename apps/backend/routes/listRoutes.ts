@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { getAllLists, createList, updateList, updateListPosition, deleteList } from "../controllers/listControllers";
-import { verifyAuth } from "../middlewares/authMiddleware";
-import { verifyRole } from "../middlewares/collaboratorMiddleware";
+import { getAllLists, createList, updateList, updateListPosition, deleteList } from "../controllers/listControllers.js";
+import { verifyAuth } from "../middlewares/authMiddleware.js";
+import { verifyRole } from "../middlewares/collaboratorMiddleware.js";
 
 const listRouter: Router = Router();
 

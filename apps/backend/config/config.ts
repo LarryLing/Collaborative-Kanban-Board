@@ -1,4 +1,4 @@
-import { NODE_ENV, PORT } from "../constants";
+import { NODE_ENV, PORT } from "../constants.js";
 
 interface Config {
   port: number;

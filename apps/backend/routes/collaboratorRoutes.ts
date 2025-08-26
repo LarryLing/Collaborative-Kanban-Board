@@ -1,8 +1,8 @@
 import { Router } from "express";
 
-import { getAllCollaborators, addCollaborator, removeCollaborator } from "../controllers/collaboratorControllers";
-import { verifyAuth } from "../middlewares/authMiddleware";
-import { verifyRole } from "../middlewares/collaboratorMiddleware";
+import { getAllCollaborators, addCollaborator, removeCollaborator } from "../controllers/collaboratorControllers.js";
+import { verifyAuth } from "../middlewares/authMiddleware.js";
+import { verifyRole } from "../middlewares/collaboratorMiddleware.js";
 
 const collaboratorRouter: Router = Router();
 
