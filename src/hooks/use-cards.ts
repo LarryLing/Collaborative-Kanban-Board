@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import type { Board, Card, List, UseCardsReturnType } from "@/lib/types";
+import type { Board, Card, UseCardsReturnType } from "@/lib/types";
 
 import { createCard, deleteCard, getAllCards, updateCard, updateCardPosition } from "@/api/cards";
+import { EVENT_TYPE_CREATE, EVENT_TYPE_DELETE, EVENT_TYPE_UPDATE, EVENT_TYPE_UPDATE_POSITION } from "@/lib/constants";
+import { useEffect } from "react";
+import { events } from "aws-amplify/api";
 
 export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const queryClient = useQueryClient();
@@ -14,6 +17,74 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
     },
     queryKey: ["cards", boardId],
   });
+
+  useEffect(() => {
+    const channel = events.connect(`/default/cards/${boardId}`);
+    channel.then((ch) => {
+      ch.subscribe({
+        next: (data) => {
+          if (data.type === EVENT_TYPE_CREATE) {
+            const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", boardId]);
+
+            if (!prevCards) return prevCards;
+
+            const nextCards = [...prevCards, data.new as Card];
+
+            queryClient.setQueryData(["cards", boardId], nextCards);
+          } else if (data.type === EVENT_TYPE_UPDATE) {
+            const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", boardId]);
+
+            if (!prevCards) return prevCards;
+
+            const { id, title, description } = data.new as Pick<Card, "id" | "title" | "description">;
+
+            const nextCards = prevCards.map((prevCard) =>
+              prevCard.id === id ? { ...prevCard, title, description } : prevCard,
+            );
+
+            queryClient.setQueryData(["cards", boardId], nextCards);
+          } else if (data.type === EVENT_TYPE_UPDATE_POSITION) {
+            const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", boardId]);
+
+            if (!prevCards) return prevCards;
+
+            const { id, list_id, position } = data.new as Pick<Card, "id" | "list_id" | "position">;
+
+            const nextCards = prevCards
+              .map((prevCard) => (prevCard.id === id ? { ...prevCard, list_id, position } : prevCard))
+              .sort((a, b) => {
+                if (a.position < b.position) return -1;
+                if (a.position > b.position) return 1;
+                return 0;
+              });
+
+            queryClient.setQueryData(["cards", boardId], nextCards);
+          } else if (data.type === EVENT_TYPE_DELETE) {
+            const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", boardId]);
+
+            if (!prevCards) return prevCards;
+
+            const { id } = data.old as Pick<Card, "id">;
+
+            const nextCards = prevCards.filter((prevCard) => prevCard.id !== id);
+
+            queryClient.setQueryData(["cards", boardId], nextCards);
+          }
+
+          queryClient.invalidateQueries({
+            queryKey: ["cards", boardId],
+          });
+        },
+        error: (error) => {
+          console.error(error);
+        },
+      });
+    });
+
+    return () => {
+      channel?.then((ch) => ch?.close());
+    };
+  }, [boardId, queryClient]);
 
   const { mutateAsync: createCardMutation } = useMutation({
     mutationFn: createCard,
@@ -50,7 +121,19 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
 
       return { prevCards };
     },
-    onSettled: (_data, _error, variables) => {
+    onSettled: async (_data, _error, variables) => {
+      await events.post(`/default/cards/${variables.boardId}`, {
+        new: {
+          board_id: variables.boardId,
+          id: variables.cardId,
+          list_id: variables.listId,
+          position: variables.cardPosition,
+          title: variables.cardTitle,
+          description: variables.cardDescription,
+        },
+        type: EVENT_TYPE_CREATE,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["cards", variables.boardId],
       });
@@ -83,7 +166,14 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
 
       return { prevCards };
     },
-    onSettled: (_data, _error, variables) => {
+    onSettled: async (_data, _error, variables) => {
+      await events.post(`/default/cards/${variables.boardId}`, {
+        old: {
+          id: variables.cardId,
+        },
+        type: EVENT_TYPE_DELETE,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["cards", variables.boardId],
       });
@@ -93,7 +183,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const { mutateAsync: updateCardMutation } = useMutation({
     mutationFn: updateCard,
     mutationKey: ["updateCard"],
-    onError: (error, variables, context: { prevCards: List[] } | undefined) => {
+    onError: (error, variables, context: { prevCards: Card[] } | undefined) => {
       toast.error("Failed to update card", {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
@@ -106,25 +196,34 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: List[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
+      const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
-      const nextCards = prevCards.map((prevlist) =>
-        prevlist.id === variables.cardId
+      const nextCards = prevCards.map((prevCard) =>
+        prevCard.id === variables.cardId
           ? {
-              ...prevlist,
+              ...prevCard,
               description: variables.cardDescription,
               title: variables.cardTitle,
             }
-          : prevlist,
+          : prevCard,
       );
 
       queryClient.setQueryData(["cards", variables.boardId], nextCards);
 
       return { prevCards };
     },
-    onSettled: (_data, _error, variables) => {
+    onSettled: async (_data, _error, variables) => {
+      await events.post(`/default/cards/${variables.boardId}`, {
+        old: {
+          id: variables.cardId,
+          title: variables.cardTitle,
+          description: variables.cardDescription,
+        },
+        type: EVENT_TYPE_UPDATE,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["cards", variables.boardId],
       });
@@ -134,7 +233,7 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const { mutateAsync: updateCardPositionMutation } = useMutation({
     mutationFn: updateCardPosition,
     mutationKey: ["updateCardPosition"],
-    onError: (error, variables, context: { prevCards: List[] } | undefined) => {
+    onError: (error, variables, context: { prevCards: Card[] } | undefined) => {
       toast.error("Failed to update card position", {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
@@ -147,19 +246,19 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         queryKey: ["cards", variables.boardId],
       });
 
-      const prevCards: List[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
+      const prevCards: Card[] | undefined = queryClient.getQueryData(["cards", variables.boardId]);
 
       if (!prevCards) return prevCards;
 
       const nextCards = prevCards
-        .map((prevlist) =>
-          prevlist.id === variables.cardId
+        .map((prevCard) =>
+          prevCard.id === variables.cardId
             ? {
-                ...prevlist,
+                ...prevCard,
                 list_id: variables.listId,
                 position: variables.cardPosition,
               }
-            : prevlist,
+            : prevCard,
         )
         .sort((a, b) => {
           if (a.position < b.position) return -1;
@@ -171,7 +270,16 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
 
       return { prevCards };
     },
-    onSettled: (_data, _error, variables) => {
+    onSettled: async (_data, _error, variables) => {
+      await events.post(`/default/cards/${variables.boardId}`, {
+        old: {
+          id: variables.cardId,
+          list_id: variables.listId,
+          position: variables.cardPosition,
+        },
+        type: EVENT_TYPE_UPDATE_POSITION,
+      });
+
       queryClient.invalidateQueries({
         queryKey: ["cards", variables.boardId],
       });
