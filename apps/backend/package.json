@@ -1,13 +1,13 @@
 {
-  "name": "Collaborative Kanban Board API",
+  "name": "backend",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/api/index.js",
-    "dev": "nodemon --exec ts-node api/index.ts",
-    "lint": "eslint api/**/*.ts",
+    "start": "node dist/src/index.js",
+    "dev": "nodemon --exec ts-node src/index.ts",
+    "lint": "eslint src/**/*.ts",
     "format": "exec prettier --write ."
   },
   "keywords": [],
@@ -24,19 +24,16 @@
     "mysql2": "^3.14.3"
   },
   "devDependencies": {
-    "@eslint/js": "latest",
+    "@eslint/js": "^9.34.0",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/node": "^22.15.3",
     "eslint": "^9.34.0",
-    "eslint-plugin": "^1.0.1",
     "globals": "^16.3.0",
-    "jiti": "^2.5.1",
     "nodemon": "^3.1.10",
-    "prettier": "3.6.2",
+    "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.40.0"
+    "typescript": "^5.9.2"
   }
 }

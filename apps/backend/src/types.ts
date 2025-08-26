@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import type { JwtPayload } from "jwt-decode";
+
 import { OWNER, COLLABORATOR } from "./constants";
 
 export interface IDTokenPayload extends JwtPayload {
@@ -15,8 +16,7 @@ export interface AuthRequest<P = any, ResBody = any, ReqBody = any> extends Requ
   };
 }
 
-export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any>
-  extends AuthRequest<P, ResBody, ReqBody> {
+export interface CollaboratorRequest<P = any, ResBody = any, ReqBody = any> extends AuthRequest<P, ResBody, ReqBody> {
   role?: Collaborator["role"];
 }
 
