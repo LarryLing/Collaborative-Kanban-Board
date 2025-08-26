@@ -76,6 +76,10 @@ export function useBoards(): UseBoardsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },
     onMutate: async (variables) => {
@@ -93,21 +97,9 @@ export function useBoards(): UseBoardsReturnType {
 
       return { prevBoards };
     },
-    onSettled: (_data, _error, variables) => {
+    onSettled: (_data, _error, _variables) => {
       queryClient.invalidateQueries({
         queryKey: ["boards"],
-      });
-
-      queryClient.removeQueries({
-        queryKey: ["lists", variables.boardId],
-      });
-
-      queryClient.removeQueries({
-        queryKey: ["cards", variables.boardId],
-      });
-
-      queryClient.removeQueries({
-        queryKey: ["collaborators", variables.boardId],
       });
 
       navigate({ to: "/boards" });
@@ -122,6 +114,10 @@ export function useBoards(): UseBoardsReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
 
       queryClient.setQueryData(["boards"], context?.prevBoards);
     },

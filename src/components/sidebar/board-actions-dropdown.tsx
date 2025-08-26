@@ -12,18 +12,22 @@ import {
 import { useBoards } from "@/hooks/use-boards";
 
 import { SidebarMenuAction, useSidebar } from "../ui/sidebar";
+import { useAuth } from "@/hooks/use-auth";
 
-type BoardActionsDropdownProps = Pick<Board, "id" | "title"> & {
+type BoardActionsDropdownProps = Pick<Board, "id" | "owner_id" | "title"> & {
   openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
   openUpdateBoardDialog: UseUpdateBoardDialogReturnType["openUpdateBoardDialog"];
 };
 
 export default function BoardActionsDropdown({
   id,
+  owner_id,
   openCollaboratorDialog,
   openUpdateBoardDialog,
   title,
 }: BoardActionsDropdownProps) {
+  const { user } = useAuth();
+
   const { isMobile } = useSidebar();
 
   const { deleteBoardMutation } = useBoards();
@@ -61,11 +65,15 @@ export default function BoardActionsDropdown({
           <Share />
           <span>Share</span>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleDeleteBoardMutation} variant="destructive">
-          <Trash />
-          <span>Delete</span>
-        </DropdownMenuItem>
+        {owner_id === user!.id && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleDeleteBoardMutation} variant="destructive">
+              <Trash />
+              <span>Delete</span>
+            </DropdownMenuItem>
+          </>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

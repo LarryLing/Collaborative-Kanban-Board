@@ -30,7 +30,13 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     enabled: !!boardId,
     queryFn: async () => {
       if (!boardId) return [];
-      return await getAllCollaborators({ boardId });
+      try {
+        return await getAllCollaborators({ boardId });
+      } catch (error) {
+        if (error instanceof Error && error.message === "User is not a board collaborator") {
+          navigate({ to: "/boards" });
+        }
+      }
     },
     queryKey: ["collaborators", boardId],
   });
@@ -40,6 +46,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     channel.then((ch) => {
       ch.subscribe({
         next: (data) => {
+          console.log(data);
           if (data.type === EVENT_TYPE_ADD_COLLABORATOR) {
             const prevCollaborators: Collaborator[] | undefined = queryClient.getQueryData(["collaborators", boardId]);
 
@@ -58,18 +65,6 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
             if (user!.id === id) {
               queryClient.invalidateQueries({
                 queryKey: ["boards"],
-              });
-
-              queryClient.removeQueries({
-                queryKey: ["lists", boardId],
-              });
-
-              queryClient.removeQueries({
-                queryKey: ["cards", boardId],
-              });
-
-              queryClient.removeQueries({
-                queryKey: ["collaborators", boardId],
               });
 
               navigate({ to: "/boards" });
@@ -95,7 +90,7 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
     return () => {
       channel?.then((ch) => ch?.close());
     };
-  }, [boardId, queryClient]);
+  }, [boardId, queryClient, user]);
 
   const { mutateAsync: addCollaboratorMutation } = useMutation({
     mutationFn: addCollaborator,
@@ -105,6 +100,11 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       form.reset();
     },
     onSuccess: async (data, variables) => {
@@ -129,6 +129,10 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
     },
     onSuccess: async (_data, variables) => {
       await events.post(`/default/collaborators/${variables.boardId}`, {
@@ -138,30 +142,19 @@ export function useCollaboratorDialog(): UseCollaboratorDialogReturnType {
         type: EVENT_TYPE_REMOVE_COLLABORATOR,
       });
 
-      queryClient.invalidateQueries({
-        queryKey: ["collaborators", variables.boardId],
-      });
-
       if (user!.id === variables.collaboratorId) {
         queryClient.invalidateQueries({
           queryKey: ["boards"],
         });
 
-        queryClient.removeQueries({
-          queryKey: ["lists", variables.boardId],
-        });
-
-        queryClient.removeQueries({
-          queryKey: ["cards", variables.boardId],
-        });
-
-        queryClient.removeQueries({
-          queryKey: ["collaborators", variables.boardId],
-        });
-
         navigate({ to: "/boards" });
         setOpen(false);
+        return;
       }
+
+      queryClient.invalidateQueries({
+        queryKey: ["collaborators", variables.boardId],
+      });
     },
   });
 

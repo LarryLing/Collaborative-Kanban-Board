@@ -7,13 +7,21 @@ import type { Board, List, UseListsReturnType } from "@/lib/types";
 
 import { createList, deleteList, getAllLists, updateList, updateListPosition } from "@/api/lists";
 import { EVENT_TYPE_CREATE, EVENT_TYPE_DELETE, EVENT_TYPE_UPDATE, EVENT_TYPE_UPDATE_POSITION } from "@/lib/constants";
+import { useNavigate } from "@tanstack/react-router";
 
 export function useLists(boardId: Board["id"]): UseListsReturnType {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: lists, isLoading } = useQuery({
     queryFn: async () => {
-      return await getAllLists({ boardId });
+      try {
+        return await getAllLists({ boardId });
+      } catch (error) {
+        if (error instanceof Error && error.message === "User is not a board collaborator") {
+          navigate({ to: "/boards" });
+        }
+      }
     },
     queryKey: ["lists", boardId],
   });
@@ -93,6 +101,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onMutate: async (variables) => {
@@ -143,6 +155,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onMutate: async (variables) => {
@@ -187,6 +203,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },
     onMutate: async (variables) => {
@@ -229,6 +249,10 @@ export function useLists(boardId: Board["id"]): UseListsReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
 
       queryClient.setQueryData(["lists", variables.boardId], context?.prevLists);
     },

@@ -7,13 +7,21 @@ import { createCard, deleteCard, getAllCards, updateCard, updateCardPosition } f
 import { EVENT_TYPE_CREATE, EVENT_TYPE_DELETE, EVENT_TYPE_UPDATE, EVENT_TYPE_UPDATE_POSITION } from "@/lib/constants";
 import { useEffect } from "react";
 import { events } from "aws-amplify/api";
+import { useNavigate } from "@tanstack/react-router";
 
 export function useCards(boardId: Board["id"]): UseCardsReturnType {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: cards, isLoading } = useQuery({
     queryFn: async () => {
-      return await getAllCards({ boardId });
+      try {
+        return await getAllCards({ boardId });
+      } catch (error) {
+        if (error instanceof Error && error.message === "User is not a board collaborator") {
+          navigate({ to: "/boards" });
+        }
+      }
     },
     queryKey: ["cards", boardId],
   });
@@ -95,6 +103,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onMutate: async (variables) => {
@@ -149,6 +161,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         duration: 5000,
       });
 
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
+
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
     onMutate: async (variables) => {
@@ -188,6 +204,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
@@ -238,6 +258,10 @@ export function useCards(boardId: Board["id"]): UseCardsReturnType {
         description: error instanceof Error ? error.message : "Unknown error",
         duration: 5000,
       });
+
+      if (error.message === "User is not a board collaborator") {
+        navigate({ to: "/boards" });
+      }
 
       queryClient.setQueryData(["cards", variables.boardId], context?.prevCards);
     },
