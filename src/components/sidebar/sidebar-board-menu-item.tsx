@@ -9,12 +9,12 @@ import BoardActionsDropdown from "./board-actions-dropdown";
 
 export const SidebarBoardMenuItemMemo = memo(SidebarBoardMenuItem);
 
-type SidebarBoardMenuItemProps = Pick<Board, "id" | "title"> & {
+type SidebarBoardMenuItemProps = Pick<Board, "id" | "owner_id" | "title"> & {
   openCollaboratorDialog: UseCollaboratorDialogReturnType["openCollaboratorDialog"];
   openUpdateBoardDialog: UseUpdateBoardDialogReturnType["openUpdateBoardDialog"];
 };
 
-function SidebarBoardMenuItem({ id, openCollaboratorDialog, openUpdateBoardDialog, title }: SidebarBoardMenuItemProps) {
+function SidebarBoardMenuItem({ id, owner_id, openCollaboratorDialog, openUpdateBoardDialog, title }: SidebarBoardMenuItemProps) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton asChild>
@@ -30,6 +30,7 @@ function SidebarBoardMenuItem({ id, openCollaboratorDialog, openUpdateBoardDialo
       </SidebarMenuButton>
       <BoardActionsDropdown
         id={id}
+        owner_id={owner_id}
         openCollaboratorDialog={openCollaboratorDialog}
         openUpdateBoardDialog={openUpdateBoardDialog}
         title={title}
